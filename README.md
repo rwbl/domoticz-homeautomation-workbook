@@ -9,7 +9,7 @@ As a Domoticz Beginner
 ***Notes***
 There might be better solutions for what is shared – but the solution works fine so far.
 
-This document is a working document – todo’s will never cease to exist 😊.
+This document is a working document – todo’s will never cease to exist.
 
 ### Functions
 * Display temperature & humidity measured in rooms.
