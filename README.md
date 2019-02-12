@@ -21,7 +21,8 @@ This document is a working document – todo’s will never cease to exist.
 * MQTT subscribe & publish messages to trigger actions or information.
 * Raspberry Pi system information with charts and threshold email notification.
 * Energy Power Consumption metering from “volkszaehler” with charts.
-* More features are added whilst exploring Domoticz
+* Control Volumio Music Player whilst listening to Web Radio.
+* _More in progress ..._
 
 ### Explore How To
 * Setup & configure Domoticz running on a Raspberry Pi.
