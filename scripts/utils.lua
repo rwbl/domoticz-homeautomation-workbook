@@ -130,13 +130,25 @@ function utils.ageyearsdays(dbirth,mbirth,ybirth)
 		ydiff =  0
 	end
 	
-	-- days diff between birth and year end of birth (31,12)
-	ddiff1 = math.abs(utils.datediff(dbirth, mbirth, ybirth, 31, 12, ybirth))
-	-- days diff between current year start (1,1) and current day,month,year
-	ddiff2 = math.abs(utils.datediff(1, 1, ynow, dnow, mnow, ynow))
+	if ydiff > 0 then
+		-- days diff between birth and year end of birth (31,12)
+		ddiff1 = math.abs(utils.datediff(dbirth, mbirth, ybirth, 31, 12, ybirth))
 
-	-- days difference between now and the target day+month for the now year, i.e. dtarget+mtarget+ynow
-	ddiff = ddiff1 + ddiff2
+		-- days diff between current year start (1,1) and current day,month,year
+		ddiff2 = math.abs(utils.datediff(1, 1, ynow, dnow, mnow, ynow))
+		
+		-- days difference between now and the target day+month for the now year, i.e. dtarget+mtarget+ynow
+		ddiff = ddiff1 + ddiff2
+	end
+
+	if ydiff == 0 then
+		-- days diff between birth and now
+		ddiff = math.abs(utils.datediff(dbirth, mbirth, ybirth, dnow, mnow, ynow))
+	end
+
+	-- if (ynow == ybirth) and (mnow == mbirth) and (dnow == dbirth) then
+	-- 	ddiff = 0
+	-- end
 
 	-- build the age string to return
 	age = ydiff .. ' J ' .. ddiff .. ' T'
