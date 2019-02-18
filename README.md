@@ -22,6 +22,7 @@ This document is a working document – todo’s will never cease to exist.
 * Raspberry Pi system information with charts and threshold email notification.
 * Energy Power Consumption metering from “volkszaehler” with charts.
 * Control Volumio Music Player whilst listening to Web Radio.
+* Monitor Stock Quotes.
 * _More in progress ..._
 
 ### Explore How To
