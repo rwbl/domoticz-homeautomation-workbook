@@ -1,0 +1,396 @@
+[
+    {
+        "id": "5718b2de.d59bcc",
+        "type": "http request",
+        "z": "695c4e54.e2f238",
+        "name": "Aplha Vantage API Request",
+        "method": "GET",
+        "ret": "obj",
+        "url": "",
+        "tls": "",
+        "x": 500,
+        "y": 740,
+        "wires": [
+            [
+                "889f169d.33a018",
+                "57b7dc3.c563fa4"
+            ]
+        ]
+    },
+    {
+        "id": "c4013840.3a79d8",
+        "type": "split",
+        "z": "695c4e54.e2f238",
+        "name": "Split Symbols",
+        "splt": ",",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": true,
+        "addname": "",
+        "x": 460,
+        "y": 620,
+        "wires": [
+            [
+                "91e3eaa6.5b2768"
+            ]
+        ]
+    },
+    {
+        "id": "50fd0079.cf9e4",
+        "type": "inject",
+        "z": "695c4e54.e2f238",
+        "name": "Inject Stock Quote Symbols (XETRA)",
+        "topic": "",
+        "payload": "STOCKA.DE,STOCKB.DE,",
+        "payloadType": "str",
+        "repeat": "1800",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 190,
+        "y": 620,
+        "wires": [
+            [
+                "c4013840.3a79d8"
+            ]
+        ]
+    },
+    {
+        "id": "5ea49c2c.5e9ac4",
+        "type": "debug",
+        "z": "695c4e54.e2f238",
+        "name": "Debug Split Symbols",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "url",
+        "x": 880,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "91e3eaa6.5b2768",
+        "type": "change",
+        "z": "695c4e54.e2f238",
+        "name": "Set Alpha Vantage Request URL",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$join(['https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=',payload,'&apikey=D6CEJWIN9NZ41777'])",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 680,
+        "wires": [
+            [
+                "5718b2de.d59bcc"
+            ]
+        ]
+    },
+    {
+        "id": "57b7dc3.c563fa4",
+        "type": "debug",
+        "z": "695c4e54.e2f238",
+        "name": "Debug Alpha Vantage Response Payload",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 940,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "24632a53.a1fd46",
+        "type": "change",
+        "z": "695c4e54.e2f238",
+        "name": "Clean JSON Response String",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$replace(payload, \". \", \"\")",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$replace(payload, \" \", \"\")",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 510,
+        "y": 860,
+        "wires": [
+            [
+                "bf769913.567e6"
+            ]
+        ]
+    },
+    {
+        "id": "bf769913.567e6",
+        "type": "json",
+        "z": "695c4e54.e2f238",
+        "name": "Convert JSON String to Object",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 510,
+        "y": 920,
+        "wires": [
+            [
+                "af607dc1.f47db8"
+            ]
+        ]
+    },
+    {
+        "id": "3635ccc.4450eb4",
+        "type": "switch",
+        "z": "695c4e54.e2f238",
+        "name": "Select Symbol",
+        "property": "payload.symbol",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "STOCKA.DE",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "STOCKB.DE",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 460,
+        "y": 1040,
+        "wires": [
+            [
+                "4656417.dc06f4"
+            ],
+            [
+                "7d1d563e.cb43f"
+            ]
+        ]
+    },
+    {
+        "id": "bdb1f0f7.131b08",
+        "type": "debug",
+        "z": "695c4e54.e2f238",
+        "name": "Debug Price",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload.price",
+        "x": 850,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "af607dc1.f47db8",
+        "type": "change",
+        "z": "695c4e54.e2f238",
+        "name": "Set Payloads symbol,price",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.symbol",
+                "pt": "msg",
+                "to": "payload.GlobalQuote.01symbol",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload.price",
+                "pt": "msg",
+                "to": "payload.GlobalQuote.05price",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 980,
+        "wires": [
+            [
+                "3635ccc.4450eb4"
+            ]
+        ]
+    },
+    {
+        "id": "4656417.dc06f4",
+        "type": "change",
+        "z": "695c4e54.e2f238",
+        "name": "STOCKA.DE",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\": \"udevice\", \"idx\": 152, \"nvalue\":0, \"svalue\": payload.price}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 660,
+        "y": 1040,
+        "wires": [
+            [
+                "7402d3ff.6ea8dc",
+                "1dd738a.2eec2c7"
+            ]
+        ]
+    },
+    {
+        "id": "7402d3ff.6ea8dc",
+        "type": "debug",
+        "z": "695c4e54.e2f238",
+        "name": "Debug Domoticz Update Stock",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 910,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "41ec8156.5deb2",
+        "type": "comment",
+        "z": "695c4e54.e2f238",
+        "name": "Alpha Vantage Stock Quote Request every 30 minutes",
+        "info": "Request stock quotes for max 5 stocks as limited by Alpha Vantage \n(max 5 API requests/min, 500 per day).\n\n",
+        "x": 240,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "1dd738a.2eec2c7",
+        "type": "mqtt out",
+        "z": "695c4e54.e2f238",
+        "name": "Domoticz MQTT Update Stock Quote",
+        "topic": "domoticz/in",
+        "qos": "",
+        "retain": "",
+        "broker": "f7c80436.a43f2",
+        "x": 930,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "7d1d563e.cb43f",
+        "type": "change",
+        "z": "695c4e54.e2f238",
+        "name": "STOCKB.DE",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\": \"udevice\", \"idx\": 153, \"nvalue\":0, \"svalue\": payload.price}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 660,
+        "y": 1080,
+        "wires": [
+            [
+                "1dd738a.2eec2c7",
+                "7402d3ff.6ea8dc"
+            ]
+        ]
+    },
+    {
+        "id": "889f169d.33a018",
+        "type": "json",
+        "z": "695c4e54.e2f238",
+        "name": "Convert JSON Object to String",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 510,
+        "y": 800,
+        "wires": [
+            [
+                "24632a53.a1fd46"
+            ]
+        ]
+    },
+    {
+        "id": "6b723c1e.e06114",
+        "type": "comment",
+        "z": "695c4e54.e2f238",
+        "name": "Separate symbols with , and end with ,",
+        "info": "",
+        "x": 190,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "4a0188dc.793e",
+        "type": "comment",
+        "z": "695c4e54.e2f238",
+        "name": "Max 5 symbols",
+        "info": "As limited by Alpha Avantage 5 API Requests/min and 500 per day.",
+        "x": 460,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "f7c80436.a43f2",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Domoticz MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]

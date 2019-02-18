@@ -1,0 +1,473 @@
+[
+    {
+        "id": "425b73b1.ecf34c",
+        "type": "mqtt in",
+        "z": "4bd36f9f.09eab8",
+        "name": "Listen to Domoticz MQTT Messages",
+        "topic": "domoticz/out",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "254b216.bde7ede"
+            ]
+        ]
+    },
+    {
+        "id": "254b216.bde7ede",
+        "type": "json",
+        "z": "4bd36f9f.09eab8",
+        "name": "Domoticz MQTT Message to JSON",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 220,
+        "y": 200,
+        "wires": [
+            [
+                "eb5c7385.d7b2c"
+            ]
+        ]
+    },
+    {
+        "id": "eb5c7385.d7b2c",
+        "type": "switch",
+        "z": "4bd36f9f.09eab8",
+        "name": "Select Domoticz Stock Device (idx=152,153)",
+        "property": "payload.idx",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "152",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "153",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 270,
+        "y": 260,
+        "wires": [
+            [
+                "e98f8ac6.fedd68"
+            ],
+            [
+                "e8895edd.c0424"
+            ]
+        ]
+    },
+    {
+        "id": "4486bc42.49e70c",
+        "type": "ui_gauge",
+        "z": "4bd36f9f.09eab8",
+        "name": "Gauge Stock STOCK.DE",
+        "group": "f93ed02a.35e4f8",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "EUR",
+        "label": "EUR",
+        "format": "{{msg.payload}}",
+        "min": "20",
+        "max": "30",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#00ff00"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 820,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "e8895edd.c0424",
+        "type": "change",
+        "z": "4bd36f9f.09eab8",
+        "name": "Set Price DTE.DE",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$number(payload.svalue1)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 300,
+        "wires": [
+            [
+                "ecd1a343.76f85"
+            ]
+        ]
+    },
+    {
+        "id": "e98f8ac6.fedd68",
+        "type": "change",
+        "z": "4bd36f9f.09eab8",
+        "name": "Set Price STOCK.DE",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$number(payload.svalue1)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 260,
+        "wires": [
+            [
+                "4486bc42.49e70c"
+            ]
+        ]
+    },
+    {
+        "id": "66dd7ea7.cf8aa8",
+        "type": "comment",
+        "z": "4bd36f9f.09eab8",
+        "name": "Set Stock Price Threshold STOCK.DE",
+        "info": "",
+        "x": 180,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "3302e89d.6d1a5",
+        "type": "http request",
+        "z": "4bd36f9f.09eab8",
+        "name": "Get Request Domoticz User Variable 8",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://192.168.1.60:8080/json.htm?type=command&param=getuservariable&idx=8",
+        "tls": "",
+        "x": 230,
+        "y": 560,
+        "wires": [
+            [
+                "d4cf3728.c858f"
+            ]
+        ]
+    },
+    {
+        "id": "d4cf3728.c858f",
+        "type": "json",
+        "z": "4bd36f9f.09eab8",
+        "name": "Convert HTTP Response to JSON Object",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 580,
+        "y": 560,
+        "wires": [
+            [
+                "1df37aaa.190b8d"
+            ]
+        ]
+    },
+    {
+        "id": "fbb0a2d7.10e3e",
+        "type": "ui_button",
+        "z": "4bd36f9f.09eab8",
+        "name": "Button Get Threshold STOCK.DE",
+        "group": "f93ed02a.35e4f8",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Refresh",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 170,
+        "y": 520,
+        "wires": [
+            [
+                "3302e89d.6d1a5"
+            ]
+        ]
+    },
+    {
+        "id": "edbb1185.682388",
+        "type": "http request",
+        "z": "4bd36f9f.09eab8",
+        "name": "Put Request Domoticz User Variable 8",
+        "method": "GET",
+        "ret": "txt",
+        "url": "",
+        "tls": "",
+        "x": 750,
+        "y": 680,
+        "wires": [
+            [
+                "19620649.7d19e2"
+            ]
+        ]
+    },
+    {
+        "id": "2090cf2c.8bf958",
+        "type": "change",
+        "z": "4bd36f9f.09eab8",
+        "name": "Set Domoticz User Variable Put Request URL",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$join(\t   [\t       'http://192.168.1.60:8080/json.htm?type=command&param=updateuservariable&vname=TH_STOCKA&vtype=1&vvalue=',\t       $string(msg.payload)\t   \t   ]\t\t)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 380,
+        "y": 680,
+        "wires": [
+            [
+                "edbb1185.682388"
+            ]
+        ]
+    },
+    {
+        "id": "19620649.7d19e2",
+        "type": "debug",
+        "z": "4bd36f9f.09eab8",
+        "name": "DEBUG Set Threshold STOCK.DE",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 1070,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "1df37aaa.190b8d",
+        "type": "change",
+        "z": "4bd36f9f.09eab8",
+        "name": "Get & Set Threshold from HTTP Response",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload.result[0].Value",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$number(payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 290,
+        "y": 600,
+        "wires": [
+            [
+                "19620649.7d19e2",
+                "4745e169.776c48"
+            ]
+        ]
+    },
+    {
+        "id": "4745e169.776c48",
+        "type": "ui_text_input",
+        "z": "4bd36f9f.09eab8",
+        "name": "Input Threshold STOCK.DE",
+        "label": "",
+        "tooltip": "",
+        "group": "f93ed02a.35e4f8",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "mode": "number",
+        "delay": "0",
+        "topic": "",
+        "x": 270,
+        "y": 640,
+        "wires": [
+            [
+                "2090cf2c.8bf958"
+            ]
+        ]
+    },
+    {
+        "id": "cfe9c299.514538",
+        "type": "comment",
+        "z": "4bd36f9f.09eab8",
+        "name": "Set Stock  Price in Gauges",
+        "info": "",
+        "x": 150,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "ecd1a343.76f85",
+        "type": "ui_gauge",
+        "z": "4bd36f9f.09eab8",
+        "name": "Gauge Stock DTE.DE",
+        "group": "57a60094.bd13b",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "EUR",
+        "label": "EUR",
+        "format": "{{msg.payload}}",
+        "min": "10",
+        "max": "20",
+        "colors": [
+            "#ff0000",
+            "#e6e600",
+            "#00ff00"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 820,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "8dd6412a.27df68",
+        "type": "inject",
+        "z": "4bd36f9f.09eab8",
+        "name": "Inject Threshold Get Request STOCK.DE",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 190,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a301d3d7.5a8898",
+        "type": "comment",
+        "z": "4bd36f9f.09eab8",
+        "name": "Set Stock Price Threshold Other",
+        "info": "",
+        "x": 170,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "23895daf.84b142",
+        "type": "comment",
+        "z": "4bd36f9f.09eab8",
+        "name": "Add more stocks",
+        "info": "Amend the Switch Node and add a change node",
+        "x": 180,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "53075ffe.d73d18",
+        "type": "ui_text",
+        "z": "4bd36f9f.09eab8",
+        "group": "f93ed02a.35e4f8",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Text Set Threshold STOCK.DE",
+        "label": "Set Threshold",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 160,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "f7c80436.a43f2",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Domoticz MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "f93ed02a.35e4f8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Stock STOCK.DE",
+        "tab": "3eaafab9.d45066",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "57a60094.bd13b",
+        "type": "ui_group",
+        "z": "",
+        "name": "Stock DTE.DE",
+        "tab": "3eaafab9.d45066",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "3eaafab9.d45066",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Stocks",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
