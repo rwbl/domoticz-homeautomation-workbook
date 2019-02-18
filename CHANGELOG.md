@@ -1,4 +1,9 @@
 
+### 20190218
+
+* NEW: Function Monitor Stock Quotes - Obtain quotes from Alpha Vantage, set thresholds with notifications, Node-RED Dashboard
+* UPD: Reworked User Variables section
+
 ### 20190212
 
 * NEW: Function Volumio Web Radio - Listen to & control, via Domoticz Dashboard, Web Radio provided by Volumio
