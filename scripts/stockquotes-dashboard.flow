@@ -161,7 +161,7 @@
         "name": "Get Request Domoticz User Variable 8",
         "method": "GET",
         "ret": "txt",
-        "url": "http://192.168.1.60:8080/json.htm?type=command&param=getuservariable&idx=8",
+        "url": "http://RPI_IP_ADDRESS:8080/json.htm?type=command&param=getuservariable&idx=8",
         "tls": "",
         "x": 230,
         "y": 560,
@@ -240,7 +240,7 @@
                 "t": "set",
                 "p": "url",
                 "pt": "msg",
-                "to": "$join(\t   [\t       'http://192.168.1.60:8080/json.htm?type=command&param=updateuservariable&vname=TH_STOCKA&vtype=1&vvalue=',\t       $string(msg.payload)\t   \t   ]\t\t)",
+                "to": "$join(\t   [\t       'http://RPI_IP_ADDRESS:8080/json.htm?type=command&param=updateuservariable&vname=TH_STOCKA&vtype=1&vvalue=',\t       $string(msg.payload)\t   \t   ]\t\t)",
                 "tot": "jsonata"
             }
         ],
