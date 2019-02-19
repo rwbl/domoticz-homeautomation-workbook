@@ -80,7 +80,7 @@
                 "t": "set",
                 "p": "url",
                 "pt": "msg",
-                "to": "$join(['https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=',payload,'&apikey=D6CEJWIN9NZ41777'])",
+                "to": "$join(['https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=',payload,'&apikey=YOURKEY'])",
                 "tot": "jsonata"
             }
         ],
