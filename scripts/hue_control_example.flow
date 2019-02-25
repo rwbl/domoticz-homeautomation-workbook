@@ -1,0 +1,193 @@
+[
+    {
+        "id": "9b5cd0a2.bcf09",
+        "type": "tab",
+        "label": "Hue Control Test",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "9d31dbf2.5f657",
+        "type": "mqtt in",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Listen to Domoticz Messages",
+        "topic": "domoticz/out",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 160,
+        "y": 100,
+        "wires": [
+            [
+                "3a4a51f6.43f186"
+            ]
+        ]
+    },
+    {
+        "id": "3a4a51f6.43f186",
+        "type": "json",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Convert Domoticz Message toJSON Object",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 490,
+        "y": 100,
+        "wires": [
+            [
+                "b2d638e8.269728"
+            ]
+        ]
+    },
+    {
+        "id": "b2d638e8.269728",
+        "type": "switch",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Select Hue Device Idx 118",
+        "property": "payload.idx",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "118",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 440,
+        "y": 160,
+        "wires": [
+            [
+                "df0e5402.ee587"
+            ]
+        ]
+    },
+    {
+        "id": "df0e5402.ee587",
+        "type": "debug",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Debug Hue 118 Payload",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 830,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "a5aeac9b.431858",
+        "type": "change",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Set Hue 118 Level",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t   \"command\": \"switchlight\",\t   \"idx\": 118,\t   \"switchcmd\":\"Set Level\",\t   \"level\": payload\t\t}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 410,
+        "y": 300,
+        "wires": [
+            [
+                "74ff044.d91a4fc",
+                "df0e5402.ee587"
+            ]
+        ]
+    },
+    {
+        "id": "49fc8261.e70284",
+        "type": "inject",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Inject Hue 118 Level 90",
+        "topic": "",
+        "payload": "90",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 300,
+        "wires": [
+            [
+                "a5aeac9b.431858"
+            ]
+        ]
+    },
+    {
+        "id": "74ff044.d91a4fc",
+        "type": "mqtt out",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Domoticz MQTT Set Hue 118 Level",
+        "topic": "domoticz/in",
+        "qos": "",
+        "retain": "",
+        "broker": "f7c80436.a43f2",
+        "x": 860,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "4bf4569f.681108",
+        "type": "inject",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Inject Hue 118 Level 0",
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 360,
+        "wires": [
+            [
+                "a5aeac9b.431858"
+            ]
+        ]
+    },
+    {
+        "id": "d44522cb.871528",
+        "type": "comment",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Domoticz MQTT Hue Light Test (idx=118)",
+        "info": "Test setting the level of a Hue Light via MQTT.\n\nMessage send by Domoticz (Topic domoticz/out)\n(Example with value 0 and value 90)\n{\"Battery\":255,\"Level\":19,\"RSSI\":12,\"description\":\"\",\"dtype\":\"Light/Switch\",\"id\":\"00000005\",\"idx\":118,\"name\":\"Hue MakeLab\",\"nvalue\":0,\"stype\":\"Switch\",\"svalue1\":\"0\",\"switchType\":\"Dimmer\",\"unit\":1}\n{\"Battery\":255,\"Level\":90,\"RSSI\":12,\"description\":\"\",\"dtype\":\"Light/Switch\",\"id\":\"00000005\",\"idx\":118,\"name\":\"Hue MakeLab\",\"nvalue\":2,\"stype\":\"Switch\",\"svalue1\":\"90\",\"switchType\":\"Dimmer\",\"unit\":1}\n\nMessage send by Node-RED to set the level:\n(Example with value 0 and value 90)\n{\"command\":\"switchlight\",\"idx\":118,\"switchcmd\":\"Set Level\",\"level\":0}\n{\"command\":\"switchlight\",\"idx\":118,\"switchcmd\":\"Set Level\",\"level\":90}\n\n",
+        "x": 200,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "f7c80436.a43f2",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Domoticz MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]

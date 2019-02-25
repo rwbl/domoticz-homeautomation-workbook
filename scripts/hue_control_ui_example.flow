@@ -1,0 +1,623 @@
+[
+    {
+        "id": "9b5cd0a2.bcf09",
+        "type": "tab",
+        "label": "Hue Control Test",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "d5384eff.f54b3",
+        "type": "comment",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Domoticz MQTT Hue Light Test (multiple idx)",
+        "info": "Test setting the level of a Hue Light via MQTT.\n\nMessage send by Domoticz (Topic domoticz/out)\n(Example with value 0 and value 90)\n{\"Battery\":255,\"Level\":19,\"RSSI\":12,\"description\":\"\",\"dtype\":\"Light/Switch\",\"id\":\"00000005\",\"idx\":118,\"name\":\"Hue MakeLab\",\"nvalue\":0,\"stype\":\"Switch\",\"svalue1\":\"0\",\"switchType\":\"Dimmer\",\"unit\":1}\n{\"Battery\":255,\"Level\":90,\"RSSI\":12,\"description\":\"\",\"dtype\":\"Light/Switch\",\"id\":\"00000005\",\"idx\":118,\"name\":\"Hue MakeLab\",\"nvalue\":2,\"stype\":\"Switch\",\"svalue1\":\"90\",\"switchType\":\"Dimmer\",\"unit\":1}\n\nMessage send by Node-RED to set the level:\n(Example with value 0 and value 90)\n{\"command\":\"switchlight\",\"idx\":118,\"switchcmd\":\"Set Level\",\"level\":0}\n{\"command\":\"switchlight\",\"idx\":118,\"switchcmd\":\"Set Level\",\"level\":90}\n\n",
+        "x": 210,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "36f58c88.96c5d4",
+        "type": "json",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Convert MQTT Message to JSON Object",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 220,
+        "y": 620,
+        "wires": [
+            [
+                "d76dbbc7.1d0f"
+            ]
+        ]
+    },
+    {
+        "id": "81a08f1e.555ef8",
+        "type": "mqtt in",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Listen to Domoticz MQTT Messages",
+        "topic": "domoticz/out",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 180,
+        "y": 560,
+        "wires": [
+            [
+                "36f58c88.96c5d4"
+            ]
+        ]
+    },
+    {
+        "id": "b42affae.deda7",
+        "type": "mqtt out",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Domoticz MQTT Set Hue",
+        "topic": "domoticz/in",
+        "qos": "",
+        "retain": "",
+        "broker": "f7c80436.a43f2",
+        "x": 1290,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "50409682.9d9af8",
+        "type": "ui_gauge",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Gauge Hue Level",
+        "group": "9dd37470.61bc78",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "",
+        "label": "%",
+        "format": "{{payload.Level}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 990,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "3d89e724.5ab768",
+        "type": "ui_slider",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Slider Hue Level",
+        "label": "",
+        "tooltip": "",
+        "group": "9dd37470.61bc78",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "end",
+        "topic": "",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "x": 980,
+        "y": 760,
+        "wires": [
+            [
+                "5e798436.299d14"
+            ]
+        ]
+    },
+    {
+        "id": "5e798436.299d14",
+        "type": "function",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Set Hue Switch Command",
+        "func": "\n// Check the payload\nif (msg.payload == \"On\" || msg.payload == \"Off\")\n{\n    msg.payload = {\"command\": \"switchlight\", \"idx\": Number(flow.get(\"hueidx\")), \"switchcmd\":msg.payload};\n}\nelse\n{\n    msg.payload = {\"command\": \"switchlight\", \"idx\": Number(flow.get(\"hueidx\")), \"switchcmd\":\"Set Level\",\"level\": msg.payload};\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1280,
+        "y": 700,
+        "wires": [
+            [
+                "b42affae.deda7"
+            ]
+        ]
+    },
+    {
+        "id": "5dd2b443.0c26dc",
+        "type": "http request",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Send HTTP Domoticz Device Status Request",
+        "method": "GET",
+        "ret": "txt",
+        "url": "",
+        "tls": "",
+        "x": 610,
+        "y": 400,
+        "wires": [
+            [
+                "daa08680.af6218"
+            ]
+        ]
+    },
+    {
+        "id": "85552f35.2e675",
+        "type": "change",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Set HTTP Domoticz Status Request URL",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$join(['localhost:8080/json.htm?type=devices&rid=',$string(msg.payload)])",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 220,
+        "y": 400,
+        "wires": [
+            [
+                "5dd2b443.0c26dc"
+            ]
+        ]
+    },
+    {
+        "id": "a74416d5.8feb18",
+        "type": "ui_switch",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Switch Hue On Off",
+        "label": "Switch Light",
+        "tooltip": "",
+        "group": "9dd37470.61bc78",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "On",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "Off",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "x": 990,
+        "y": 700,
+        "wires": [
+            [
+                "5e798436.299d14"
+            ]
+        ]
+    },
+    {
+        "id": "442a152c.c8462c",
+        "type": "ui_text",
+        "z": "9b5cd0a2.bcf09",
+        "group": "9dd37470.61bc78",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Text Hue Name",
+        "label": "",
+        "format": "{{payload.name}}",
+        "layout": "col-center",
+        "x": 980,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "d76dbbc7.1d0f",
+        "type": "function",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Select Hue by Idx",
+        "func": "// Check the idx and return its payload\n\n// Define an array containing the Hue idx\n// var idxArray = [110,111,112,113,118];\nvar idxArray = flow.get(\"idxarray\");\n\n// Check  if the payload idx is in the idxArray\nif (idxArray.indexOf(msg.payload.idx) > -1)\n{\n    return msg;\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 530,
+        "y": 620,
+        "wires": [
+            [
+                "442a152c.c8462c",
+                "50409682.9d9af8",
+                "8ad1d556.4473a",
+                "faacc0f1.ca5818"
+            ]
+        ]
+    },
+    {
+        "id": "faacc0f1.ca5818",
+        "type": "change",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Change Hue Status",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.nvalue",
+                "tot": "msg"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "0",
+                "fromt": "num",
+                "to": "Off",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "1",
+                "fromt": "num",
+                "to": "On",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "2",
+                "fromt": "num",
+                "to": "On",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 680,
+        "wires": [
+            [
+                "a74416d5.8feb18"
+            ]
+        ]
+    },
+    {
+        "id": "8ad1d556.4473a",
+        "type": "change",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Set Hue Level",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.Level",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 760,
+        "wires": [
+            [
+                "3d89e724.5ab768"
+            ]
+        ]
+    },
+    {
+        "id": "b86e07f.40aadf8",
+        "type": "debug",
+        "z": "9b5cd0a2.bcf09",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1230,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "e601f62d.e0bb6",
+        "type": "function",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Build JSON message object from HTTP Response",
+        "func": "// Convert the Domoticz HTTP response to a Message Object\n// To learn what is returned by requesting devive status information use url, like:\n// http://domoticz-rpi-ip-address:8080/json.htm?type=devices&rid=118\n// The returned message object has properties: idx,name,Level,status,nvalue\n// IMPORTANT: The properties are case sensitive as returned by the domoticz MQTT message object!\n// To go for sure, checkout the MQTT message object properties received from the device.\n// ... add more properties as required\n\n// Create a new message object\nvar devicemsg = {};\n\n// Get the result property\nvar result = msg.payload.result[0];\n\n// For  debug\n// node.warn(Number(result.idx));\n\n// Build the message properties\n// Use nvalue for the status: 0=Off,1=On\nvar nvaluestatus = 1;\nif (result.Status == \"Off\") { nvaluestatus = 0 }\ndevicemsg.payload = {idx:Number(result.idx), name:result.Name, Level:Number(result.Level), status:result.Status,nvalue:nvaluestatus};\n\n// Set the flow context idx used by the slider_ui\nflow.set(\"hueidx\", Number(result.idx))\n\n// Return the new message\nreturn devicemsg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 630,
+        "y": 460,
+        "wires": [
+            [
+                "d76dbbc7.1d0f"
+            ]
+        ]
+    },
+    {
+        "id": "daa08680.af6218",
+        "type": "json",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Convert HTTP Response to JSON Object",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 240,
+        "y": 460,
+        "wires": [
+            [
+                "e601f62d.e0bb6"
+            ]
+        ]
+    },
+    {
+        "id": "309ad860.1a162",
+        "type": "inject",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Inject Get Hue Lights",
+        "topic": "",
+        "payload": "118",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.2",
+        "x": 140,
+        "y": 220,
+        "wires": [
+            [
+                "31f992cb.33252e"
+            ]
+        ]
+    },
+    {
+        "id": "c5c150b5.5ae778",
+        "type": "function",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Create Hue Select Option",
+        "func": "// Create the dropdown list of hue lights containing name:idx\n\n// Define an array containing the Hue idx to be selected from the HTTP response\n// var idxArray = [110,111,112,113,118];\nvar idxArray = flow.get(\"idxarray\");\n// node.warn(flow.get(\"idxarray\"))\n\n// Get the array of light devices information from property result of the HTTP response\nvar arrayResult =msg.payload.result;\n// Log the number of light devices found\nvar nrlightdevices = arrayResult.length;\n// node.warn(\"Light devices:\"+Number(nrlightdevices))\n\n// Loop over the result array to get the light device name (property Name using property idx)\nvar arrayLights = []\narrayResult.forEach(function(value, index, _arrayResult) {\n    //node.warn(index + \": \" + value.Name + ' = idx:' + value.idx);\n    \n    // Check if the payload idx is in the idxArray\n    if (idxArray.indexOf(Number(value.idx)) > -1)\n    {\n        // Add new element label:value\n        var entry = {};      \n        entry[value.Name] = Number(value.idx)\n        arrayLights.push(entry)\n    }\n    return false;\n});\n\n// Assign the array to the messageoptions\nmsg.options = arrayLights\n// Set the first entry as default\nvar obj = arrayLights[0]; \nmsg.payload = obj[Object.keys(obj)[0]]\n// node.warn(obj[Object.keys(obj)[0]]);\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 550,
+        "y": 280,
+        "wires": [
+            [
+                "61631398.324a8c"
+            ]
+        ]
+    },
+    {
+        "id": "61631398.324a8c",
+        "type": "ui_dropdown",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Select Hue Light 2",
+        "label": "",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "9dd37470.61bc78",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 990,
+        "y": 280,
+        "wires": [
+            [
+                "85552f35.2e675"
+            ]
+        ]
+    },
+    {
+        "id": "44f6de7e.86bbf8",
+        "type": "debug",
+        "z": "9b5cd0a2.bcf09",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1230,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "31f992cb.33252e",
+        "type": "change",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Set HTTP Domoticz Status Request URL",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$join(\t   [\t       'localhost:8080/json.htm?type=devices&filter=light&used=true&order=Name',\t       $string('')\t   ]\t)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 220,
+        "wires": [
+            [
+                "2dd39054.6c6b88"
+            ]
+        ]
+    },
+    {
+        "id": "2dd39054.6c6b88",
+        "type": "http request",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Send HTTP Domoticz Device Status Request",
+        "method": "GET",
+        "ret": "txt",
+        "url": "",
+        "tls": "",
+        "x": 810,
+        "y": 220,
+        "wires": [
+            [
+                "4029f1bf.30fbf"
+            ]
+        ]
+    },
+    {
+        "id": "4029f1bf.30fbf",
+        "type": "json",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Convert HTTP Response to JSON Object",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 220,
+        "y": 280,
+        "wires": [
+            [
+                "c5c150b5.5ae778"
+            ]
+        ]
+    },
+    {
+        "id": "34ede9e2.d28c36",
+        "type": "comment",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Create select options (dynamic from devices list)",
+        "info": "Use API request:\ndomoticz-ip-address:8080/json.htm?type=devices&filter=light&used=true&order=Name\n\nwhich return a JSON string containing the devices in the property result.\nProperty result is an array.\nLoop over the array, select the predefined idx and obtain the device name.\n\nNOTE:\ndefine at least one dummy entry in the dropdown_ui.\nif static instead of dynamic, then define the entries ar numbers with name:\n118, Hue MakeLab\n",
+        "x": 220,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "c6574f09.4dfd",
+        "type": "comment",
+        "z": "9b5cd0a2.bcf09",
+        "name": "For the selected device get status and update the dashboard",
+        "info": "",
+        "x": 260,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "89f8dcb9.2eb4f",
+        "type": "comment",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Listen to device changes and update the dashboard",
+        "info": "",
+        "x": 230,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "8c8a055d.4a9dd",
+        "type": "inject",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Inject Array Hue Light Idx",
+        "topic": "",
+        "payload": "110,111,112,113,118",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "e4255662.82f7e"
+            ]
+        ]
+    },
+    {
+        "id": "e4255662.82f7e",
+        "type": "function",
+        "z": "9b5cd0a2.bcf09",
+        "name": "Create Flow Context Array idxarray",
+        "func": "// Create the array of idx (as numbers) to be used\n// Input is the payload holding csv string with hue light idx\nvar idxstring = msg.payload\n\n// Split the string into array of numbers using the map(Number) function\nvar idxarray = idxstring.split(\",\").map(Number);\n// node.warn(\"Light devices Cnt:\"+Number(idxarray.length))\n\n// Set the flow context holding the idx array as ints\nflow.set(\"idxarray\", idxarray);\n// node.warn(\"Light devices:\"+idxarray)\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 580,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3f1f5d75.1a5fd2",
+        "type": "comment",
+        "z": "9b5cd0a2.bcf09",
+        "name": "csv string idx1,idx2...",
+        "info": "Modify the list when adding,changing or deleting Hue devices.\n",
+        "x": 130,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "f7c80436.a43f2",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Domoticz MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "9dd37470.61bc78",
+        "type": "ui_group",
+        "z": "",
+        "name": "Hue Light",
+        "tab": "2b651c3d.b27614",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "2b651c3d.b27614",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Hue Light Control",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
