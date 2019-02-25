@@ -5,6 +5,6 @@
 * NEW: Hardware Plugin for Tinkerforge Master Brick & selected Bricklets (Status: Not started).
 * NEW: Traffic Light Status Indicator for the Raspberry Pi Domoticz Server (using GPIO) (Status: Not started).
 * NEW: CO2 Room Measurement (Status: Not started).
-* NEW: Node-RED Control Hue Lights (Status: Finalizing).
+* NEW: Node-RED Control Hue Lights via Dashboard UI (Status: Finalizing).
 
 ... _and many more to explore_ ...
