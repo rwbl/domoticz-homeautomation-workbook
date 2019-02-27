@@ -23,6 +23,7 @@ This document is a working document – todo’s will never cease to exist.
 * Energy Power Consumption metering from “volkszaehler” with charts.
 * Control Volumio Music Player whilst listening to Web Radio.
 * Monitor Stock Quotes.
+* Ambient Light from a ESP8266 NodeMCU running ESPEasy
 * _More in progress ..._
 
 ### Explore How To
