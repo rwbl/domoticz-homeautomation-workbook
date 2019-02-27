@@ -1,0 +1,396 @@
+[
+    {
+        "id": "47c58571.c5f90c",
+        "type": "tab",
+        "label": "Ambient Light Dashboard",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "83525488.8e5a28",
+        "type": "comment",
+        "z": "47c58571.c5f90c",
+        "name": "Set Ambient Light Threshold (User Variable 10)",
+        "info": "User Variable:\nName: TH_AMBIENT_LIGHT\nType: 0 (Integer)\nIdx: 10\n",
+        "x": 220,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "bf22235d.2f3b3",
+        "type": "http request",
+        "z": "47c58571.c5f90c",
+        "name": "Get Request Domoticz User Variable",
+        "method": "GET",
+        "ret": "txt",
+        "url": "http://localhost:8080/json.htm?type=command&param=getuservariable&idx=10",
+        "tls": "",
+        "x": 210,
+        "y": 460,
+        "wires": [
+            [
+                "7980e845.c58078"
+            ]
+        ]
+    },
+    {
+        "id": "7980e845.c58078",
+        "type": "json",
+        "z": "47c58571.c5f90c",
+        "name": "Convert HTTP Response to JSON Object",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 560,
+        "y": 460,
+        "wires": [
+            [
+                "2b6700cf.81055"
+            ]
+        ]
+    },
+    {
+        "id": "2972d93b.9498ce",
+        "type": "ui_button",
+        "z": "47c58571.c5f90c",
+        "name": "Button Get Value User Variable",
+        "group": "5523e4b3.62486c",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Refresh",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 170,
+        "y": 400,
+        "wires": [
+            [
+                "bf22235d.2f3b3"
+            ]
+        ]
+    },
+    {
+        "id": "ca6ce600.9f216",
+        "type": "http request",
+        "z": "47c58571.c5f90c",
+        "name": "Put Request Domoticz User Variable",
+        "method": "GET",
+        "ret": "txt",
+        "url": "",
+        "tls": "",
+        "x": 650,
+        "y": 640,
+        "wires": [
+            [
+                "3afa2563.870bea"
+            ]
+        ]
+    },
+    {
+        "id": "49639ef.3abcd6",
+        "type": "change",
+        "z": "47c58571.c5f90c",
+        "name": "Set Domoticz Put Request URL User Variable",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$join(\t   [\t       'http://localhost:8080/json.htm?type=command&param=updateuservariable&vname=TH_AMBIENT_LIGHT&vtype=0&vvalue=',\t       $string(msg.payload)\t   \t   ]\t\t)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 280,
+        "y": 640,
+        "wires": [
+            [
+                "ca6ce600.9f216"
+            ]
+        ]
+    },
+    {
+        "id": "3afa2563.870bea",
+        "type": "debug",
+        "z": "47c58571.c5f90c",
+        "name": "DEBUG Set Threshold AL",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 950,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "2b6700cf.81055",
+        "type": "change",
+        "z": "47c58571.c5f90c",
+        "name": "Get & Set Threshold from HTTP Response",
+        "rules": [
+            {
+                "t": "move",
+                "p": "payload.result[0].Value",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$number(payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 270,
+        "y": 520,
+        "wires": [
+            [
+                "3afa2563.870bea",
+                "a5181201.a1bf98"
+            ]
+        ]
+    },
+    {
+        "id": "a5181201.a1bf98",
+        "type": "ui_text_input",
+        "z": "47c58571.c5f90c",
+        "name": "Input Threshold User Variable",
+        "label": "",
+        "tooltip": "Set a number without digits. Press Enter to update the value.",
+        "group": "5523e4b3.62486c",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "mode": "number",
+        "delay": "0",
+        "topic": "",
+        "x": 170,
+        "y": 580,
+        "wires": [
+            [
+                "49639ef.3abcd6"
+            ]
+        ]
+    },
+    {
+        "id": "3d0d5eeb.2e67ba",
+        "type": "ui_text",
+        "z": "47c58571.c5f90c",
+        "group": "5523e4b3.62486c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Text Set Threshold",
+        "label": "Set Threshold",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 130,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "a791a124.38df5",
+        "type": "mqtt in",
+        "z": "47c58571.c5f90c",
+        "name": "Listen to Domoticz MQTT Messages",
+        "topic": "domoticz/out",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "da950e93.ebadd"
+            ]
+        ]
+    },
+    {
+        "id": "da950e93.ebadd",
+        "type": "json",
+        "z": "47c58571.c5f90c",
+        "name": "Domoticz MQTT Message to JSON",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 220,
+        "y": 200,
+        "wires": [
+            [
+                "4908eb29.cd325c"
+            ]
+        ]
+    },
+    {
+        "id": "4908eb29.cd325c",
+        "type": "switch",
+        "z": "47c58571.c5f90c",
+        "name": "Select Domoticz Ambient Light Device (idx=46)",
+        "property": "payload.idx",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "46",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 280,
+        "y": 260,
+        "wires": [
+            [
+                "9f86c1aa.f2ae48",
+                "885f9ec9.8e0488"
+            ]
+        ]
+    },
+    {
+        "id": "41c76cf7.33ee24",
+        "type": "ui_gauge",
+        "z": "47c58571.c5f90c",
+        "name": "Gauge Ambient Light",
+        "group": "5523e4b3.62486c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "",
+        "label": "lux",
+        "format": "{{msg.payload | number:0}}",
+        "min": "0",
+        "max": "500",
+        "colors": [
+            "#000000",
+            "#c0c0c0",
+            "#ffffff"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 900,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "9f86c1aa.f2ae48",
+        "type": "change",
+        "z": "47c58571.c5f90c",
+        "name": "Set Ambient Light Value (Lux)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$number(payload.svalue1)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 630,
+        "y": 260,
+        "wires": [
+            [
+                "41c76cf7.33ee24"
+            ]
+        ]
+    },
+    {
+        "id": "5bbccb78.15b95c",
+        "type": "comment",
+        "z": "47c58571.c5f90c",
+        "name": "Ambient Light Dashboard",
+        "info": "",
+        "x": 150,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "64482da1.04aacc",
+        "type": "comment",
+        "z": "47c58571.c5f90c",
+        "name": "Set Gauge Ambient Light Lux Value (idx=46)",
+        "info": "",
+        "x": 210,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "885f9ec9.8e0488",
+        "type": "debug",
+        "z": "47c58571.c5f90c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 570,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "5523e4b3.62486c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Ambient Light",
+        "tab": "520a8931.c3731",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "f7c80436.a43f2",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Domoticz MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "520a8931.c3731",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Ambient Light",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
