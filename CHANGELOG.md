@@ -1,9 +1,15 @@
+### r20190301
+
+* NEW: Function Volumio - Control using dzVents scripts (in addition to the Node-RED solution)
+* NEW: Custom Icons - first two custom icons used by the Function Volumio
+* UPD: User Variable section
+
 ### r20190227
 
 * NEW: Function Ambient Light w/ threshold. The Ambient Light is connected to a ESP8266 NodeMCU running ESPEasy
 * NEW: Function Hue Lights - Control the lights via Node-RED Dashboard UI
 * NEW: User Variables - Example how to use Node-RED Dashboard UI to set threshold value
-* UPD: Function Volumio - Reworked checking Volumio server response (using ping)
+* UPD: Function Volumio - Node-RED Reworked checking Volumio server response (using ping)
 * FIX: Function Hue Lights - Bug in dzVents script Timed Switch Light
 
 ### r20190218
