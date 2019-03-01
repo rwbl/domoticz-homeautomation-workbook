@@ -1,8 +1,9 @@
 ### r20190301
 
 * NEW: Function Volumio - Control using dzVents scripts (in addition to the Node-RED solution)
-* NEW: Custom Icons - first two custom icons used by the Function Volumio
+* NEW: Custom Icons - first two custom icons used by the Function Volumio (in file CustomIcons.zip)
 * UPD: User Variable section
+* NEW: Added all generated dzVents scripts (Lua files) to the scripts folder
 
 ### r20190227
 
