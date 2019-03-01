@@ -23,7 +23,8 @@ This document is a working document – todo’s will never cease to exist.
 * Energy Power Consumption metering from “volkszaehler” with charts.
 * Control Volumio Music Player whilst listening to Web Radio.
 * Monitor Stock Quotes.
-* Ambient Light from a ESP8266 NodeMCU running ESPEasy
+* Ambient Light (from a ESP8266 NodeMCU running ESPEasy) with threshold.
+* Custom icons.
 * _More in progress ..._
 
 ### Explore How To
@@ -37,8 +38,8 @@ This document is a working document – todo’s will never cease to exist.
 * Use bindings like MQTT, Astro, Philips Hue.
 * Use Node-RED as an alternative script engine and User Interface.
 * Use a, to be determined, Domoticz Android App (native client).
-* Create advanced User Interfaces, i.e. Node-RED, Bootstrap …
-* Scripting using Python, Lua, dzVents, JavaScript.
+* Create advanced User Interfaces, i.e. Node-RED, Bootstrap and others.
+* Scripting using Python, Lua, dzVents, JavaScript - with dzVents as target.
 
 ### Credits
 To the developers of Domoticz and to all sharing information about Domoticz. Without these, it would not be possible to build this project and write the workbook.
