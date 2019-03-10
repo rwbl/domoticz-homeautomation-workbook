@@ -10,9 +10,6 @@
     Version: 20180909
 ]]--
 
--- External modules:
-local msgbox = require('msgbox')
- 
 -- Idx of the devices used
 -- Switch Alert Meldung Reset
 local IDX_ALERTMSG_RESET = 119
@@ -31,7 +28,8 @@ return {
             -- only change if the current text differs from the default text
 	        if (domoticz.devices(domoticz.variables('IDX_ALERTMSG').value).text ~= domoticz.variables('DEF_ALERTMSG').value) then
                 local message = domoticz.variables('DEF_ALERTMSG').value
-                msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_GREY, message)
+                domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_GREY, message)
+                -- msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_GREY, message)
                 domoticz.log(message)
             end
 	        device.switchOff()

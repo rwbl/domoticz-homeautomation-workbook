@@ -13,12 +13,9 @@
     Interpreter: dzVents, Timer
     See: athome.pdf
     Author: Robert W.B. Linn
-    Version: 20190228
+    Version: 20190305
 ]]--
 
--- External modules: /home/pi/domoticz/scripts/dzVents/scripts
-local msgbox = require('msgbox')
- 
 -- Request url (see reference https://volumio.github.io/docs/API/REST_API.html)
 -- Example setting the Volumiovolume to 80:
 -- volumio.local/api/v1/commands/?cmd=volume&volume=80
@@ -34,7 +31,7 @@ local cmd
 -- Idx of the devices
 local IDX_VOLUMIOPLAYSWITCH = 149
 local IDX_VOLUMIOSTATUS = 151
-local IDX_VOLUMIOUPDATESTATESWITCH = 155
+local IDX_VOLUMIOREFRESHSWITCH = 155
 local IDX_DEF_VOLUMIO_TRACK = 11
 
 -- Messages
@@ -62,11 +59,8 @@ return {
             -- to set the command
             if (domoticz.devices(IDX_VOLUMIOPLAYSWITCH).state == 'On') then
                 cmd = cmdplay .. tostring(domoticz.variables(IDX_DEF_VOLUMIO_TRACK).value)
-        		domoticz.log(cmd, domoticz.LOG_INFO)
-                domoticz.devices(IDX_VOLUMIOSTATUS).updateAlertSensor(1, MSGVOLUMIOPLAY)
             else
                 cmd = cmdstop
-                domoticz.devices(IDX_VOLUMIOSTATUS).updateAlertSensor(2, MSGVOLUMIOSTOP)
             end
 
             -- set play mode play or stop via api request
@@ -83,12 +77,19 @@ return {
 
             if (item.ok) then -- statusCode == 2xx
                 domoticz.log('[INFO] Volumio Play set to ' .. domoticz.devices(IDX_VOLUMIOPLAYSWITCH).state, domoticz.LOG_INFO)
+                --  if switch state is on, update status & current song
+                if (domoticz.devices(IDX_VOLUMIOPLAYSWITCH).state == 'On') then
+                    domoticz.devices(IDX_VOLUMIOSTATUS).updateAlertSensor(1, MSGVOLUMIOPLAY)
+                    domoticz.devices(IDX_VOLUMIOREFRESHSWITCH).switchOn()
+                else
+                    domoticz.devices(IDX_VOLUMIOSTATUS).updateAlertSensor(2, MSGVOLUMIOSTOP)
+                end
             end
 
             if not (item.ok) then -- statusCode != 2xx
                 domoticz.devices(IDX_VOLUMIOSTATUS).updateAlertSensor(4, MSGVOLUMIOOFF)
                 local message = '[ERROR] Volumio Set Play Mode: ' .. tostring(item.statusCode) .. ' ' .. msgbox.isnowdatetime(domoticz)
-                msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
+                domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
                 domoticz.log(message, domoticz.LOG_INFO)
             end
 

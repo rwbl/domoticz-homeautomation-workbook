@@ -15,9 +15,6 @@
     Version: 20190207
 ]]--
 
--- External modules: /home/pi/domoticz/scripts/dzVents/scripts
-local msgbox = require('msgbox')
- 
 -- Request url (see reference https://volumio.github.io/docs/API/REST_API.html)
 -- Example setting the Volumiovolume to 80:
 -- volumio.local/api/v1/commands/?cmd=volume&volume=80
@@ -71,7 +68,7 @@ return {
 
             if not (item.ok) then -- statusCode != 2xx
                 local message = '[ERROR] Volumio Volume: ' .. tostring(item.statusCode) .. ' ' .. msgbox.isnowdatetime(domoticz)
-                msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
+                domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
                 domoticz.log(message, domoticz.LOG_INFO)
             end
         end

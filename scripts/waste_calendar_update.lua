@@ -11,10 +11,6 @@
     Version: 20180930
 ]]--
 
--- External modules: /home/pi/domoticz/scripts/dzVents/scripts
-local utils = require('utils')
-local msgbox = require('msgbox')
-
 -- threshold in days to notify
 -- if the difference of the current day to a wastecalendarday equals threshold
 -- then notify
@@ -60,7 +56,7 @@ function readandupdate(domoticz)
 		    -- split the wastedate into an array with 3 entries day, month, year
 		    local wastedatesplit = wastedate:split("-")
 		    -- calculate the daysdiff between now and the wastedate
-		    local daysdiff = utils.datediffnow(wastedatesplit[1], wastedatesplit[2], wastedatesplit[3])
+		    local daysdiff = domoticz.helpers.datediffnow(wastedatesplit[1], wastedatesplit[2], wastedatesplit[3])
 		    -- 
 		    local month = tonumber(wastedatesplit[2])
 
@@ -122,7 +118,7 @@ return {
 	on = {
         timer = {
             -- for tests use every minute
-            -- 'every minute',
+            -- 'every minute'
 	        'at 00:30'
         }
     },

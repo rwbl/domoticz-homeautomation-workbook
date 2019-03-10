@@ -9,9 +9,6 @@
     Version: 20181001
 ]]--
 
-local utils = require('utils')
--- local msgbox = require('msgbox')
-
 -- Idx of the devices
 local IDX_SUNRISESET = 121
 
@@ -26,7 +23,7 @@ return {
     execute = function(domoticz, timer)
 
         local daylength = domoticz.time.sunsetInMinutes - domoticz.time.sunriseInMinutes
-        local msg = utils.MinutesToClock(domoticz.time.sunriseInMinutes)..' - '..utils.MinutesToClock(domoticz.time.sunsetInMinutes)..' ('..utils.MinutesToClock(daylength)..')'
+        local msg = domoticz.helpers.MinutesToClock(domoticz.time.sunriseInMinutes)..' - ' .. domoticz.helpers.MinutesToClock(domoticz.time.sunsetInMinutes)..' (' .. domoticz.helpers.MinutesToClock(daylength)..')'
         domoticz.devices(IDX_SUNRISESET).updateText(msg)
         domoticz.log(msg)
 

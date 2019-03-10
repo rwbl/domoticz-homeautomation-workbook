@@ -22,9 +22,6 @@
     Version: 201809111
 ]]--
 
--- External modules: /home/pi/domoticz/scripts/dzVents/scripts
-local msgbox = require('msgbox')
- 
 -- The request url uses from=5 minutes ago to to=now
 local requesturl = 'http://192.168.1.139/middleware.php/data/958bce60-b342-11e8-b54f-bbec0573e1f4.json?from=5+minutes+ago&to=now'
 
@@ -68,7 +65,7 @@ return {
 
             if not (item.ok) then -- statusCode != 2xx
                 local message = '[ERROR] Electric usage: ' .. tostring(item.statusCode) .. ' ' .. msgbox.isnowdatetime(domoticz)
-                msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
+                domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
                 domoticz.log(message, domoticz.LOG_INFO)
             end
         end

@@ -8,9 +8,6 @@
     Version: 20190202
 ]]--
 
--- External modules:
-local msgbox = require('msgbox')
- 
 -- Idx of the devices used
 -- Switch Volumio Bookmark
 local IDX_VOLUMIO_BOOKMARK = 145

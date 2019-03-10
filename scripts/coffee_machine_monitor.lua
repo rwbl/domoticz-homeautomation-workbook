@@ -11,9 +11,6 @@
     Version: 20180926
 ]]--
 
--- Module msgbox: /home/pi/domoticz/scripts/dzVents/scripts
-local msgbox = require('msgbox')
-
 -- Idx of the devices
 local IDX_STROMVERBRAUCH = 44
 local TH_STROMVERBRAUCH = 1100
@@ -51,7 +48,7 @@ return {
             -- define message to notify the time coffee machine switches off
             message = ('Kaffee Machine aus %02d:%02d'):format(timeoff.hour, timeoff.min)
             -- update alert message
-            msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_ORANGE, message)
+            domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_ORANGE, message)
             domoticz.log(message, domoticz.LOG_INFO)
         end
 

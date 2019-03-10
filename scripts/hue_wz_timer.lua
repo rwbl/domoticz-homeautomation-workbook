@@ -10,10 +10,6 @@
     Version: 20181128
 ]]--
 
--- External modules
-local utils = require('utils')
-local msgbox = require('msgbox')
-
 -- Idx of the devices
 local IDX_HUE_WZABLAGE = 111
 local IDX_HUE_WZTV = 112
@@ -21,8 +17,8 @@ local IDX_HUE_HAUSTUER = 110
 
 -- Update alert message with alert level green.
 local function setalertmsg(domoticz, state)
-	local message= 'Hue Lampen ' .. state .. ' ' .. utils.isnowhhmm(domoticz)
-    msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_GREEN, message)
+	local message= 'Hue Lampen ' .. state .. ' ' .. domoticz.helpers.isnowhhmm(domoticz)
+    domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_GREEN, message)
 end
 
 local function hueswitchon(domoticz)
@@ -56,9 +52,9 @@ return {
         if (timer.trigger == '60 minutes before sunset') then
             -- format date & time see www.lua.org/pil/22.1.html. X = time.
             local now=os.time()
-            local nowplus30minutes = utils.converttimehhmm(os.date("%X",now+(30*60)))
+            local nowplus30minutes = domoticz.helpers.converttimehhmm(domoticz,os.date("%X",now+(30*60)))
         	local message= 'Hue Lampen gehen an ' .. nowplus30minutes
-            msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_GREEN, message)
+            domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_GREEN, message)
         end
 
         -- switch the hue lights on & off in the evening

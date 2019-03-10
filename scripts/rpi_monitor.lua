@@ -8,10 +8,6 @@
     Version: 20180910
 ]]--
 
--- External modules
-local msgbox = require('msgbox')
-local utils = require('utils')
- 
 -- Idx of the devices
 local IDX_RPI_MEMORYUSAGE = 1
 local IDX_RPI_HDDUSAGE = 3
@@ -23,7 +19,7 @@ local IDX_RPI_TEMPERATURE = 4
 local function checkthreshold(domoticz, device, threshold)
     if (tonumber(device.state) > threshold) then
         local message = device.name .. ' above threshold ' .. threshold .. ' (' .. device.state .. ') ' .. utils.isnowhhmm(domoticz)
-        msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_RED, message)
+        domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_RED, message)
     end
 end
 

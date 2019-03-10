@@ -23,9 +23,6 @@
     Version: 20190228
 ]]--
 
--- external modules: /home/pi/domoticz/scripts/dzVents/scripts
-local msgbox = require('msgbox')
- 
 -- request url 
 local requesturl = 'volumio.local/api/v1/getstate'
 
@@ -117,7 +114,7 @@ return {
                 domoticz.devices(IDX_VOLUMIOPLAYSWITCH).switchOff()
                 -- domoticz.devices(IDX_VOLUMIOSTATUS).updateAlertSensor(4, MSGVOLUMIOOFF)
                 local message = '[ERROR] Volumio Current Song update: Code=' .. tostring(item.statusCode) .. ' ' .. msgbox.isnowdatetime(domoticz)
-                -- msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
+                -- domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
                 -- log
                 domoticz.log(message, domoticz.LOG_INFO)
             end

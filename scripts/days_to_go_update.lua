@@ -9,9 +9,6 @@
     Version: 20190213
 ]]--
 
--- External modules
-local utils = require('utils')
-
 -- Idx of the devices
 local IDX_DAYSLANZAROTE = 142; 
 
@@ -31,7 +28,7 @@ return {
 		-- define the text to display and update the device
 
 		-- Lanzarote Urlaub days till
-		domoticz.devices(IDX_DAYSLANZAROTE).updateText(tostring(utils.datediffnow2(12,3,2019)) .. ' T')
+		domoticz.devices(IDX_DAYSLANZAROTE).updateText(tostring(domoticz.helpers.datediffnow2(12,3,2019)) .. ' T')
 
 end
 }
