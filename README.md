@@ -7,9 +7,11 @@ As a Domoticz Beginner
 * Write up experiences during development … and build further.
 
 ***Notes***
-There might be better solutions for what is shared – but the solution works fine so far.
-
-This document is a working document – todo’s will never cease to exist.
+* There might be better solutions for what is shared – solutions might change whilst evolving.
+* This is a working document – idea’s & todo’s will never cease to exist.
+* The code of scripts & flows is not fully shared or might have changed – check the GitHub scripts folder for the latest full source.
+* The scripts are mainly developed using dzVents Lua scripts. Few exceptions using Python.
+* There is quite a bit of functionality where Node-RED flows are used. Node-RED is one of my favorite tools – esp. as wanting to learn JavaScript.
 
 ### Functions
 * Display temperature & humidity measured in rooms.
@@ -23,23 +25,21 @@ This document is a working document – todo’s will never cease to exist.
 * Energy Power Consumption metering from “volkszaehler” with charts.
 * Control Volumio Music Player whilst listening to Web Radio.
 * Monitor Stock Quotes.
-* Ambient Light (from a ESP8266 NodeMCU running ESPEasy) with threshold.
+* Ambient Light (from an ESP8266 NodeMCU running ESPEasy) with threshold.
 * Custom icons.
 * _More in progress ..._
 
-### Explore How To
-* Setup & configure Domoticz running on a Raspberry Pi.
-* Use the RFXCOM RFXtrx433E USB RF Transceiver for
-* Temperature & Humidity devices.
-* External Wind device (only for RFXCOM tests).
-* Other 433Mhz devices, i.e. door & window contacts.
-* Use external services, i.e. OpenWeatherMap.
-* Use MQTT messaging.
-* Use bindings like MQTT, Astro, Philips Hue.
-* Use Node-RED as an alternative script engine and User Interface.
-* Use a, to be determined, Domoticz Android App (native client).
-* Create advanced User Interfaces, i.e. Node-RED, Bootstrap and others.
+### Explore How To Use
+* Domoticz running on a Raspberry Pi (setup & configure).
 * Scripting using Python, Lua, dzVents, JavaScript - with dzVents as target.
+* RFXCOM RFXtrx433E USB RF Transceiver for Temperature & Humidity devices, External Wind device (only for RFXCOM tests), ither 433Mhz devices, i.e. door & window contacts.
+* External services, i.e. OpenWeatherMap.
+* MQTT messaging.
+* Philips Hue Lights.
+* Node-RED as an alternative script engine and User Interface.
+* Domoticz Android App (native client, to be determined).
+* Create advanced User Interfaces, i.e. Node-RED, Bootstrap and others.
+* ESP Easy for sensors.
 
 ### Credits
 To the developers of Domoticz and to all sharing information about Domoticz. Without these, it would not be possible to build this project and write the workbook.

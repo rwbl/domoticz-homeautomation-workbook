@@ -1,3 +1,10 @@
+### r20190310
+
+* NEW: Shared helper functions for dzVents scripts global_data.lua. Replaces the libraries utils.lua & msgbox.lua
+* UPD: Function Stock Quotes renamed to Stock Monitor
+* NEW: Function Stock Monitor - Device Total Stock Value
+* NEW: Explore ESP Easy - Rules example LED triggered by Ambient Light Lux threshold
+
 ### r20190301
 
 * NEW: Function Volumio - Control using dzVents scripts (in addition to the Node-RED solution)
