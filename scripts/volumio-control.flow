@@ -10,7 +10,7 @@
         "id": "ad1b3441.087d28",
         "type": "inject",
         "z": "ac682f6e.96aed8",
-        "name": "Make Volumio Status Request",
+        "name": "Make Volumio Status Request (NOT USED)",
         "topic": "",
         "payload": "",
         "payloadType": "date",
@@ -18,12 +18,10 @@
         "crontab": "",
         "once": true,
         "onceDelay": 0.1,
-        "x": 170,
-        "y": 120,
+        "x": 550,
+        "y": 100,
         "wires": [
-            [
-                "8e2ad04b.794528"
-            ]
+            []
         ]
     },
     {
@@ -35,8 +33,8 @@
         "ret": "txt",
         "url": "volumio.local/api/v1/getstate",
         "tls": "",
-        "x": 500,
-        "y": 120,
+        "x": 220,
+        "y": 220,
         "wires": [
             [
                 "755e3d15.e91c9c"
@@ -47,9 +45,9 @@
         "id": "fb68fdb6.72f6e8",
         "type": "comment",
         "z": "ac682f6e.96aed8",
-        "name": "Volumio Control via Domoticz r190211",
-        "info": "To basic control Volumio, the Open Audiophile Music Player, via Domoticz Dashboard.\nThe main usage is listening to web radio and capture favorite songs.\n\nThe Volumio Control features:\n\n•\tSet status Play or Stop\n•\tShow the title of the current song playing in real time\n•\tSet Volume 0 – 100 or switch On | Off\n•\tBookmark the current song to the favorites list\n•\tIndicate status OFF, PLAY, STOP\n•\tDomoticz Dashboard with dedicated Room to control Volumio\n\n",
-        "x": 190,
+        "name": "Volumio Control via Domoticz",
+        "info": "To basic control Volumio, the Open Audiophile Music Player, via Domoticz Dashboard.\nThe main usage is listening to web radio and capture favorite songs.\n\nThe Volumio Control features:\n\n•\tSet status Play or Stop\n•\tShow the title of the current song playing in real time\n•\tSet Volume 0 – 100 or switch On | Off\n•\tBookmark the current song to the favorites list\n•\tIndicate status OFF, PLAY, STOP\n•\tDomoticz Dashboard with dedicated Room to control Volumio\n\nHints:\nError: getaddrinfo ENOTFOUND volumio.local volumio.local:80\"\nChange the url to the ip.\n",
+        "x": 160,
         "y": 20,
         "wires": []
     },
@@ -60,7 +58,7 @@
         "name": "Volumio to update Domoticz \"Volumio Current Song\"  (idx=144) and \"Volumio Status\" (idx=151)",
         "info": "Make Volumio status request using the Volumio REST API.\nCheck if Volumio is playing and update the Domoticz Current Song device.\nIf Volumio status is stop, display message \"Volumio not playing\".\n",
         "x": 360,
-        "y": 80,
+        "y": 60,
         "wires": []
     },
     {
@@ -72,7 +70,7 @@
         "qos": "2",
         "broker": "f7c80436.a43f2",
         "x": 180,
-        "y": 480,
+        "y": 500,
         "wires": [
             [
                 "ed979ac3.7df488"
@@ -88,7 +86,7 @@
         "action": "",
         "pretty": false,
         "x": 500,
-        "y": 480,
+        "y": 500,
         "wires": [
             [
                 "6ce24f79.119b38"
@@ -106,7 +104,7 @@
         "tostatus": false,
         "complete": "payload",
         "x": 1030,
-        "y": 640,
+        "y": 660,
         "wires": []
     },
     {
@@ -116,7 +114,7 @@
         "name": "Domoticz Switch \"Volumio Play\"  (idx=149) to set \"Volumio Status\" (idx=151) Play or Stop",
         "info": "Listen to Domoticz MQTT messages.\nIf idx=149 (Device Volumio Play) then trigger action depending nvalue of the device.\nnvalue=1 set Volumio status Play\nnvalue=0 set Volumio status Stop\n\nExtract of the Domoticz message for idx=149:\n{\"dtype\":\"Light/Switch\",\"idx\":149,\"name\":\"Volumio Play\",\"nvalue\":0,\"stype\":\"Switch\",\"svalue1\":\"0\",\"switchType\":\"On/Off\",\"unit\":1}\n",
         "x": 340,
-        "y": 440,
+        "y": 460,
         "wires": []
     },
     {
@@ -137,7 +135,7 @@
         "repair": false,
         "outputs": 1,
         "x": 230,
-        "y": 540,
+        "y": 560,
         "wires": [
             [
                 "d24ec9bf.645a98"
@@ -167,7 +165,7 @@
         "repair": false,
         "outputs": 2,
         "x": 530,
-        "y": 540,
+        "y": 560,
         "wires": [
             [
                 "827e0ead.d3b668"
@@ -376,12 +374,12 @@
         "id": "355499a3.46b17e",
         "type": "function",
         "z": "ac682f6e.96aed8",
-        "name": "Set Domoticz MQTT payload Volumio Status",
+        "name": "Set Domoticz MQTT Volumio Status",
         "func": "// Handling Volumio HTTP Response\n// Error: The HTTP message is a string, i.e. \"Error: getaddrinfo ENOTFOUND volumio.local volumio.local:80\"\n// OK: The HTTP Message is parsed as a JSON object, which contains status play or stop\n\n// Global context are set:\n// flow.set(\"currentsong\", \"\");\n// NOT USED but an option:\n// flow.set(\"showartist\", 0); // set to 1 to show the artist in the current song\n\n// Return two messages:\n// msgvolumiostatus = Payload to update domoticz device \"Volumio Status\", i.e. 0=Off,1=play,2=stop\n// msgvolumiocurrentsong = Payload to update domoticz device \"Volumio Current Song\" displaying the title\n\n// Create Domoticz MQTT command to update the Domoticz Alert Device \"Volumio Status\" (idx=151)\nvar idxvolumiostatus = 151;\nvar idxvolumiocurrentsong = 144;\n\n// Convert the msg payload  to a string to be able to determine if contains ENOTFOUND or status\nvar msgstring = msg.payload;\n\n// Domoticz Command Message \"Volumio Status\"\nvar msgvolumiostatus = {};\n\n// Domoticz Command Message \"Volumio Current Song\"\nvar msgvolumiocurrentsong = {};\nvar currentsong = \"\";\n\n// Create the Domoticz message payload.\n// Reference:\n// command=udevice, idx=IDX, nvalue=LEVEL, svalue=TEXT\n// Level = (0=gray, 1=green, 2=yellow, 3=orange, 4=red)\n// TEXT = Text you want to display\n\nif (msg.payload.status == \"error\") {\n    // Set the alert level to 4 with svalue displaying message \"OFF\"\n    msgvolumiostatus.payload = {\"command\": \"udevice\", \"idx\": idxvolumiostatus, \"nvalue\":4, \"svalue\": \"OFF\"};\n    msgvolumiocurrentsong.payload = {};\n    flow.set(\"currentsong\", \"\");\n}\n    \nif (msg.payload.status == \"play\") {\n    // Set the alert level to 1 with svalue displaying message \"PLAY\"\n    msgvolumiostatus.payload = {\"command\": \"udevice\", \"idx\": idxvolumiostatus, \"nvalue\":1, \"svalue\": \"PLAY\"};\n    // Build the current song title - if not service webradio, then add artist\n    currentsong = msg.payload.title;\n    if (msg.payload.service !== \"webradio\") {\n        currentsong = msg.payload.artist + \" ~ \" + msg.payload.title;\n    }\n    msgvolumiocurrentsong.payload = {\"command\": \"udevice\", \"idx\": idxvolumiocurrentsong, \"svalue\": currentsong};\n    flow.set(\"currentsong\", currentsong);\n}\n\nif (msg.payload.status == \"stop\") {\n    // Set the alert level to 2 with svalue displaying message \"STOP\"\n    msgvolumiostatus.payload = {\"command\": \"udevice\", \"idx\": idxvolumiostatus, \"nvalue\":2, \"svalue\": \"STOP\"};\n    msgvolumiocurrentsong.payload = {};\n    flow.set(\"currentsong\", \"\");\n}\n\n// node.warn(flow.get(\"currentsong\"));\n\nreturn [msgvolumiostatus,msgvolumiocurrentsong];\n",
         "outputs": 2,
         "noerr": 0,
-        "x": 470,
-        "y": 240,
+        "x": 570,
+        "y": 340,
         "wires": [
             [
                 "9b96f84.4310f88"
@@ -401,7 +399,7 @@
         "retain": "",
         "broker": "f7c80436.a43f2",
         "x": 1090,
-        "y": 220,
+        "y": 280,
         "wires": []
     },
     {
@@ -414,8 +412,8 @@
         "start": "",
         "inout": "out",
         "property": "payload",
-        "x": 750,
-        "y": 220,
+        "x": 810,
+        "y": 280,
         "wires": [
             [
                 "1fd7fa83.2b5d6d",
@@ -434,7 +432,7 @@
         "retain": "",
         "broker": "f7c80436.a43f2",
         "x": 1110,
-        "y": 280,
+        "y": 340,
         "wires": []
     },
     {
@@ -448,39 +446,39 @@
         "tostatus": false,
         "complete": "payload",
         "x": 1020,
-        "y": 120,
+        "y": 160,
         "wires": []
     },
     {
         "id": "755e3d15.e91c9c",
         "type": "switch",
         "z": "ac682f6e.96aed8",
-        "name": "Check Volumio Response",
+        "name": "Check Volumio REST Request Response",
         "property": "payload",
         "propertyType": "msg",
         "rules": [
             {
                 "t": "cont",
-                "v": "status",
+                "v": "Error",
                 "vt": "str"
             },
             {
                 "t": "cont",
-                "v": "Error",
+                "v": "status",
                 "vt": "str"
             }
         ],
         "checkall": "true",
         "repair": false,
         "outputs": 2,
-        "x": 190,
-        "y": 180,
+        "x": 240,
+        "y": 280,
         "wires": [
             [
-                "9ded57c7.f82048"
+                "58a12c98.05430c"
             ],
             [
-                "58a12c98.05430c"
+                "9ded57c7.f82048"
             ]
         ]
     },
@@ -492,8 +490,8 @@
         "property": "payload",
         "action": "",
         "pretty": false,
-        "x": 520,
-        "y": 180,
+        "x": 200,
+        "y": 340,
         "wires": [
             [
                 "355499a3.46b17e"
@@ -510,8 +508,8 @@
         "start": "",
         "inout": "out",
         "property": "payload",
-        "x": 750,
-        "y": 280,
+        "x": 810,
+        "y": 340,
         "wires": [
             [
                 "976da084.1ea958",
@@ -524,7 +522,7 @@
         "id": "58a12c98.05430c",
         "type": "change",
         "z": "ac682f6e.96aed8",
-        "name": "Set Status to Error",
+        "name": "Set Volumio Status to Error",
         "rules": [
             {
                 "t": "set",
@@ -539,8 +537,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 170,
-        "y": 240,
+        "x": 560,
+        "y": 280,
         "wires": [
             [
                 "355499a3.46b17e"
@@ -799,7 +797,7 @@
         "retain": "",
         "broker": "f7c80436.a43f2",
         "x": 1050,
-        "y": 340,
+        "y": 400,
         "wires": []
     },
     {
@@ -812,7 +810,7 @@
         "retain": "",
         "broker": "f7c80436.a43f2",
         "x": 1020,
-        "y": 160,
+        "y": 220,
         "wires": []
     },
     {
@@ -838,7 +836,7 @@
         "retain": "",
         "broker": "f7c80436.a43f2",
         "x": 1020,
-        "y": 460,
+        "y": 480,
         "wires": []
     },
     {
@@ -861,7 +859,7 @@
         "to": "",
         "reg": false,
         "x": 780,
-        "y": 520,
+        "y": 540,
         "wires": [
             [
                 "6a15c492.7c6d2c",
@@ -889,7 +887,7 @@
         "to": "",
         "reg": false,
         "x": 780,
-        "y": 560,
+        "y": 580,
         "wires": [
             [
                 "6a15c492.7c6d2c",
@@ -917,7 +915,7 @@
         "to": "",
         "reg": false,
         "x": 1080,
-        "y": 520,
+        "y": 540,
         "wires": [
             [
                 "476caab9.dd2024"
@@ -934,10 +932,181 @@
         "url": "",
         "tls": "",
         "x": 1060,
-        "y": 580,
+        "y": 600,
         "wires": [
             [
                 "69a0b87f.3e6d4"
+            ]
+        ]
+    },
+    {
+        "id": "2e38ec69.bf5dfc",
+        "type": "file",
+        "z": "ac682f6e.96aed8",
+        "name": "Volumio Save Favorite to File",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "x": 1040,
+        "y": 1360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aeb8c26e.916a4",
+        "type": "change",
+        "z": "ac682f6e.96aed8",
+        "name": "Volumio Set Bookmark Filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.svalue1",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$replace(payload, \" \", \" \")\t",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "filename",
+                "pt": "msg",
+                "to": "$join(['/home/pi/music/',$string(msg.payload)])",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 610,
+        "y": 1360,
+        "wires": [
+            [
+                "2e38ec69.bf5dfc"
+            ]
+        ]
+    },
+    {
+        "id": "cc2c9efa.cd2b78",
+        "type": "mqtt in",
+        "z": "ac682f6e.96aed8",
+        "name": "Listen to Domoticz MQTT Messages",
+        "topic": "domoticz/out",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 180,
+        "y": 1300,
+        "wires": [
+            [
+                "93131bfb.ce7498"
+            ]
+        ]
+    },
+    {
+        "id": "93131bfb.ce7498",
+        "type": "json",
+        "z": "ac682f6e.96aed8",
+        "name": "Domoticz MQTT Message to JSON",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 500,
+        "y": 1300,
+        "wires": [
+            [
+                "463cad52.50d1d4"
+            ]
+        ]
+    },
+    {
+        "id": "463cad52.50d1d4",
+        "type": "switch",
+        "z": "ac682f6e.96aed8",
+        "name": "Select Domoticz Bookmark Device (idx=146)",
+        "property": "payload.idx",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "146",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 250,
+        "y": 1360,
+        "wires": [
+            [
+                "aeb8c26e.916a4"
+            ]
+        ]
+    },
+    {
+        "id": "d766706b.5dbfb8",
+        "type": "comment",
+        "z": "ac682f6e.96aed8",
+        "name": "Save the bookmarked song to file",
+        "info": "in folder:\n/home/pi/music\n\nProcess:\nListen to Domoticz msg with idx 146\nSet the filename from the Domoticz msg payloda property svalue 1\n(msg.payload.svalue1)\nSet the msg.filename\nSave the file\n",
+        "x": 170,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "a7d76400.ffa03",
+        "type": "ping",
+        "z": "ac682f6e.96aed8",
+        "name": "Ping Volumio Server Response",
+        "host": "volumio.local",
+        "timer": "5",
+        "x": 170,
+        "y": 100,
+        "wires": [
+            [
+                "1b98b8f.9183ac7"
+            ]
+        ]
+    },
+    {
+        "id": "1b98b8f.9183ac7",
+        "type": "switch",
+        "z": "ac682f6e.96aed8",
+        "name": "Switch Volumio Return Response",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "neq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 220,
+        "y": 160,
+        "wires": [
+            [
+                "58a12c98.05430c"
+            ],
+            [
+                "8e2ad04b.794528"
             ]
         ]
     },
