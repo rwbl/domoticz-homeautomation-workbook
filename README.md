@@ -26,6 +26,7 @@ As a Domoticz Beginner
 * Control Volumio Music Player whilst listening to Web Radio.
 * Monitor Stock Quotes.
 * Ambient Light (from an ESP8266 NodeMCU running ESPEasy) with threshold.
+* Hue Light controlled via ESP8266 microcontroller with slide potentiometer & 4-digit-7-segment-display.
 * Custom icons.
 * _More in progress ..._
 
