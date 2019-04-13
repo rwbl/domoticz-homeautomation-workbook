@@ -1,4 +1,4 @@
-### 201904DD
+### 20190413
 * NEW: Explore ESP Easy - added chapters to update firmware, set / view rules logging
 * NEW: Explore ESP8266 - Hue light remote control = small fun project to tinker with microcontrollers and connected devices (programming an ESP8266 microcontroller in C++ using the Arduino IDE)
 * UPD: RFXCOM - Prepare RFXtrx433E
