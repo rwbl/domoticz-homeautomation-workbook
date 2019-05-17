@@ -1,6 +1,6 @@
-### 201905DD
+### 20190516
 * NEW: Explore ESP Easy - added chapters to update firmware, set / view rules logging
-* NEW: Explore ESP Easy - added preferred solution to Control Hue Brightness using Potentiometer using dummy devices and rule with SendToHTTP command
+* NEW: Explore ESP Easy - added preferred solution to control Hue Light Brightness via Potentiometer using dummy devices and rule with SendToHTTP command
 * UPD: Explore ESP Easy - reworked the experiments documentation tobe consistent (purpose,parts,circuit,esp easy,domoticz)
 * NEW: Explore ESP8266 - Hue light remote control = small fun project to tinker with microcontrollers and connected devices (programming an ESP8266 microcontroller in C++ using the Arduino IDE)
 * NEW: Explore API Interaction: Example Syntax HTTP vs MQTT 
