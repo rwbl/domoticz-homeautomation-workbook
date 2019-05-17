@@ -1,43 +1,50 @@
-Status 20190516
+### Status 20190516
 
 NEW: Power measurement using a Revolt SF-436 [requires rfxtrx type2 firmware, ELEC5 protocol] (or other).
-Status:
+_Status_
 Device ordered.
 
 NEW: Samsung TV with Tizen OS - explore if possible to build some basic control (on/off, Volume) as a starter.
-Status:
+_Status_
 Tested on the Domoticz development environment (RPi) the Node-RED nodes https://www.npmjs.com/package/node-red-contrib-samsung-tv-mk .
 
 NEW: Hardware Plugin for Tinkerforge Master Brick & selected Bricklets.
-Status:
+_Status_
 Not started.
 
 NEW: Traffic Light Status Indicator for the Raspberry Pi Domoticz Server (using GPIO).
-Status: Not started.
+_Status_
+Not started.
 
 NEW: Measure CO living room.
-Status: Not started.
+_Status_
+Not started.
+Have not found a device yet which is supported by RFXCOM 433MHz and Domoticz.
 
 NEW: Notifications Explore usage of notifications other then Email (Status: Not started).
-Status: Not started.
+_Status_
+Not started.
 
 NEW: Thresholds Set threshold via another UI, i.e. Node-RED or Custom UI (Status: Not started).
-Status: Not started.
+_Status_
+Not started.
 
 UPD: Build house control functions.
-Status: These are implemented but not shared yet.
+_Status_
+These are implemented but not shared yet.
 
 NEW: Connect Sonoff (Itead) devices using ESP Easy software.
-Status:
-Sonoff device and FTDI converter (3.3v connection) ordered.
-Important to set mode DOUT!
-Use the ESP Easy flasher:
+_Status_
+Sonoff device and FTDI converter (3.3v connection) ordered [20190516].
+Planned to use the ESP Easy flasher as outlined in my  Domoticz Home Automation workbook chapter Explore ESP Easy.
+Steps like...
 * Do not connect power to the Sonoff
 * Press and keep the button down on the Sonoff
 * Connect the FTDI Adapter
 * Release the button on the Sonoff
 * Flash
 * Disconnect the Sonoff from the FTDI adapter
+Important to set mode DOUT!
 
 Manage the Sonoff from ESP Easy via HTTP.
 Sonoff parameter:
