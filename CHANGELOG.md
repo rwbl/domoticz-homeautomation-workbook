@@ -7,6 +7,7 @@
 * UPD: RFXCOM - Prepare RFXtrx433E
 * UPD: Function Volumio - changed Volumio Bookmark switch type from On/Off to Push On Button
 * UPD: Function Volumio - changed Volumio Refresh switch type from On/Off to Push On Button
+* UPD: Various minor corrections
 
 ### 20190310
 
