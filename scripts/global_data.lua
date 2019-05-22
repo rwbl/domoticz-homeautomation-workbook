@@ -1,9 +1,9 @@
 -- global_data.lua
 -- utility functions used by all dzVents scripts
--- this scripts holds all the globally persistent variables and helper functions
+-- this script holds all the globally persistent variables and helper functions
 -- see the documentation in the wiki
 -- NOTE:
--- THERE CAN BE ONLY ONE global_data SCRIPT in your Domoticz install.
+-- THERE IS ONLY ONE global_data SCRIPT for each Domoticz install.
 -- usage:
 -- return {
 --    ...
@@ -17,7 +17,7 @@
 --    end
 -- }
 -- Robert W.B. Linn
--- 20190309
+-- 20190518
 
 return {
 	-- global persistent data
@@ -28,10 +28,11 @@ return {
 	-- global helper functions
 	helpers = {
 	    
-		-- Idx of devices used
+		-- Idx of devices used (do not forget the comma at the end of the list)
 	    IDX_ALERTMSG = 55,
 	    IDX_CONTROLMSG = 52,
-
+	    IDX_EVENTMONITORMSG = 161,
+	    
         ------------------------------------------------------------------------
         -- STRING
         ------------------------------------------------------------------------
@@ -225,6 +226,11 @@ return {
         -- Update the control message with text
         controlmsg = function(domoticz, msg)
 	        domoticz.devices(domoticz.helpers.IDX_CONTROLMSG).updateText(msg)
+        end,
+
+        -- Update the event monitor message with text
+        eventmonitormsg = function(domoticz, msg)
+	        domoticz.devices(domoticz.helpers.IDX_EVENTMONITORMSG).updateText(msg)
         end
 
 	}
