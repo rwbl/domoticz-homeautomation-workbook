@@ -2,7 +2,7 @@
 Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 
 As a Domoticz Beginner
-* Main Purpose is to explore & learn Domoticz & Scripting.
+* Main Purpose to explore and learn Domoticz & Scripting.
 * Get an initial Home Automation Solution up & running.
 * Write up experiences during development … and build further.
 
@@ -19,28 +19,36 @@ As a Domoticz Beginner
 * Control Somfy roller shutters with RTS motors in rooms.
 * Philips Hue Lighting System control via Hue Bridge for ZigBee devices.
 * Security door & window wireless contact detectors.
-* Information on some key dates (Calendar type information).
+* Information on key dates (calendar type information).
 * MQTT subscribe & publish messages to trigger actions or information.
 * Raspberry Pi system information with charts and threshold email notification.
-* Energy Power Consumption metering from “volkszaehler” with charts.
-* Control Volumio Music Player whilst listening to Web Radio.
-* Monitor Stock Quotes.
-* Ambient Light (from an ESP8266 NodeMCU running ESPEasy) with threshold.
-* Hue Light controlled via ESP8266 microcontroller with slide potentiometer & 4-digit-7-segment-display.
+* Electricity power & energy for the house from “volkszaehler” with charts.
+* Electricity power & energy for selected devices / rooms (washer, MakeLab etc.).
+* Coffee machine monitor – start and end time, info message.
+* Control Volumio music player whilst listening to web radio.
+* Monitor stock quotes.
+* Ambient light (from ESP8266 running ESP Easy) with threshold.
+* Hue Light controlled via ESP8266 with slide potentiometer & 4-digit-7-segment-display.
+* Soil Moisture monitor for plants.
+* Event monitor for selected devices.
 * Custom icons.
 * _More in progress ..._
 
 ### Explore How To Use
-* Domoticz running on a Raspberry Pi (setup & configure).
-* Scripting using Python, Lua, dzVents, JavaScript - with dzVents as target.
-* RFXCOM RFXtrx433E USB RF Transceiver for Temperature & Humidity devices, External Wind device (only for RFXCOM tests), ither 433Mhz devices, i.e. door & window contacts.
-* External services, i.e. OpenWeatherMap.
-* MQTT messaging.
-* Philips Hue Lights.
+* Domoticz running on a Raspberry Pi (setup, configure).
+* Scripting Python, Lua, dzVents, JavaScript.
+* Python Plugin Development (mainly with Tinkerforge Building Blocks)
+* API interaction
+* MQTT messaging
 * Node-RED as an alternative script engine and User Interface.
-* Domoticz Android App (native client, to be determined).
-* Create advanced User Interfaces, i.e. Node-RED, Bootstrap and others.
+* SQLite
+* ESP8266
 * ESP Easy for sensors.
+* RFXCOM RFXtrx433E USB RF Transceiver for Temperature & Humidity devices, External Wind device (only for RFXCOM tests), Other 433Mhz devices, i.e. door & window contacts.
+* Philips Hue Light Control.
+* External services
+* Domoticz Android App (native client, to be determined).
+* Advanced User Interfaces, i.e. Node-RED, Bootstrap …
 
 ### Credits
 To the developers of Domoticz and to all sharing information about Domoticz. Without these, it would not be possible to build this project and write the workbook.
