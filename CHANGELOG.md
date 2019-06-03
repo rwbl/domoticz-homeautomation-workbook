@@ -11,6 +11,7 @@
 * UPD: Explore ESP Easy - Experiment Ambient Light enhanced with LED indicator
 * UPD: To-Do-List
 * UPD: Various smaller enhancements & corrections
+* INF: _The more exploring, the more fun it makes_
 
 ### 20190516
 * NEW: Explore ESP Easy - added chapters to update firmware, set / view rules logging
