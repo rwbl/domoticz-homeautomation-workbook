@@ -24,14 +24,14 @@ end
 local function hueswitchon(domoticz)
 	domoticz.devices(IDX_HUE_WZABLAGE).switchOn()
     domoticz.devices(IDX_HUE_WZTV).switchOn()
-    domoticz.devices(IDX_HUE_HAUSTUER).switchOn()
+    -- domoticz.devices(IDX_HUE_HAUSTUER).switchOn()
     setalertmsg(domoticz, 'an')
 end
 
 local function hueswitchoff(domoticz)
     domoticz.devices(IDX_HUE_WZABLAGE).switchOff()
     domoticz.devices(IDX_HUE_WZTV).switchOff()
-    domoticz.devices(IDX_HUE_HAUSTUER).switchOff()
+    -- domoticz.devices(IDX_HUE_HAUSTUER).switchOff()
     setalertmsg(domoticz, 'aus')
 end
 

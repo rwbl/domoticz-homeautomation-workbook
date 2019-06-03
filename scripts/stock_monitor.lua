@@ -11,10 +11,10 @@
 
 -- Stock constants
 -- idx device
-local IDX_STOCKA = 152           -- price
-local IDX_TH_STOCKA = 8          -- threshold
-local IDX_STOCKA_TOTAL = 156     -- total value all shares
-local IDX_DEF_STOCKA_COUNT = 12  -- number of shares
+local IDX_STOCK_RDS = 152           -- price
+local IDX_TH_STOCK_RDS = 8          -- threshold
+local IDX_STOCK_RDS_TOTAL = 156     -- total value all shares
+local IDX_DEF_STOCK_RDS_COUNT = 12  -- number of shares
 
 -- temp vars
 local thresholdvalue
@@ -25,7 +25,7 @@ local message
 return {
 	on = {
 		devices = {
-			IDX_STOCKA
+			IDX_STOCK_RDS
 		},
 	},
 	data = {
@@ -37,15 +37,15 @@ return {
 		    domoticz.log('Device ' .. device.name .. ' was changed  to '.. device.state, domoticz.LOG_INFO)
 
             -- select the device to obtain the thresholdvalue
-            if device.idx == IDX_STOCKA then
+            if device.idx == IDX_STOCK_RDS then
                 -- get threshold
-                thresholdvalue = domoticz.variables(IDX_TH_STOCKA).value
+                thresholdvalue = domoticz.variables(IDX_TH_STOCK_RDS).value
  		        domoticz.log('Device ' .. device.name .. ': '.. tostring(thresholdvalue) .. ', ' .. tostring(domoticz.data.thresholdnotified), domoticz.LOG_INFO)
  		        
  		        -- update total value custom sensor
- 		        stockvalue = math.floor(domoticz.variables(IDX_DEF_STOCKA_COUNT).value * tonumber(device.state))
+ 		        stockvalue = math.floor(domoticz.variables(IDX_DEF_STOCK_RDS_COUNT).value * tonumber(device.state))
  		        domoticz.log('Device ' .. device.name .. ' Stock Value: '.. tostring(stockvalue), domoticz.LOG_INFO)
-                domoticz.devices(IDX_STOCKA_TOTAL).updateCustomSensor(stockvalue)
+                domoticz.devices(IDX_STOCK_RDS_TOTAL).updateCustomSensor(stockvalue)
             end
             -- add more devices
 

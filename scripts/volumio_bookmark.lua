@@ -53,7 +53,7 @@ return {
             domoticz.devices(IDX_VOLUMIO_FAVORITES).updateText(domoticz.devices(IDX_VOLUMIO_CURRENTSONG).text);
             savesong(domoticz.devices(IDX_VOLUMIO_CURRENTSONG).text);
             domoticz.log(message)
-	        switch.switchOff()
+	        -- switch.switchOff() NOT REQUIRED as changed to push on button
 		end
 	end
 }
