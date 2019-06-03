@@ -1,16 +1,17 @@
 # domoticz-homeautomation-workbook
 Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 
-As a Domoticz Beginner
-* Main Purpose to explore and learn Domoticz & Scripting.
-* Get an initial Home Automation Solution up & running.
-* Write up experiences during development … and build further.
+### Objectives
+* To explore and learn the Domoticz Home Automation System.
+* Set up a solution from scratch on using two Raspberry Pi 3B+ (production and development server).
+* Write up experiences in building the solution … and update any further with new ideas - see To-Do-List.
 
-***Notes***
-* There might be better solutions for what is shared – solutions might change whilst evolving.
-* This is a working document – idea’s & todo’s will never cease to exist.
-* The code of scripts & flows is not fully shared or might have changed – check the GitHub scripts folder for the latest full source.
+### Notes
+* There might be better solutions for what is shared = means solutions might change whilst evolving.
+* This is a working document – idea’s & to-do’s will (probably) never cease to exist.
+* The source code of scripts & flows is not fully shared or might have changed – check the scripts folder for the latest full source.
 * The scripts are mainly developed using dzVents Lua scripts. Few exceptions using Python.
+* Python is used for creating hardware plugins (mainly with Tinkerforge Building Blocks.
 * There is quite a bit of functionality where Node-RED flows are used. Node-RED is one of my favorite tools – esp. as wanting to learn JavaScript.
 
 ### Functions
