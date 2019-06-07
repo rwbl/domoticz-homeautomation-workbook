@@ -1,5 +1,5 @@
 ### 20190607
-* UPD: Explore Python Plugin Development - Hints on log errors
+* UPD: Explore Python Plugin Development - Hints on Domoticz log errors
 * UPD: Various smaller enhancements & corrections
 
 ### 20190603
