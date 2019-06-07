@@ -6,8 +6,8 @@ _Status_
 Enhancement: second device to measure the power & energy of the heating system.
 
 #### NEW: Air Quality Monitor
-Measure Indoor Air Quality (IAQ) index, temperature, humidity and air pressure
-Build solution "Air Quality Monitor" composed out of Tinkerforge Master Brick with WiFi Extension & Bricklets (Air Quality, RGB LED, LCD 20x4).
+Purpose: To measure the Indoor Air Quality (IAQ) index, temperature, humidity, air pressure and illuminance.
+Build solution, called "Air Quality Plus" composed out of Tinkerforge Master Brick with WiFi Extension & Bricklets (Air Quality 1.0, RGB LED 2.0, LCD 20x4 1.2,Ambientlight 2.0).
 Information taken from the Tinkerforge [documentation](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Air_Quality.html#air-quality-bricklet):
 Typical applications for the Air Quality Bricklet are the monitoring of air quality, environmental statistics, home automation and similar.
 The IAQ index is a measurement for the quality of air.
@@ -15,9 +15,10 @@ To calculate the IAQ index the Bricklet detects ethane, isoprene (2-methylbuta-1
 These gas measurements are combined with the measurements of air pressure, humidity and temperature to calculate the final IAQ index.
 The IAQ index has a range of 0-500:
 0-50=good,51-100=average,101-150=little bad,151-200=bad,201-300=worse,301-500=very bad.
-The "Air Quality Monitor" hardware will be a Domotizc Python Plugin.
+The "Air Quality Plus" hardware will be a Domotizc Python Plugin.
 _Status_
-Waiting for the Air Qiality Bricklet, received the other required Bricks & Bricklets.
+Waiting for the Air Quality Bricklet, received the other required Bricks & Bricklets.
+In progress building the prototype.
 
 #### NEW: Postbox Watcher
 Watch opening the top cover of the postbox and notify if opened.

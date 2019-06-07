@@ -1,3 +1,7 @@
+### 20190607
+* UPD: Explore Python Plugin Development - Hints on log errors
+* UPD: Various smaller enhancements & corrections
+
 ### 20190603
 * NEW: Function Contact Detection - using X10 devices PB-62R
 * NEW: Function Event Monitor - keep a log for changes for selected devices
