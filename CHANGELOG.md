@@ -5,7 +5,7 @@
 ### 20190603
 * NEW: Function Contact Detection - using X10 devices PB-62R
 * NEW: Function Event Monitor - keep a log for changes for selected devices
-* NEW: Hardware Python Plugin - build a showcase [Traffic Light](https://github.com/rwbl/domoticz-plugin-traffic-light) interacting with Tinkerforge Brick & Bricklets, for functions using Tinkerforge Building Blocks. 
+* NEW: Hardware Python Plugin - showcase [Traffic Light](https://github.com/rwbl/domoticz-plugin-traffic-light) interacting with Tinkerforge Brick & Bricklets, for functions using Tinkerforge Building Blocks (i.e. Soil Moisture Monitor, Air Quality Plus)
 * NEW: Power & Energy Monitoring - started but work in progress
 * NEW: Electricity Device & Rooms - implemented measuring room MakeLab with Revolt SF-436
 * UPD: Electricity House - complete rework of the solution
@@ -13,7 +13,7 @@
 * UPD: User Variables - database table info, list of variables updated
 * UPD: Explore SQL - installed the SQLite3 package with examples
 * UPD: Explore ESP Easy - Experiment Ambient Light enhanced with LED indicator
-* UPD: To-Do-List
+* UPD: To-do list
 * UPD: Various smaller enhancements & corrections
 * INF: _The more exploring, the more fun it makes_
 
