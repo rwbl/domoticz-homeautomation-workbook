@@ -31,10 +31,10 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * Ambient light (from ESP8266 running ESP Easy) with threshold.
 * Hue Light controlled via ESP8266 with slide potentiometer & 4-digit-7-segment-display.
 * Event monitor for selected devices.
-* Hardware Monitor for the Raspberry Pi's used.
+* Hardware Monitor for the Raspberry Pi's used (see HardwareMonitor.zip).
 * Custom icons.
-* Soil Moisture monitor for plants (Plugin).
-* Air Quality monitor (Plugin)
+* Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
+* Air Quality monitor - [Plugin](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor).
 * _More in progress ..._
 
 ### Explore How To Use
