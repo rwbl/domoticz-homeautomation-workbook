@@ -1,26 +1,24 @@
-### Status 20190603
+### Status 20190621
 
-#### NEW: Additional Revolt SF-436 
-Installed a Revolt SF-436 to measure power (Watt) & energy (Wh, kWh) for the room MakeLab = working fine.
+#### FIX: Function Energy Devices & Rooms - Revolt SF-436.m Range
+Installed a Revolt SF-436.m to measure power (Watt) & energy (Wh, kWh) for the room MakeLab.
+**Issues**
+1) If the RFXtrx433E is more then about 10 meters range away from the Revolot device, then no data is received else working ok.
+Probably rather weak antenna. Explore how to improve the range ELSE consider other solution.
+2) The device is causing high traffic on the 433.92MHz frequency. Sending almost every few seconds data.
+The Domoticz log is getting spoiled with data and of course the RFXtrx433E is rather busy.
+3) Been thinking about additional Revolot devices - but regarding issues 1 and 2 will not continue.
+4) Alternatives (need to explore further):
+* Tinkerforge upcoming [Energy Bricklet](https://github.com/Tinkerforge/energy-monitor-bricklet)
+* HomeMatic CCU3 with plugs = rather expensive, requires interface to Domoticz (MQTT prefferable), if using then add more functionality
 _Status_
-Enhancement: second device to measure the power & energy of the heating system.
+On Hold for now.
 
-#### NEW: Function Air Quality Plus
-Purpose: To measure the Indoor Air Quality (IAQ) index, temperature, humidity, air pressure and illuminance.
-Build solution, called "Air Quality Plus" (because measuring more then the air quality) composed out of 
-* Tinkerforge Master Brick with WiFi Extension
-* Tinkerforge Bricklets - Air Quality 1.0, RGB LED 2.0, LCD 20x4 1.2,Ambientlight 2.0.
-Information taken from the Tinkerforge [documentation](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Air_Quality.html#air-quality-bricklet):
-Typical applications for the Air Quality Bricklet are the monitoring of air quality, environmental statistics, home automation and similar.
-The IAQ index is a measurement for the quality of air.
-To calculate the IAQ index the Bricklet detects ethane, isoprene (2-methylbuta-1,3-diene), ethanol, acetone and carbon monoxide (often called VOC, volatile organic components) by adsorption.
-These gas measurements are combined with the measurements of air pressure, humidity and temperature to calculate the final IAQ index.
-The IAQ index has a range of 0-500:
-0-50=good,51-100=average,101-150=little bad,151-200=bad,201-300=worse,301-500=very bad.
-The "Air Quality Plus" hardware will be a Domotizc Python Plugin.
+#### NEW: Function Homematic
+Include a homemtic Raspberry Pi CCU2 or 3 in this Home Automation solution.
+Start with few tests to check out ho to integrate in Domoticz and explore further.
 _Status_
-Waiting for the Air Quality Bricklet, received the other required Bricks & Bricklets.
-In progress building the prototype and the Domoticz Hardware Plugin.
+Not started.
 
 #### NEW: Function Postbox Watcher
 Watch opening the top cover of the postbox and notify if opened.
@@ -45,7 +43,7 @@ Not started.
 Have not found a device yet which is supported by RFXCOM 433MHz and Domoticz.
 Will probably not continue as could be covered by the function "Air Quality Plus".
 
-#### NEW: Explore notifications usage other then Email
+#### NEW: Explore using notifications beside Email
 _Status_
 Not started.
 

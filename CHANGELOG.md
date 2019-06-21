@@ -1,4 +1,8 @@
-### 20190607
+### 20190621
+* NEW: Function Hardware Monitor for all Raspberry Pi's used.
+* NEW: Function Indoor Air Quality Monitor - Plugin. See [more](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor)
+* NEW: Appendix Tools MQTT Logger - Log and analyse Domoticz MQTT messages (topic domoticz/out),  Node-RED flow
+* UPD: Function Custom Icons reworked
 * UPD: Explore Python Plugin Development - Hints on Domoticz log errors
 * UPD: Various smaller enhancements & corrections
 
