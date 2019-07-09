@@ -5,6 +5,7 @@
 * NEW: Function Postbox Watcher - RaspberryMatic CCU with device HMIP-SDWO
 * NEW: User Variables - List with Python3 script
 * UPD: Alert Message - improved dzVents Lua scripts; Alert Level 4 sends Email notifications
+* UPD: Various smaller enhancements & corrections
 
 ### 20190621
 * NEW: Function Hardware Monitor for all Raspberry Pi's used.
