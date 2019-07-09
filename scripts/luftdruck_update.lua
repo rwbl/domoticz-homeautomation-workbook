@@ -13,6 +13,8 @@
 -- Idx of the devices
 local IDX_BMP280 = 115;
 local IDX_LUFTDRUCK = 116;
+local DEF_BMP280_COMPENSATION = 0
+
 
 -- Event handling changes of the BMP280 device
 return {
@@ -25,10 +27,10 @@ return {
         -- print(device.dump())
 
 		-- domoticz.log('Device ' .. device.name .. ' changed ', domoticz.LOG_INFO)
-		domoticz.log('Barometer: ' .. device.barometer .. '/' .. device.forecast .. '/' .. device.forecastString, domoticz.LOG_INFO)
+		domoticz.log('Barometer: B=' .. device.barometer .. '/F=' .. device.forecast .. '/FS=' .. device.forecastString, domoticz.LOG_INFO)
 
         -- Round the pressure
-		pressure = math.floor(device.barometer)
+		pressure = math.floor(device.barometer) + DEF_BMP280_COMPENSATION
 
 		-- Forecast from the BMP device to the Barometer device
 		-- See source code RFXNames.cpp, BMP_Forecast_Desc

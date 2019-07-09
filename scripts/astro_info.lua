@@ -15,10 +15,7 @@ local IDX_SUNRISESET = 121
 return {
     -- active = true,
     on = {
-        timer = {
-            -- 'every minute'
-	        'at 01:00'
-        }
+        timer = { 'at 01:00' }
     },
     execute = function(domoticz, timer)
 

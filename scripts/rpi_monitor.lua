@@ -19,7 +19,7 @@ local IDX_RPI_TEMPERATURE = 4
 local function checkthreshold(domoticz, device, threshold)
     if (tonumber(device.state) > threshold) then
         local message = device.name .. ' above threshold ' .. threshold .. ' (' .. device.state .. ') ' .. utils.isnowhhmm(domoticz)
-        domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_RED, message)
+        domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
     end
 end
 

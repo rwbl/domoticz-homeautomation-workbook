@@ -2,7 +2,7 @@
     wind_update.lua
 	If the a value of the device Windmesser (idx=28) changes, 
 	update the value (Wind direction & speed) of 
-	the Virtual Sensor Wind named Wind (idx=117)
+	the Virtual Sensor Wind named Wind (ix=117)
     Use print(device.dump()) ONLY ONCE to get the properties.
     Project: atHome
     Interpreter: dzVents, Device

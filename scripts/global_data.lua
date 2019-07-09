@@ -16,8 +16,7 @@
 --
 --    end
 -- }
--- Robert W.B. Linn
--- 20190518
+-- 20190709 by rwbl
 
 return {
 	-- global persistent data
@@ -32,7 +31,8 @@ return {
 	    IDX_ALERTMSG = 55,
 	    IDX_CONTROLMSG = 52,
 	    IDX_EVENTMONITORMSG = 161,
-	    
+        IDX_TH_ALERTTOEMAIL = 14,
+
         ------------------------------------------------------------------------
         -- STRING
         ------------------------------------------------------------------------
@@ -183,7 +183,7 @@ return {
         end,
 
         -- Convert seconds to clock hh:mm:ss
-        SecondsToClock = function(seconds)
+        secondstoclock = function(seconds)
             local seconds = tonumber(seconds)
             if seconds <= 0 then
                 return "00:00:00";
@@ -197,7 +197,7 @@ return {
 
         -- Convert minutes to clock hh:mm
         -- Example: MinutesToClock(domoticz.time.sunriseInMinutes)
-        MinutesToClock = function(minutes)
+        minutestoclock = function(minutes)
             local minutes = tonumber(minutes)
             if minutes <= 0 then
                 return "00:00";
@@ -210,17 +210,32 @@ return {
 
         -- Return the time of day in minutes since midnight
         -- Example: domoticz.log(tostring(domoticz.helpers.TimeOfDayMinutes()), domoticz.LOG_INFO)
-        TimeOfDayMinutes = function()
+        timeofdayminutes = function()
 	        return os.date("%H") * 60 + os.date("%M")
         end,
 
         ------------------------------------------------------------------------
-        --  MESSAGES
+        -- MATH
+        ------------------------------------------------------------------------
+        
+        -- Round a number to n decimals
+        -- Returns rounded number
+        roundnumber = function(number, decimals)
+            local power = 10^decimals
+            return math.floor(number * power) / power
+        end,
+
+        ------------------------------------------------------------------------
+        -- MESSAGES
         ------------------------------------------------------------------------
 
         -- Update the alert message with level and text
         alertmsg = function(domoticz, level, msg)
         	domoticz.devices(domoticz.helpers.IDX_ALERTMSG).updateAlertSensor(level, msg)
+        	-- Send email notification in case level = 4 (or other as set by uservar TH_ALERTTOEMAIL)
+        	if (level == domoticz.variables(IDX_TH_ALERTTOEMAIL).value) then
+        	    domoticz.notify('ALERT', msg, domoticz.PRIORITY_HIGH)
+        	end
         end,
 
         -- Update the control message with text

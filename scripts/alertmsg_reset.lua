@@ -1,13 +1,14 @@
 --[[
     alertmsg_reset.lua
-    If the "Alert Meldung Reset" switch is turned ON, 
-    the text of the alert sensor (idx=55) is set to the value of the User Variable DEF_ALERTMSG and 
+    If the "Alert Message Reset" push-on-button (switch) is turned ON, 
+    the text of the alert sensor (idx=55, "Alert Messages") is set to the value of the User Variable DEF_ALERTMSG.
+    Because its a push-on-button, no need to turn the switch off.
     the switch is turned OFF again.    
     Project: atHome
     Interpreter: dzVents, Timer
     See: athome.pdf
     Author: Robert W.B. Linn
-    Version: 20180909
+    Version: 20190708
 ]]--
 
 -- Idx of the devices used
@@ -17,9 +18,7 @@ local IDX_ALERTMSG_RESET = 119
 return {
     -- Check which device(s) have a state change
 	on = {
-		devices = {
-			IDX_ALERTMSG_RESET
-		}
+		devices = { IDX_ALERTMSG_RESET }
 	},
     -- Handle the switch if its state has changed to On
 	execute = function(domoticz, device)
@@ -32,7 +31,6 @@ return {
                 -- msgbox.alertmsg(domoticz, domoticz.ALERTLEVEL_GREY, message)
                 domoticz.log(message)
             end
-	        device.switchOff()
 		end
 	end
 }
