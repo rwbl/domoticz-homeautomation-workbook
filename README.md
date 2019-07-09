@@ -11,8 +11,8 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * This is a working document – idea’s & to-do’s will (probably) never cease to exist.
 * The source code of scripts & flows is not fully shared or might have changed – check the scripts folder for the latest full source.
 * The scripts are mainly developed using dzVents Lua scripts. Few exceptions using Python.
-* Python is used for creating hardware plugins (mainly with Tinkerforge Building Blocks.
-* Several functions are using Node-RED flows (one of my favorite tools).
+* Python is used for creating hardware plugins (with HomeMatic, Tinkerforge).
+* Several functions are using Node-RED flows.
 
 ### Functions
 * Display temperature & humidity measured in rooms.
