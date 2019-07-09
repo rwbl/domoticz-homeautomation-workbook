@@ -12,25 +12,13 @@ The Domoticz log is getting spoiled with data and of course the RFXtrx433E is ra
 * Tinkerforge upcoming [Energy Bricklet](https://github.com/Tinkerforge/energy-monitor-bricklet)
 * HomeMatic CCU3 with plugs = rather expensive, requires interface to Domoticz (MQTT prefferable), if using then add more functionality
 _Status_
-On Hold for now.
-
-#### NEW: Function Homematic
-Include a homemtic Raspberry Pi CCU2 or 3 in this Home Automation solution.
-Start with few tests to check out ho to integrate in Domoticz and explore further.
-_Status_
-Not started.
-
-#### NEW: Function Postbox Watcher
-Watch opening the top cover of the postbox and notify if opened.
-Same hardware solution as described in chapter "Contact Detection" (X10 devices PB-62R).
-_Status_
-Received a new PB-62R. Will start the solution afetr completing the function "Air Quality Plus".
+ON HOLD.
 
 #### NEW: Control Samsung TV with Tizen OS
 Explore if possible to build some basic control (on/off, Volume) as a starter using Node-RED.
 _Status_
 Tested on the Domoticz development environment, the node [Samsung-TV-MK Node-RED](https://www.npmjs.com/package/node-red-contrib-samsung-tv-mk).
-On hold for now as focus on other functions.
+ON HOLD.
 
 #### NEW: Function Traffic Light Status Indicator for the Raspberry Pi Domoticz Server (using GPIO)
 Monitor the memory & disc space usage and notify.
@@ -42,6 +30,7 @@ _Status_
 Not started.
 Have not found a device yet which is supported by RFXCOM 433MHz and Domoticz.
 Will probably not continue as could be covered by the function "Air Quality Plus".
+ON HOLD.
 
 #### NEW: Explore using notifications beside Email
 _Status_
@@ -59,6 +48,7 @@ These are implemented but not shared yet.
 _Status_
 Tested the Sonoff POW R2 to measure power & energy without success - think made a mistake soldering the IO's to be able to flash ESP Easy.
 Will probably not continue as the Revolt SF-436 deliver the same results.
+ON HOLD.
 
 #### NEW: Function MQTT Monitor
 Monitor message payload of topic "domoticz/out" to analyze properties of devices

@@ -1,3 +1,11 @@
+### 20190709
+* NEW: Explore RaspberryMatic CCU solution, addons XML-API & CUxD and Domoticz integration
+* NEW: Function Electric Usage Rooms/Devices - RaspberryMatic CCU with device HMIP-PSM (Plugin)
+* NEW: Function Radiator Thermostat - RaspberryMatic CCU with device HMIP-eTRV-2 (Plugin)
+* NEW: Function Postbox Watcher - RaspberryMatic CCU with device HMIP-SDWO
+* NEW: User Variables - List with Python3 script
+* UPD: Alert Message - improved dzVents Lua scripts; Alert Level 4 sends Email notifications
+
 ### 20190621
 * NEW: Function Hardware Monitor for all Raspberry Pi's used.
 * NEW: Function Indoor Air Quality Monitor - Plugin. See [more](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor)
