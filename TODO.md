@@ -4,7 +4,7 @@
 _Status_
 Device received, but Domotixz not installed set.
 
-#### UPD: Polish up document and some minor
+#### UPD: Polish up document and some minor updates
 * Order the functions chapter alphabetically
 * Rename function "Postbox Watcher" to "Postbox Notifier"
 * Styling: Code Style to font Consolas,9; Note(s) Style to Italic, 11
@@ -25,13 +25,18 @@ Not started.
 _Status_
 These are implemented but not shared yet.
 
-#### UPD: Tools MQTT Logger
+#### UPD: Tool MQTT Logger
 Monitor message payload of topic "domoticz/out" to analyze properties of devices.
 _Status_
 Build flow using the Node-RED Dashboard UI. Running ok.
 Enhance with option to select the MQTT Broker Domoticz Production or Domoticz Development.
 
 #### NEW: Explore custom UI further
+_Status_
+Not started.
+
+#### UPD: Tool Domoticz Internal Script Viewer
+Create a Python3 version with a UI library like GUIZero or QT.
 _Status_
 Not started.
 
