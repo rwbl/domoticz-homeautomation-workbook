@@ -1,4 +1,41 @@
-### Status 20190621
+### Status 20190710
+
+#### NEW: Test Domoticz on the Raspberry Pi 4 with 4GB
+_Status_
+Device received, but Domotixz not installed set.
+
+#### UPD: Polish up document and some minor
+* Order the functions chapter alphabetically
+* Rename function "Postbox Watcher" to "Postbox Notifier"
+* Styling: Code Style to font Consolas,9; Note(s) Style to Italic, 11
+_Status_
+Not started.
+
+#### NEW: Explore using notifications beside Email
+_Status_
+Not started.
+
+#### NEW: Threshold setting via another UI, i.e. Node-RED or Custom UI
+The various thresholds are set by User Variables. Updating can be done either via GUI or HTTP REST Requests.
+Seeking for a solution to quickly change the user variable values. A custom UI would be a possibility.
+_Status_
+Not started.
+
+#### UPD: Build house control functions
+_Status_
+These are implemented but not shared yet.
+
+#### UPD: Tools MQTT Logger
+Monitor message payload of topic "domoticz/out" to analyze properties of devices.
+_Status_
+Build flow using the Node-RED Dashboard UI. Running ok.
+Enhance with option to select the MQTT Broker Domoticz Production or Domoticz Development.
+
+#### NEW: Explore custom UI further
+_Status_
+Not started.
+
+#### [TODOS ON HOLD]
 
 #### FIX: Function Energy Devices & Rooms - Revolt SF-436.m Range
 Installed a Revolt SF-436.m to measure power (Watt) & energy (Wh, kWh) for the room MakeLab.
@@ -32,25 +69,8 @@ Have not found a device yet which is supported by RFXCOM 433MHz and Domoticz.
 Will probably not continue as could be covered by the function "Air Quality Plus".
 ON HOLD.
 
-#### NEW: Explore using notifications beside Email
-_Status_
-Not started.
-
-#### NEW: Threshold setting via another UI, i.e. Node-RED or Custom UI
-_Status_
-Not started.
-
-#### UPD: Build house control functions
-_Status_
-These are implemented but not shared yet.
-
 #### NEW: Connect Sonoff (Itead) devices using ESP Easy
 _Status_
 Tested the Sonoff POW R2 to measure power & energy without success - think made a mistake soldering the IO's to be able to flash ESP Easy.
 Will probably not continue as the Revolt SF-436 deliver the same results.
 ON HOLD.
-
-#### NEW: Function MQTT Monitor
-Monitor message payload of topic "domoticz/out" to analyze properties of devices
-_Status_
-Scribbled a first flow using Node-RED Dashboard UI nodes. Runs on the Domoticz Development server.
