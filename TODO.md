@@ -2,14 +2,14 @@
 
 #### NEW: Test Domoticz on the Raspberry Pi 4 with 4GB
 _Status_
-Device received, but Domotixz not installed set.
+Device received, but Domoticz not installed set.
 
 #### UPD: Polish up document and some minor updates
 * Order the functions chapter alphabetically
 * Rename function "Postbox Watcher" to "Postbox Notifier"
 * Styling: Code Style to font Consolas,9; Note(s) Style to Italic, 11
 _Status_
-Not started.
+In progress (reodering done, function Postbox renamed).
 
 #### NEW: Explore using notifications beside Email
 _Status_
@@ -17,7 +17,8 @@ Not started.
 
 #### NEW: Threshold setting via another UI, i.e. Node-RED or Custom UI
 The various thresholds are set by User Variables. Updating can be done either via GUI or HTTP REST Requests.
-Seeking for a solution to quickly change the user variable values. A custom UI would be a possibility.
+Seeking for a solution to quickly change the user variable values.
+A custom GUI would be a possibility (simple field with update and cancel button).
 _Status_
 Not started.
 
@@ -27,13 +28,14 @@ These are implemented but not shared yet.
 
 #### UPD: Tool MQTT Logger
 Monitor message payload of topic "domoticz/out" to analyze properties of devices.
+Flow created using the Node-RED Dashboard UI. Running ok.
+To enhance with option to select the MQTT Broker Domoticz Production or Domoticz Development.
 _Status_
-Build flow using the Node-RED Dashboard UI. Running ok.
-Enhance with option to select the MQTT Broker Domoticz Production or Domoticz Development.
+Not started.
 
 #### NEW: Explore custom UI further
 _Status_
-Not started.
+In progress.
 
 #### UPD: Tool Domoticz Internal Script Viewer
 Create a Python3 version with a UI library like GUIZero or QT.
