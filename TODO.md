@@ -1,15 +1,19 @@
-### Status 20190710
+### Status 20190714
+
+#### UPD: Replace BMP280 with BME280
+_Status_
+Device ordered.
 
 #### NEW: Test Domoticz on the Raspberry Pi 4 with 4GB
 _Status_
-Device received, but Domoticz not installed set.
+Device received; testing first other software before installing Domoticz.
 
 #### UPD: Polish up document and some minor updates
 * Order the functions chapter alphabetically
 * Rename function "Postbox Watcher" to "Postbox Notifier"
-* Styling: Code Style to font Consolas,9; Note(s) Style to Italic, 11
+* Styling: Code Style to font Consolas,9; Note(s) Style to Italic,11
 _Status_
-In progress (reodering done, function Postbox renamed).
+In progress (reordering completed, function Postbox renamed).
 
 #### NEW: Explore using notifications beside Email
 _Status_
