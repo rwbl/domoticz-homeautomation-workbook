@@ -7,14 +7,18 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * Write up experiences in building the solution … and update any further with new ideas - see To-do list.
 
 ### Notes
-* There might be better solutions for what is shared and might change whilst evolving
-* This is a working document – idea’s & to-do’s will (probably) never cease to exist.
-* The source code of scripts & flows is not fully shared or might have changed – check the scripts folder for the latest full source.
-* The scripts are mainly developed using dzVents Lua scripts. Few exceptions using Python.
-* Python is used for creating hardware plugins (with HomeMatic, Tinkerforge).
-* Several functions are using Node-RED flows.
+* This is a working document … solution changes, idea’s & todo’s will probably never cease to exist.
+* There might be better solutions for what is shared ... updates or changes will happen as progressing with the learning curve.
+* Source code for the scripts & flows not fully shared in this document or have changed … check the GitHub scripts folder for the latest full source code.
+* Automation scripts developed as dzVents Lua script events … very few in Python (to be replaced).
+* Domoticz Hardware Plugin development in Python.
+* Some functions make initially use of Node-RED flows … but target is to replace by dzVents events if possible.
+* Functions that have been replaced by another solution are kept in this document as reference – might be of use.
+* Screenshots shared might not be update as functionality is evolving.
+* To-do’s are tagged with <TODO>. The To-do list, with prefix, i.e. NEW, UPD …, are captured in the file TODO.md.
 
 ### Functions
+(full list see the workbook)
 * Display temperature & humidity measured in rooms.
 * Charts for selective weather items, room temperature & humidity.
 * Control Somfy roller shutters with RTS motors in rooms.
@@ -36,6 +40,7 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * Custom icons.
 * Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
 * Air Quality monitor - [Plugin](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor).
+* Remote Control Domoticz devices using Email client - icludes simple android test app 
 * _More in progress ..._
 
 ### Explore How To Use

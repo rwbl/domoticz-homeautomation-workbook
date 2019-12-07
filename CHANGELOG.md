@@ -1,3 +1,19 @@
+### 20191207
+* NEW: Function EMail Control - Experiment to Remote Control Domoticz devices using Email client - includes simple Android test app
+* NEW: Function River Elbe Tide - watch the tide of the river "Elbe" at "Schulau" near Hamburg Germany
+* NEW: Function Radiator Thermostat HMIP-eTRV-2 - Event to ensure not heating overnight (switch off)
+* NEW: Function Stock Quotes - Automation script (dzVents Lua) instead Node-RED flow (disabled)
+* UPD: Function BMP280 - Sensor replaced by BME280 (T+H+P), function renamed & automation scripts updated
+* UPD: Function Postbox Watcher - Renamed to Postbox Notifier; new second solution with reset switch
+* UPD: Function RaspberryMatic - update 3.47.22.20191130 
+* NEW: Explore RaspberryMatic - Reworked, added more examples using the XML-API addon
+* NEW: Explore ESP Easy - ESP BMP280 to Domoticz
+* UPD: Explore ESP Easy - Firmware update, chapter reviewed and polished up 
+* UPD: Coffee Machine Monitor - User Variable to set the power threshold
+* UPD: Setup - Added ethernet configuration and network overview
+* UPD: Functions and Explore - Reordered chapters
+* UPD: Various smaller enhancements & corrections
+
 ### 20190709
 * NEW: Explore RaspberryMatic CCU solution, addons XML-API & CUxD and Domoticz integration
 * NEW: Function Electric Usage Rooms/Devices - RaspberryMatic CCU with device HMIP-PSM (Plugin)

@@ -1,19 +1,4 @@
-### Status 20190714
-
-#### UPD: Replace BMP280 with BME280
-_Status_
-Device ordered.
-
-#### NEW: Test Domoticz on the Raspberry Pi 4 with 4GB
-_Status_
-Device received; testing first other software before installing Domoticz.
-
-#### UPD: Polish up document and some minor updates
-* Order the functions chapter alphabetically
-* Rename function "Postbox Watcher" to "Postbox Notifier"
-* Styling: Code Style to font Consolas,9; Note(s) Style to Italic,11
-_Status_
-In progress (reordering completed, function Postbox renamed).
+### Status 201912
 
 #### NEW: Explore using notifications beside Email
 _Status_
@@ -46,42 +31,53 @@ Create a Python3 version with a UI library like GUIZero or QT.
 _Status_
 Not started.
 
-#### [TODOS ON HOLD]
-
-#### FIX: Function Energy Devices & Rooms - Revolt SF-436.m Range
-Installed a Revolt SF-436.m to measure power (Watt) & energy (Wh, kWh) for the room MakeLab.
-**Issues**
-1) If the RFXtrx433E is more then about 10 meters range away from the Revolot device, then no data is received else working ok.
-Probably rather weak antenna. Explore how to improve the range ELSE consider other solution.
-2) The device is causing high traffic on the 433.92MHz frequency. Sending almost every few seconds data.
-The Domoticz log is getting spoiled with data and of course the RFXtrx433E is rather busy.
-3) Been thinking about additional Revolot devices - but regarding issues 1 and 2 will not continue.
-4) Alternatives (need to explore further):
-* Tinkerforge upcoming [Energy Bricklet](https://github.com/Tinkerforge/energy-monitor-bricklet)
-* HomeMatic CCU3 with plugs = rather expensive, requires interface to Domoticz (MQTT prefferable), if using then add more functionality
-_Status_
-ON HOLD.
-
-#### NEW: Control Samsung TV with Tizen OS
-Explore if possible to build some basic control (on/off, Volume) as a starter using Node-RED.
-_Status_
-Tested on the Domoticz development environment, the node [Samsung-TV-MK Node-RED](https://www.npmjs.com/package/node-red-contrib-samsung-tv-mk).
-ON HOLD.
-
 #### NEW: Function Traffic Light Status Indicator for the Raspberry Pi Domoticz Server (using GPIO)
 Monitor the memory & disc space usage and notify.
 _Status_
 Not started.
 
-#### NEW: Function Measure CO living room
+#### NEW: Function Energy Devices & Rooms
+Explore integating a Tinkerforge [Energy Bricklet](https://github.com/Tinkerforge/energy-monitor-bricklet).
+This function requires a Tinkerorge Master Brick to be connected to the Domoticz server.
 _Status_
 Not started.
+
+### [TODOS ON HOLD OR STOPPED]
+
+#### NEW: Test Domoticz on the Raspberry Pi 4 with 4GB
+The intention is to test Domoticz and other like Node-RED on the Raspberry Pi 4.
+_Status_
+STOPPED.
+Based on the CPU load of ~3-5% on both the Domoticz production (running since 3 years now) & developed Raspberry Pi 3 boards, dediced not to continue.
+An option might be to use other hardware, like Rock Pi S, Intel NUC, Server running Ubuntu.
+One issue noticed, is an increase in CPU load if Node-RED flows are used with high interval triggers (like the "e-mail in node" from node-red-node-email).
+
+#### FIX: Function Energy Devices & Rooms - Revolt SF-436.m Range
+Installed a Revolt SF-436.m to measure power (Watt) & energy (Wh, kWh) for the room MakeLab.
+**Issue**
+If the RFXtrx433E is more then about 10 meters range away from the Revolot device, then no data is received else working ok.
+Probably rather weak antenna. Explore how to improve the range ELSE consider other solution.
+The device is causing high traffic on the 433.92MHz frequency. Sending almost every few seconds data.
+The Domoticz log is getting spoiled with data and of course the RFXtrx433E is rather busy.
+_Status_
+STOPPED.
+Been thinking about additional Revolt devices - but regarding issues 1 and 2 will not continue.
+Developed & installed a solution using a RaspberryMatic HomeMatic CCU3 with several own developed plugins.
+
+#### NEW: Control Samsung TV with Tizen OS
+Explore if possible to build some basic control (on/off, Volume) as a starter using Node-RED.
+_Status_
+ON HOLD.
+Tested on the Domoticz development environment, the node [Samsung-TV-MK Node-RED](https://www.npmjs.com/package/node-red-contrib-samsung-tv-mk).
+
+#### NEW: Function Measure CO living room
+_Status_
+ON HOLD.
 Have not found a device yet which is supported by RFXCOM 433MHz and Domoticz.
 Will probably not continue as could be covered by the function "Air Quality Plus".
-ON HOLD.
 
 #### NEW: Connect Sonoff (Itead) devices using ESP Easy
 _Status_
-Tested the Sonoff POW R2 to measure power & energy without success - think made a mistake soldering the IO's to be able to flash ESP Easy.
-Will probably not continue as the Revolt SF-436 deliver the same results.
 ON HOLD.
+Tested the Sonoff POW R2 to measure power & energy without success - think made a mistake soldering the IO's to be able to flash ESP Easy.
+Will not continue as a) the Revolt SF-436 delivers the same results and b) developed a RaspberryMatic solution which works great.
