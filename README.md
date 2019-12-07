@@ -40,7 +40,7 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * Custom icons.
 * Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
 * Air Quality monitor - [Plugin](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor).
-* Remote Control Domoticz devices using Email client - icludes simple android test app 
+* Remote Control Domoticz devices using Email client - includes a simple Android test app 
 * _More in progress ..._
 
 ### Explore How To Use
