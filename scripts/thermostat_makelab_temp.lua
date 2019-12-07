@@ -1,7 +1,7 @@
 -- thermostat_makelab_temp
 -- Get information from the makelab homematicIP thermostat
 -- HmIP-eTRV-2 000A18A9A64DAC:1
--- Obtain the device information and extract the setpoint & temperature from the response
+-- Obtain the device information and extract the temperature from the response
 -- http://192.168.1.225/config/xmlapi/state.cgi?datapoint_id=1567
 -- HTTP response showing the datapoints 1567 (temperature)
 -- <?xml version="1.0" encoding="ISO-8859-1"?>
