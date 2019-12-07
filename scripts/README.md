@@ -19,4 +19,10 @@ The flows can be inported in Node-RED via the settings menu > import (paste).
 The files with extension _.py_ are function specific. 
 
 ### ESP Easy
-The files with extension _.rule_ are rules.
+The files with extension _.rule_ are ESP Easy rules.
+
+### Archives
+The files with extension _.zip_ are archives named as the function.
+The archive contains the required files with subfolders.
+Example: emailcontrol.zip.
+

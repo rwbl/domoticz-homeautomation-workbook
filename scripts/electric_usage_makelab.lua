@@ -15,7 +15,7 @@ local IDX_ELECTRICUSAGEMAKELAB = 174;
 local ID_DEVICE = 1418;
 
 -- url of the CCU to obtain device information
-local URL_CCU = 'http://192.168.1.225/config/xmlapi/state.cgi?device_id=' .. ID_DEVICE;
+local URL_CCU = 'http://IP-CCU/config/xmlapi/state.cgi?device_id=' .. ID_DEVICE;
 
 -- callback of the url request - must be unique across all dzevents
 local RES_CCU = 'electricusagemakelab';

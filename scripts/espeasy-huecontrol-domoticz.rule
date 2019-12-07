@@ -24,7 +24,7 @@ on HUE_Dimmer#Analog do
   // Submit api rest request to domoticz server to set brightness level
   if [Varstore#HUE_Dimmer_Delta]>2
 
-    SendToHTTP 192.168.1.60,8080,/json.htm?type=command&param=switchlight&idx=118&switchcmd=Set%20Level&level=[HUE_Dimmer#Analog]
+    SendToHTTP DOMOTICZ-IP-ADDRESS,8080,/json.htm?type=command&param=switchlight&idx=118&switchcmd=Set%20Level&level=[HUE_Dimmer#Analog]
 
   endif
 

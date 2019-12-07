@@ -33,7 +33,7 @@ return {
         if (item.isDevice) then
             -- if the state is not normal, then trigger action.
 		    if (item.state ~= 'Normal') then
-		        -- domoticz.email('SECURITY ALERT atHome', item.name .. ' state ' .. item.state, 'rwblinn@outlook.de')
+		        -- domoticz.email('SECURITY ALERT atHome', item.name .. ' state ' .. item.state, 'email@address')
                 domoticz.variables(IDX_DEF_SECURITY_ALARM).set(1)
 		    end
 		 end

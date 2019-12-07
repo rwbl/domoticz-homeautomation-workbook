@@ -202,7 +202,7 @@
         "type": "adv ping",
         "z": "a61e843b.319488",
         "name": "Ping Volumio",
-        "host": "192.168.1.49",
+        "host": "VOLUMIO-SERVER--IP-ADDRESS",
         "x": 110,
         "y": 140,
         "wires": [

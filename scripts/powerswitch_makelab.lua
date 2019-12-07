@@ -4,7 +4,7 @@
 -- the device HMIP-PSM is an actuator switch with status report measured value channel.
 -- switching is triggered by sending an url request to raspberrymatic server using the xmlapi addon.
 -- the url request uses the xmlapi script statechange with the channel id nd the new value.
--- example switching the plug on: http://192.168.1.225/config/xmlapi/statechange.cgi?ise_id=1451&new_value=true
+-- example switching the plug on: http://CCU-IP-ADDRESS/config/xmlapi/statechange.cgi?ise_id=1451&new_value=true
 -- response XML string:
 -- <?xml version="1.0" encoding="ISO-8859-1"?><result><changed id="1451" new_value="true"/></result>
 -- notes:
@@ -25,7 +25,7 @@ local IDX_POWERSWITCH_MAKELAB = 177;
 local ID_DATAPOINT_STATE = 1451
 
 -- CCU url to switch on/off. use statechange.cgi with value true/false
-local URL_CCU = 'http://192.168.1.225/config/xmlapi/statechange.cgi?ise_id=' .. ID_DATAPOINT_STATE .. '&new_value='
+local URL_CCU = 'http://CCU-IP-ADDRESS/config/xmlapi/statechange.cgi?ise_id=' .. ID_DATAPOINT_STATE .. '&new_value='
 -- callback of the url request - must be unique across all dzevents
 local RES_CCU = 'powerswitchmakelab';
 

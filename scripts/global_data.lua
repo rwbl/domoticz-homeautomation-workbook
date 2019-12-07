@@ -16,21 +16,22 @@
 --
 --    end
 -- }
+-- Project: domoticz-homeautomation-workbook
 -- 20190709 by rwbl
 
 return {
-	-- global persistent data
-	-- data = {
-	-- 	myGlobalVar = { initial = 12 }
-	-- },
+  -- global persistent data
+  -- data = {
+  --   myGlobalVar = { initial = 12 }
+  -- },
 
-	-- global helper functions
-	helpers = {
-	    
-		-- Idx of devices used (do not forget the comma at the end of the list)
-	    IDX_ALERTMSG = 55,
-	    IDX_CONTROLMSG = 52,
-	    IDX_EVENTMONITORMSG = 161,
+  -- global helper functions
+  helpers = {
+      
+    -- Idx of devices used (do not forget the comma at the end of the list)
+      IDX_ALERTMSG = 55,
+      IDX_CONTROLMSG = 52,
+      IDX_EVENTMONITORMSG = 161,
         IDX_TH_ALERTTOEMAIL = 14,
 
         ------------------------------------------------------------------------
@@ -99,11 +100,11 @@ return {
         -- Return days rounded up
         datediffnow = function(d,m,y)
             -- print(d,m,y)
-	        -- Set the target date from the parameter
-	        local targetdate = os.time{day=d, month=m, year=y, hour=0, min=0, sec=0}
+          -- Set the target date from the parameter
+          local targetdate = os.time{day=d, month=m, year=y, hour=0, min=0, sec=0}
 
-        	-- Get the time diff between now and the target date in seconds in a day
-	        local daysdiff = os.difftime(targetdate, os.time()) / (24 * 60 * 60)
+          -- Get the time diff between now and the target date in seconds in a day
+          local daysdiff = os.difftime(targetdate, os.time()) / (24 * 60 * 60)
 
             -- Return the days rounded up; round down use math.floor(daysdiff)
             return math.ceil(daysdiff)
@@ -113,11 +114,11 @@ return {
         -- Return days rounded down
         datediffnow2 =function(d,m,y)
             -- print(d,m,y)
-	        -- Set the target date from the parameter
-	        local targetdate = os.time{day=d, month=m, year=y}
+          -- Set the target date from the parameter
+          local targetdate = os.time{day=d, month=m, year=y}
 
-	        -- Get the time diff between now and the target date in seconds in a day
-	        local daysdiff = os.difftime(targetdate, os.time()) / (24 * 60 * 60)
+          -- Get the time diff between now and the target date in seconds in a day
+          local daysdiff = os.difftime(targetdate, os.time()) / (24 * 60 * 60)
 
             -- Return the days round down
             return math.floor(daysdiff)
@@ -126,60 +127,82 @@ return {
         -- Calculate the date difference in days between start and end date
         -- Return days
         datediff  = function(ds,ms,ys, de,me,ye)
-        	-- Set the start date from the parameter
-	        local startdate = os.time{day=ds, month=ms, year=ys}
+          -- Set the start date from the parameter
+          local startdate = os.time{day=ds, month=ms, year=ys}
 
-	        -- Set the target date from the parameter
-	        local enddate = os.time{day=de, month=me, year=ye}
+          -- Set the target date from the parameter
+          local enddate = os.time{day=de, month=me, year=ye}
 
-	        -- Get the time diff between source and the target date in seconds in a day
-	        local daysdiff = os.difftime(startdate, enddate) / (24 * 60 * 60)
-	
-	        -- Return the days
-	        return math.floor(daysdiff)    
+          -- Get the time diff between source and the target date in seconds in a day
+          local daysdiff = os.difftime(startdate, enddate) / (24 * 60 * 60)
+  
+          -- Return the days
+          return math.floor(daysdiff)    
+        end,
+
+        -- Calculate time difference in seconds between now and new time
+        -- Returns seconds
+        timediff = function (t2) 
+            t1 = os.time()
+            difference = os.difftime (t1, t2)
+            return difference
+        end,
+
+        timediff2 = function (s) 
+            -- if s == nil then print("Error  ") end
+            year = string.sub(s, 1, 4)
+            month = string.sub(s, 6, 7)
+            day = string.sub(s, 9, 10)
+            hour = string.sub(s, 12, 13)
+            minutes = string.sub(s, 15, 16)
+            seconds = string.sub(s, 18, 19)
+            t1 = os.time()
+            t2 = os.time{year=year, month=month, day=day, hour=hour, min=minutes, sec=seconds}
+            difference = os.difftime (t1, t2)
+            return difference
         end,
 
         -- Calculate the age in years + days
         -- Return age as string years J days T
         ageyearsdays = function(domoticz,dbirth,mbirth,ybirth)
-	        -- get the actual date 
-        	t = os.date ("*t")
+          -- get the actual date 
+          t = os.date ("*t")
 
-	        -- get the year, month, day for now
-	        ynow = t.year
-	        mnow = t.month
-	        dnow = t.day
+          -- get the year, month, day for now
+          ynow = t.year
+          mnow = t.month
+          dnow = t.day
 
-	        -- year difference between now year and the target year
-	        ydiff = ynow - ybirth
-	        if (mnow < mbirth) or ((mnow == mbirth) and (dnow < dbirth)) then
-		        ydiff = ydiff - 1
-	        end
+          -- year difference between now year and the target year
+          ydiff = ynow - ybirth
+          if (mnow < mbirth) or ((mnow == mbirth) and (dnow < dbirth)) then
+            ydiff = ydiff - 1
+          end
 
-	        if ydiff < 0 then
-		        ydiff =  0
-	        end
-	
-	        if ydiff > 0 then
-		        -- days diff between birth and year end of birth (31,12)
-		        ddiff1 = math.abs(domoticz.helpers.datediff(dbirth, mbirth, ybirth, 31, 12, ybirth))
+          if ydiff < 0 then
+            ydiff =  0
+          end
+  
+          if ydiff > 0 then
+            -- days diff between birth and year end of birth (31,12)
+            ddiff1 = math.abs(domoticz.helpers.datediff(dbirth, mbirth, ybirth, 31, 12, ybirth))
 
-		        -- days diff between current year start (1,1) and current day,month,year
-		        ddiff2 = math.abs(domoticz.helpers.datediff(1, 1, ynow, dnow, mnow, ynow))
-		
-		        -- days difference between now and the target day+month for the now year, i.e. dtarget+mtarget+ynow
-		        ddiff = ddiff1 + ddiff2
-	        end
+            -- days diff between current year start (1,1) and current day,month,year
+            ddiff2 = math.abs(domoticz.helpers.datediff(1, 1, ynow, dnow, mnow, ynow))
+    
+            -- days difference between now and the target day+month for the now year, i.e. dtarget+mtarget+ynow
+            ddiff = ddiff1 + ddiff2
+          end
 
-	        if ydiff == 0 then
-		        -- days diff between birth and now
-		        ddiff = math.abs(domoticz.helpers.datediff(dbirth, mbirth, ybirth, dnow, mnow, ynow))
-	        end
+          if ydiff == 0 then
+            -- days diff between birth and now
+            ddiff = math.abs(domoticz.helpers.datediff(dbirth, mbirth, ybirth, dnow, mnow, ynow))
+          end
 
-	        -- build the age string to return
-	        age = ydiff .. ' J ' .. ddiff .. ' T'
-	        print(age)
-	        return age
+          -- build the age string to return
+          age = ydiff .. ' J ' .. ddiff .. ' T'
+          print(age)
+          return age
         end,
 
         -- Convert seconds to clock hh:mm:ss
@@ -211,7 +234,7 @@ return {
         -- Return the time of day in minutes since midnight
         -- Example: domoticz.log(tostring(domoticz.helpers.TimeOfDayMinutes()), domoticz.LOG_INFO)
         timeofdayminutes = function()
-	        return os.date("%H") * 60 + os.date("%M")
+          return os.date("%H") * 60 + os.date("%M")
         end,
 
         ------------------------------------------------------------------------
@@ -231,25 +254,24 @@ return {
 
         -- Update the alert message with level and text
         alertmsg = function(domoticz, level, msg)
-        	domoticz.devices(domoticz.helpers.IDX_ALERTMSG).updateAlertSensor(level, msg)
-        	-- Send email notification in case level = 4 (or other as set by uservar TH_ALERTTOEMAIL)
-        	if (level == domoticz.variables(IDX_TH_ALERTTOEMAIL).value) then
-        	    domoticz.notify('ALERT', msg, domoticz.PRIORITY_HIGH)
-        	end
+          domoticz.devices(domoticz.helpers.IDX_ALERTMSG).updateAlertSensor(level, msg)
+          -- Send email notification in case level = 4 (or other as set by uservar TH_ALERTTOEMAIL)
+          if (level == domoticz.variables(IDX_TH_ALERTTOEMAIL).value) then
+              domoticz.notify('ALERT', msg, domoticz.PRIORITY_HIGH)
+          end
         end,
 
         -- Update the control message with text
         controlmsg = function(domoticz, msg)
-	        domoticz.devices(domoticz.helpers.IDX_CONTROLMSG).updateText(msg)
+          domoticz.devices(domoticz.helpers.IDX_CONTROLMSG).updateText(msg)
         end,
 
         -- Update the event monitor message with text
         eventmonitormsg = function(domoticz, msg)
-	        domoticz.devices(domoticz.helpers.IDX_EVENTMONITORMSG).updateText(msg)
+          domoticz.devices(domoticz.helpers.IDX_EVENTMONITORMSG).updateText(msg)
         end
 
-	}
+  }
 
 -- end return
 }
-
