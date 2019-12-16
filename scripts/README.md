@@ -21,6 +21,9 @@ The files with extension _.py_ are function specific.
 ### ESP Easy
 The files with extension _.rule_ are ESP Easy rules.
 
+### RaspberryMatic
+The file with extention _.script_ are RaspMatic scripts used in programs.
+
 ### Archives
 The files with extension _.zip_ are archives named as the function.
 The archive contains the required files with subfolders.

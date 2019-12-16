@@ -1,0 +1,51 @@
+! Function: Thermostat MakeLab Notify Actual Temperature change
+! 20191208 by rwbl
+string function = "Thermostat MakeLab Temperature";
+string actdate = system.Date("%d.%m"); ! sDate = "09.08"; 
+! string actDate = system.Date("%d.%m.%Y"); ! sDate = "09.08.2019"; 
+string acttime = system.Date("%H:%M"); ! sTime = "07:32"; 
+! string actime = system.Date("%H:%M:%S"); ! sTime = "07:32:00"; 
+
+! A domoticz virtual temperature device is used
+string idx = 65; ! Type: Temp; SubType: LaCrosse TX3
+! Define the parameter nvalue and svalue - see domoticz api documentation
+string nvalue = 0;
+! The object string is taken from the raspmatic XML-API script statelist.cgi
+string svalue = dom.GetObject("HmIP-RF.000A18A9A64DAC:1.ACTUAL_TEMPERATURE").State();
+! for tests: string svalue = 20;
+
+! Build the domoticz http api request url to set the actual temperature on the domoticz device
+! Example: http://192.168.1.179:8080/json.htm?type=command¶m=udevice&idx=65&nvalue=0&svalue=20.89
+string amp = "&";
+string urldom = "'http://192.168.1.179:8080/json.htm"; ! Production=60,Development=179
+string urlrequest = urldom#"?type=command"#amp#"param=udevice"#amp#"idx="#idx#amp#"nvalue="#nvalue#amp#"svalue="#svalue#"'";
+! For Tests. Output like 'http://192.168.1.179:8080/json.htm?type=command¶m=udevice&idx=65&nvalue=0&svalue=21.700000'
+WriteLine(urlrequest);
+
+! OPTION: Run the command without a return result
+! res = dom.GetObject("CUxD.CUX2801001:1.CMD_EXEC").State("wget -q -O - "#sUrl);
+
+! OPTION: Run the command with a return result
+! Define the command to execute
+dom.GetObject("CUxD.CUX2801001:1.CMD_SETS").State ("wget -q -O - "#urlrequest);
+
+! Set the return flag to 1 to be able to read the json result
+dom.GetObject("CUxD.CUX2801001:1.CMD_QUERY_RET").State (1);
+
+! Start the command, wait till completed and get the result JSON string, i.e.
+! {"status" : "OK","title" : "Update Device"}
+! NOTE: The script running on the CCU waits until the completion - ensure not to execute commands which take long time.
+string res = dom.GetObject("CUxD.CUX2801001:1.CMD_RETS").State();
+! WriteLine("VT="#res.VarType()#"/"#res); ! VT=4, {"status" : "OK","title" : "Update Device"}
+
+! handle result
+var domlog = dom.GetObject ("DomoticzLog");
+! Update the var with result text
+if (res.Find("OK") > 0) {
+  domlog.Variable(function#"-Last update OK:"#actdate#" "#acttime )
+}
+else {
+  domlog.Variable(function#"-Last update ERROR:"#actdate#" "#acttime)
+};
+! WriteLine("VT="#domlog.VarType());  ! VT=9
+WriteLine(domlog.Variable());       ! shows the last update string
