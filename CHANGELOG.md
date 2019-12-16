@@ -4,6 +4,7 @@
 * NEW: Explore RaspberryMatic - Added more push & pull examples
 * UPD: Function Radiator Thermostat reworked; new plugin HmIP-eTRV; Timers to control heating
 * UPD: Explore SQL - Added more SQL select examples
+* UPD: TODO.md
 * UPD: Various smaller enhancements & corrections
 
 ### 20191207
