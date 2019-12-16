@@ -14,34 +14,35 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * Domoticz Hardware Plugin development in Python.
 * Some functions make initially use of Node-RED flows … but target is to replace by dzVents events if possible.
 * Functions that have been replaced by another solution are kept in this document as reference – might be of use.
-* Screenshots shared might not be update as functionality is evolving.
-* To-do’s are tagged with <TODO>. The To-do list, with prefix, i.e. NEW, UPD …, are captured in the file TODO.md.
+* Device names or screenshots shared might not be up-to-date as functionality is evolving.
+* To-do’s tagged with <TODO> and most captured in the To-do list TODO.md.
 
 ### Functions
 (full list see the workbook)
-* Display temperature & humidity measured in rooms.
-* Charts for selective weather items, room temperature & humidity.
-* Control Somfy roller shutters with RTS motors in rooms.
-* Philips Hue Lighting System control via Hue Bridge for ZigBee devices.
-* HomeMatic (RaspberryMatic) CCU3 integration with variety of devices.
-* Security door & window wireless contact detectors.
-* Information on key dates (calendar type information).
-* MQTT subscribe & publish messages to trigger actions or information.
-* Raspberry Pi system information with charts and threshold email notification.
-* Electricity power & energy for the house from “volkszaehler” with charts.
-* Electricity power & energy for selected devices / rooms (washer, MakeLab etc.).
-* Coffee machine monitor – start and end time, info message.
-* Control Volumio music player whilst listening to web radio.
-* Monitor stock quotes.
+* Air Quality monitor - [Plugin](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor).
 * Ambient light (from ESP8266 running ESP Easy) with threshold.
-* Hue Light controlled via ESP8266 with slide potentiometer & 4-digit-7-segment-display.
+* Charts for selective weather items, room temperature & humidity.
+* Coffee machine monitor – start and end time, info message.
+* Control Somfy roller shutters with RTS motors in rooms.
+* Control Volumio music player whilst listening to web radio.
+* Custom icons.
+* Display temperature & humidity measured in rooms.
+* Electricity power & energy for selected devices / rooms (washer, MakeLab etc.).
+* Electricity power & energy for the house from “volkszaehler” with charts.
 * Event monitor for selected devices.
 * Hardware Monitor for the Raspberry Pi's used (see HardwareMonitor.zip).
-* Custom icons.
-* Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
-* Air Quality monitor - [Plugin](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor).
+* HomeMatic (RaspberryMatic) CCU3 integration with variety of devices.
+* Hue Light controlled via ESP8266 with slide potentiometer & 4-digit-7-segment-display.
+* Information on key dates (calendar type information).
+* MQTT subscribe & publish messages to trigger actions or information.
+* Monitor stock quotes.
+* Philips Hue Lighting System control via Hue Bridge for ZigBee devices.
+* Postbox Notifier.
+* Raspberry Pi system information with charts and threshold email notification.
 * Remote Control Domoticz devices using Email client - includes a simple Android test app 
-* _More in progress ..._
+* Security door & window wireless contact detectors.
+* Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
+* Timers for single devices or complex tasks (Automation events dzVents script)
 
 ### Explore How To Use
 * Domoticz running on a Raspberry Pi (setup, configure).

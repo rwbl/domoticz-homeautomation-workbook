@@ -1,15 +1,23 @@
+### 20191215
+* NEW: Functions Timers - Started to use switches device timers for simple tasks like setting setpoint or switch on|off.
+* NEW: Function Postbox Notifier - Solution with Alert + Switch + Voltage
+* NEW: Explore RaspberryMatic - Added more push & pull examples
+* UPD: Function Radiator Thermostat reworked; new plugin HmIP-eTRV; Timers to control heating.
+* UPD: Explore SQL - Added more SQL select examples.
+* UPD: Various smaller enhancements & corrections
+
 ### 20191207
 * NEW: Function EMail Control - Experiment to Remote Control Domoticz devices using Email client - includes simple Android test app
 * NEW: Function River Elbe Tide - watch the tide of the river "Elbe" at "Schulau" near Hamburg Germany
 * NEW: Function Radiator Thermostat HMIP-eTRV-2 - Event to ensure not heating overnight (switch off)
 * NEW: Function Stock Quotes - Automation script (dzVents Lua) instead Node-RED flow (disabled)
-* NEW: Explore RaspberryMatic - Reworked, added more examples using the XML-API addon
-* NEW: Explore ESP Easy - ESP BMP280 to Domoticz
 * UPD: Function BMP280 - Sensor replaced by BME280 (T+H+P), function renamed & automation scripts updated
 * UPD: Function Postbox Watcher - Renamed to Postbox Notifier; new second solution with reset switch
 * UPD: Function RaspberryMatic - update 3.47.22.20191130 
-* UPD: Function Coffee Machine Monitor - User Variable to set the power threshold
+* NEW: Explore RaspberryMatic - Reworked, added more examples using the XML-API addon
+* NEW: Explore ESP Easy - ESP BMP280 to Domoticz
 * UPD: Explore ESP Easy - Firmware update, chapter reviewed and polished up 
+* UPD: Coffee Machine Monitor - User Variable to set the power threshold
 * UPD: Setup - Added ethernet configuration and network overview
 * UPD: Functions and Explore - Reordered chapters
 * UPD: Various smaller enhancements & corrections
