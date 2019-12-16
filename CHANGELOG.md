@@ -1,9 +1,9 @@
 ### 20191215
-* NEW: Functions Timers - Started to use switches device timers for simple tasks like setting setpoint or switch on|off.
+* NEW: Functions Timers - Started to use switch device timers for simple tasks like setting setpoint or switch on|off
 * NEW: Function Postbox Notifier - Solution with Alert + Switch + Voltage
 * NEW: Explore RaspberryMatic - Added more push & pull examples
-* UPD: Function Radiator Thermostat reworked; new plugin HmIP-eTRV; Timers to control heating.
-* UPD: Explore SQL - Added more SQL select examples.
+* UPD: Function Radiator Thermostat reworked; new plugin HmIP-eTRV; Timers to control heating
+* UPD: Explore SQL - Added more SQL select examples
 * UPD: Various smaller enhancements & corrections
 
 ### 20191207
