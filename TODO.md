@@ -4,6 +4,7 @@
 The purpose of this tool, is to obtain the list of devices and datapoints , with selected properties, from the RaspberryMatic server.
 The focus is on getting the device id's and datapoint id's as these are used by RaspberryMatic scripts and Domoticz Automation Events (dzVents Lua scripts).
 The tool is also handy to quickly check a property of a device, i.e. valve level of a Radiator Thermostat (check if running max level) or operating voltage (check the battery).
+
 _Status_
 Desktop version (B4J): ready; not published.
 Android version (B4A): not started.
@@ -11,16 +12,19 @@ Android version (B4A): not started.
 #### NEW: homematicIP Device HmIP/SWDM
 Develop a plugin for the Window and Door Contact with magnet.
 These devices are connected to the RaspberryMatic system which communicates via XML-API with Domoticz.
+
 _Status_
 Not started.
 
 #### NEW: Tool DeviceTimerList
 To get a list of timers defined for the switch devices.
 Select the data via SQL SELECT statements direct from the Domoticz SQLIte3 database, i.e. for production pinneberg.db.
+
 _Status_
 Not started.
 
 #### NEW: Explore using notifications beside Email
+
 _Status_
 Not started.
 
@@ -28,10 +32,12 @@ Not started.
 The various thresholds are set by User Variables. Updating can be done either via GUI or HTTP REST Requests.
 Seeking for a solution to quickly change the user variable values.
 A custom GUI would be a possibility (simple field with update and cancel button).
+
 _Status_
 Not started.
 
 #### UPD: Build house control functions
+
 _Status_
 These are implemented but not shared yet.
 
@@ -39,26 +45,31 @@ These are implemented but not shared yet.
 Monitor message payload of topic "domoticz/out" to analyze properties of devices.
 Flow created using the Node-RED Dashboard UI. Running ok.
 To enhance with option to select the MQTT Broker Domoticz Production or Domoticz Development.
+
 _Status_
 Not started.
 
 #### NEW: Explore custom UI further
+
 _Status_
 In progress.
 
 #### UPD: Tool Domoticz Internal Script Viewer
 Create a Python3 version with a UI library like GUIZero or QT.
+
 _Status_
 Not started.
 
 #### NEW: Function Traffic Light Status Indicator for the Raspberry Pi Domoticz Server (using GPIO)
 Monitor the memory & disc space usage and notify.
+
 _Status_
 Not started.
 
 #### NEW: Function Energy Devices & Rooms
 Explore integating a Tinkerforge [Energy Bricklet](https://github.com/Tinkerforge/energy-monitor-bricklet).
 This function requires a Tinkerorge Master Brick to be connected to the Domoticz server.
+
 _Status_
 Not started.
 
