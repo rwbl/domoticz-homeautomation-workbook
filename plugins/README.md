@@ -2,14 +2,17 @@
 Created by the author and used for several functions in the workbook.
 
 #### Installation
-For each of the plugins, create a dedicated folder
+For each of the plugins, create a dedicated folder.
+
+Example:
 ```
 /home/pi/domoticz/plugins/hmip-etrv
 ```
 
 Copy from the plugin archive (i.e. plugin-hmip-etrv), the file **plugin.py** to the new folder
 
-Restart Domoticz
+Restart Domoticz.
+Example using the CLI:
 ```
 sudo service domoticz.sh restart
 ```
