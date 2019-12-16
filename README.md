@@ -11,7 +11,7 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * There might be better solutions for what is shared ... updates or changes will happen as progressing with the learning curve.
 * Source code for the scripts & flows not fully shared in this document or have changed … check the GitHub scripts folder for the latest full source code.
 * Automation scripts developed as dzVents Lua script events … very few in Python (to be replaced).
-* Domoticz Hardware Plugin development in Python.
+* Domoticz Hardware Plugin development in Python (see folder plugins).
 * Some functions make initially use of Node-RED flows … but target is to replace by dzVents events if possible.
 * Functions that have been replaced by another solution are kept in this document as reference – might be of use.
 * Device names or screenshots shared might not be up-to-date as functionality is evolving.
@@ -42,7 +42,7 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * Remote Control Domoticz devices using Email client - includes a simple Android test app 
 * Security door & window wireless contact detectors.
 * Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
-* Timers for single devices or complex tasks (Automation events dzVents script)
+* Timers for single devices or complex tasks (Automation events dzVents script).
 
 ### Explore How To Use
 * Domoticz running on a Raspberry Pi (setup, configure).
