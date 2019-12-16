@@ -3,7 +3,7 @@
 #### NEW: Tool RaspMaticStateList
 The purpose of this tool, is to obtain the list of devices and datapoints , with selected properties, from the RaspberryMatic server.
 The focus is on getting the device id's and datapoint id's as these are used by RaspberryMatic scripts and Domoticz Automation Events (dzVents Lua scripts).
-The tool is also handy to quickly check a property of a device, i.e. valve level of a Radiator Thermostat (check if running max level) or operating voltage (check battery).
+The tool is also handy to quickly check a property of a device, i.e. valve level of a Radiator Thermostat (check if running max level) or operating voltage (check the battery).
 _Status_
 Desktop version (B4J): ready; not published.
 Android version (B4A): not started.
