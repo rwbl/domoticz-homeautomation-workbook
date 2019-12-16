@@ -1,4 +1,4 @@
-### 20191215
+### 20191216
 * NEW: Functions Timers - Started to use switch device timers for simple tasks like setting setpoint or switch on|off
 * NEW: Function Postbox Notifier - Solution with Alert + Switch + Voltage
 * NEW: Explore RaspberryMatic - Added more push & pull examples
