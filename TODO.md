@@ -12,7 +12,7 @@ _Examples_
 * Thermostat dining room with three devices setpoint,temperature, battery. Roomplan: Esszmmer (EZ). Name: Hzg EZ Sollwert, Hzg EZ Temperatur, Hzg EZ Batterie
 
 _Status_
-Started the definitions, but not documented yet.
+Started the definitions, build the roomplans and assigned the devices. Not documented yet.
 
 #### NEW: Tool RaspMaticStateList
 The purpose of this tool, is to obtain the list of devices and datapoints , with selected properties, from the RaspberryMatic server.
