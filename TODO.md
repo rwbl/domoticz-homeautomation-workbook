@@ -1,13 +1,15 @@
-### Status 20191216
+### Status 20191217
 
 #### NEW: Device Names & Roomplans
-Defined device naming convention: Hardware Roomplan Device.
-For the production server, all device names will be translated to german.
-For the development server all device names will be in english
-Define roomplans and associate devices.
-Examples (device, roomplan, device name):
-Hue Light located in the living room near TV. Roomplan: Wohnzimmer (WZ). Name: Hue WZ TV
-Thermostat dining room with 3 devices setpoint,temperature, battery. Roomplan: Esszmmer (EZ). Name: Hzg EZ Sollwert, Hzg EZ Temperatur, Hzg EZ Batterie
+Define naming convention and organise device according roomplans.
+* Defined device naming convention: Hardware Roomplan Device.
+* Domoticz Production server: all device names translated to german.
+* Domoticz Development server: all device names in english.
+* Define roomplans and associate devices.
+_Examples_
+(hardware, roomplan, device)
+* Hue Light located in the living room near TV. Roomplan: Wohnzimmer (WZ). Name: Hue WZ TV
+* Thermostat dining room with three devices setpoint,temperature, battery. Roomplan: Esszmmer (EZ). Name: Hzg EZ Sollwert, Hzg EZ Temperatur, Hzg EZ Batterie
 
 _Status_
 Started the definitions, but not documented yet.
@@ -85,10 +87,17 @@ This function requires a Tinkerorge Master Brick to be connected to the Domoticz
 _Status_
 Not started.
 
+#### UPD: Function Postbox Notifier
+Replace checking operating voltage (datapoint OPERATING_VOLTAGE) by checking low battery state (Datapoint LOW_BAT). See plugin HmIP-eTRV.
+
+_Status_
+Not started.
+
 ### [TODOS ON HOLD OR STOPPED]
 
 #### NEW: Test Domoticz on the Raspberry Pi 4 with 4GB
 The intention is to test Domoticz and other like Node-RED on the Raspberry Pi 4.
+
 _Status_
 STOPPED.
 Based on the CPU load of ~3-5% on both the Domoticz production (running since 3 years now) & developed Raspberry Pi 3 boards, dediced not to continue.
@@ -102,6 +111,7 @@ If the RFXtrx433E is more then about 10 meters range away from the Revolot devic
 Probably rather weak antenna. Explore how to improve the range ELSE consider other solution.
 The device is causing high traffic on the 433.92MHz frequency. Sending almost every few seconds data.
 The Domoticz log is getting spoiled with data and of course the RFXtrx433E is rather busy.
+
 _Status_
 STOPPED.
 Been thinking about additional Revolt devices - but regarding issues 1 and 2 will not continue.
@@ -109,17 +119,20 @@ Developed & installed a solution using a RaspberryMatic HomeMatic CCU3 with seve
 
 #### NEW: Control Samsung TV with Tizen OS
 Explore if possible to build some basic control (on/off, Volume) as a starter using Node-RED.
+
 _Status_
 ON HOLD.
 Tested on the Domoticz development environment, the node [Samsung-TV-MK Node-RED](https://www.npmjs.com/package/node-red-contrib-samsung-tv-mk).
 
 #### NEW: Function Measure CO living room
+
 _Status_
 ON HOLD.
 Have not found a device yet which is supported by RFXCOM 433MHz and Domoticz.
 Will probably not continue as could be covered by the function "Air Quality Plus".
 
 #### NEW: Connect Sonoff (Itead) devices using ESP Easy
+
 _Status_
 ON HOLD.
 Tested the Sonoff POW R2 to measure power & energy without success - think made a mistake soldering the IO's to be able to flash ESP Easy.
