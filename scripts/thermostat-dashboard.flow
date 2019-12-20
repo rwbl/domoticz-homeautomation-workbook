@@ -1,0 +1,697 @@
+[
+    {
+        "id": "1a610b55.58c675",
+        "type": "inject",
+        "z": "97a7881.177d778",
+        "name": "Inject HTTP Request Statelist DataPoints",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 230,
+        "y": 100,
+        "wires": [
+            [
+                "d0601d47.9e49f"
+            ]
+        ]
+    },
+    {
+        "id": "d0601d47.9e49f",
+        "type": "http request",
+        "z": "97a7881.177d778",
+        "name": "Send HTTP Request",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": false,
+        "url": "http://ccu-ip/config/xmlapi/statelist.cgi",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 180,
+        "y": 160,
+        "wires": [
+            [
+                "3427aadb.2ffae6"
+            ]
+        ]
+    },
+    {
+        "id": "3427aadb.2ffae6",
+        "type": "xml",
+        "z": "97a7881.177d778",
+        "name": "Convert XML to JavaScript Object",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 240,
+        "y": 220,
+        "wires": [
+            [
+                "8f298ea.3b54c7",
+                "8ff26513.cfe088",
+                "a3702418.f73a38",
+                "d8fee0ee.34c07",
+                "20793f83.033db",
+                "ce1e28f7.75ee58"
+            ]
+        ]
+    },
+    {
+        "id": "8f298ea.3b54c7",
+        "type": "change",
+        "z": "97a7881.177d778",
+        "name": "ML-D LEVEL (1576)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$number(payload.**[ise_id=\"1576\"].value) * 100",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 220,
+        "wires": [
+            [
+                "65b204d1.b2d2fc",
+                "8a8ce273.d069e",
+                "d48946a9.a99068"
+            ]
+        ]
+    },
+    {
+        "id": "65b204d1.b2d2fc",
+        "type": "debug",
+        "z": "97a7881.177d778",
+        "name": "DEBUG JSONNATA",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 960,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "a901474c.482b08",
+        "type": "comment",
+        "z": "97a7881.177d778",
+        "name": "RaspMatic XML-API Datapoints",
+        "info": "",
+        "x": 170,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "8ff26513.cfe088",
+        "type": "change",
+        "z": "97a7881.177d778",
+        "name": "ML-D ACTUAL_TEMPERATURE (1567)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.**[ise_id=\"1567\"].value",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 260,
+        "wires": [
+            [
+                "65b204d1.b2d2fc",
+                "f66e7d5f.d28cc",
+                "5b8a22cb.aea51c"
+            ]
+        ]
+    },
+    {
+        "id": "a3702418.f73a38",
+        "type": "change",
+        "z": "97a7881.177d778",
+        "name": "ML-D SET_POINT_TEMPERATURE (1584)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.**[ise_id=\"1584\"].value",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 300,
+        "wires": [
+            [
+                "65b204d1.b2d2fc",
+                "9667a8fa.b86058",
+                "6e99adc5.677dd4"
+            ]
+        ]
+    },
+    {
+        "id": "8a8ce273.d069e",
+        "type": "ui_gauge",
+        "z": "97a7881.177d778",
+        "name": "ML-G Valve Opening",
+        "group": "587fa9c9.b929c8",
+        "order": 5,
+        "width": "3",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Valve Opening",
+        "label": "%",
+        "format": "{{value}} ",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 960,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "d48946a9.a99068",
+        "type": "ui_chart",
+        "z": "97a7881.177d778",
+        "name": "ML-C Valve opening",
+        "group": "587fa9c9.b929c8",
+        "order": 6,
+        "width": "3",
+        "height": "3",
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "8",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1200,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f66e7d5f.d28cc",
+        "type": "ui_gauge",
+        "z": "97a7881.177d778",
+        "name": "ML-G Temperature",
+        "group": "587fa9c9.b929c8",
+        "order": 3,
+        "width": "3",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Temperature",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "10",
+        "max": "30",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 950,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "5b8a22cb.aea51c",
+        "type": "ui_chart",
+        "z": "97a7881.177d778",
+        "name": "ML-C Temperature",
+        "group": "587fa9c9.b929c8",
+        "order": 4,
+        "width": "3",
+        "height": "3",
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "8",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1190,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9667a8fa.b86058",
+        "type": "ui_chart",
+        "z": "97a7881.177d778",
+        "name": "ML-C Setpoint",
+        "group": "587fa9c9.b929c8",
+        "order": 2,
+        "width": "3",
+        "height": "3",
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "8",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1180,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6e99adc5.677dd4",
+        "type": "ui_gauge",
+        "z": "97a7881.177d778",
+        "name": "ML-G Setpoint",
+        "group": "587fa9c9.b929c8",
+        "order": 1,
+        "width": "3",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Setpoint",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "10",
+        "max": "30",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 940,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "d8fee0ee.34c07",
+        "type": "change",
+        "z": "97a7881.177d778",
+        "name": "WZ-D LEVEL (3578)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$number(payload.**[ise_id=\"3578\"].value) * 100",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 360,
+        "wires": [
+            [
+                "6df600e5.a466e",
+                "94af969.3b12868"
+            ]
+        ]
+    },
+    {
+        "id": "20793f83.033db",
+        "type": "change",
+        "z": "97a7881.177d778",
+        "name": "ML-D ACTUAL_TEMPERATURE (3569)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.**[ise_id=\"3569\"].value",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 400,
+        "wires": [
+            [
+                "aa9cbb4.06e6b48",
+                "af3b22e9.8f8bb"
+            ]
+        ]
+    },
+    {
+        "id": "ce1e28f7.75ee58",
+        "type": "change",
+        "z": "97a7881.177d778",
+        "name": "ML-D SET_POINT_TEMPERATURE (3586)",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.**[ise_id=\"3586\"].value",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 440,
+        "wires": [
+            [
+                "2ce3fc6b.7b82c4",
+                "e81b54fc.04bc58"
+            ]
+        ]
+    },
+    {
+        "id": "6df600e5.a466e",
+        "type": "ui_gauge",
+        "z": "97a7881.177d778",
+        "name": "WZ-G Valve Opening",
+        "group": "23b6f9a1.6576b6",
+        "order": 5,
+        "width": "3",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Valve Opening",
+        "label": "%",
+        "format": "{{value}} ",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 960,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "94af969.3b12868",
+        "type": "ui_chart",
+        "z": "97a7881.177d778",
+        "name": "WZ-C Valve opening",
+        "group": "23b6f9a1.6576b6",
+        "order": 6,
+        "width": "3",
+        "height": "3",
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "8",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1200,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "aa9cbb4.06e6b48",
+        "type": "ui_gauge",
+        "z": "97a7881.177d778",
+        "name": "WZ-G Temperature",
+        "group": "23b6f9a1.6576b6",
+        "order": 3,
+        "width": "3",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Temperature",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "10",
+        "max": "30",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 950,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "af3b22e9.8f8bb",
+        "type": "ui_chart",
+        "z": "97a7881.177d778",
+        "name": "WZ-C Temperature",
+        "group": "23b6f9a1.6576b6",
+        "order": 4,
+        "width": "3",
+        "height": "3",
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "8",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1190,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2ce3fc6b.7b82c4",
+        "type": "ui_chart",
+        "z": "97a7881.177d778",
+        "name": "WZ-C Setpoint",
+        "group": "23b6f9a1.6576b6",
+        "order": 2,
+        "width": "3",
+        "height": "3",
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "8",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 1180,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e81b54fc.04bc58",
+        "type": "ui_gauge",
+        "z": "97a7881.177d778",
+        "name": "WZ-G Setpoint",
+        "group": "23b6f9a1.6576b6",
+        "order": 1,
+        "width": "3",
+        "height": "3",
+        "gtype": "gage",
+        "title": "Setpoint",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "10",
+        "max": "30",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 940,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "587fa9c9.b929c8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Thermostat MakeLab",
+        "tab": "837ddd8b.929fd8",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "23b6f9a1.6576b6",
+        "type": "ui_group",
+        "z": "",
+        "name": "Thermostat WZ",
+        "tab": "837ddd8b.929fd8",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "837ddd8b.929fd8",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Homematic",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

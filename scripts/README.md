@@ -1,5 +1,9 @@
 ## Domoticz Homeautomation Workbook Scripts
 
+### Explore Scripting
+The files starting with explore_automation_events_.md contain various test or initially used scripts, whilst exploring dzVents Lua, Lua, Python and Blockly.
+These scripts are not used anymore but kept as learning reference.
+
 ### dzVents
 The files with extension _.lua_ are the generated dzVents scripts used. All scripts are maintained via the Domoticz Web UI Event Editor.
 
@@ -17,6 +21,7 @@ The flows can be inported in Node-RED via the settings menu > import (paste).
 
 ### Python
 The files with extension _.py_ are function specific. 
+Example: The files starting with _sql-_ are Python test scrpts for SQL operations.
 
 ### ESP Easy
 The files with extension _.rule_ are ESP Easy rules.
