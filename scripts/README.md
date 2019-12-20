@@ -1,7 +1,7 @@
 ## Domoticz Homeautomation Workbook Scripts
 
 ### Explore Scripting
-The files starting with explore_automation_events_.md contain various test or initially used scripts, whilst exploring dzVents Lua, Lua, Python and Blockly.
+The files _explore_automation_events_<name>.md_ contain various test or initially used scripts, whilst exploring dzVents Lua, Lua, Python and Blockly.
 These scripts are not used anymore but kept as learning reference.
 
 ### dzVents
