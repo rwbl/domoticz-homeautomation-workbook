@@ -1,19 +1,5 @@
 ### Status 20191217
 
-#### NEW: Device Names & Roomplans
-Define naming convention and organise device according roomplans.
-* Defined device naming convention: Hardware Roomplan Device.
-* Domoticz Production server: all device names translated to german.
-* Domoticz Development server: all device names in english.
-* Define roomplans and associate devices.
-_Examples_
-(hardware, roomplan, device)
-* Hue Light located in the living room near TV. Roomplan: Wohnzimmer (WZ). Name: Hue WZ TV
-* Thermostat dining room with three devices setpoint,temperature, battery. Roomplan: Esszmmer (EZ). Name: Hzg EZ Sollwert, Hzg EZ Temperatur, Hzg EZ Batterie
-
-_Status_
-Started the definitions, build the roomplans and assigned the devices. Not documented yet.
-
 #### NEW: Tool RaspMaticStateList
 The purpose of this tool, is to obtain the list of devices and datapoints , with selected properties, from the RaspberryMatic server.
 The focus is on getting the device id's and datapoint id's as these are used by RaspberryMatic scripts and Domoticz Automation Events (dzVents Lua scripts).
