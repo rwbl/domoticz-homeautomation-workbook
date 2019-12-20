@@ -1,5 +1,5 @@
-### 20191220 BETA
-(Version in progress)
+### In Progress
+Changed: 20191220
 * NEW: Function Roomplan - Created roomplans with associated devices; defined device naming convention
 * NEW: Function Timers - Started to use timers for simple tasks like thermostat setting setpoint or switch on|off
 * NEW: Function Postbox Notifier - Solution with Alert + Switch + Voltage
