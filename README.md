@@ -31,7 +31,7 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * Electricity power & energy for the house from “volkszaehler” with charts.
 * Event monitor for selected devices.
 * Hardware Monitor for the Raspberry Pi's used (see HardwareMonitor.zip).
-* HomeMatic (RaspberryMatic) CCU3 integration with variety of devices.
+* HomeMatic (RaspberryMatic) CCU3 integration with variety of devices and plugins [HmIP-eTRV](https://github.com/rwbl/domoticz-plugin-hmip-etrv), [HmIP-PSM](https://github.com/rwbl/domoticz-plugin-hmip-psm).
 * Hue Light controlled via ESP8266 with slide potentiometer & 4-digit-7-segment-display.
 * Information on key dates (calendar type information).
 * MQTT subscribe & publish messages to trigger actions or information.
