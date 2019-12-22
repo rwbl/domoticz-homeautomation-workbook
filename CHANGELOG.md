@@ -1,13 +1,13 @@
-### In Progress
-Changed: 20191220
+### 20191222
 * NEW: Function Roomplan - Created roomplans with associated devices; defined device naming convention
 * NEW: Function Timers - Started to use timers for simple tasks like thermostat setting setpoint or switch on|off
 * NEW: Function Postbox Notifier - Solution with Alert + Switch + Voltage
-* NEW: Explore RaspberryMatic - Added more push & pull examples
+* NEW: Explore RaspberryMatic - Added more push & pull examples; HTTP XML-API URL replaced config by addons
 * NEW: Explore RaspberryMatic - Experiment Node-RED dashboard with two radiator thermostats
-* UPD: Function Radiator Thermostat reworked; new plugin HmIP-eTRV; Timers to control heating
-* UPD: Explore SQL - Chapter reworked and added more SQL select examples
 * UPD: Explore Events - bundled testscripts to files explore_automation_events*.md
+* UPD: Explore Node-RED - updated installation information as Node-RED installation/update script has changed (Linux Installers for Node-RED)
+* UPD: Function Radiator Thermostat reworked; new plugin HmIP-eTRV; Timers to control heating; New device vale position
+* UPD: Explore SQL - Chapter reworked and added more SQL select examples
 * UPD: TODO.md
 * UPD: Various smaller enhancements & corrections
 
