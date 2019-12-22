@@ -6,7 +6,7 @@
 * NEW: Explore RaspberryMatic - Experiment Node-RED dashboard with two radiator thermostats
 * UPD: Explore Events - bundled testscripts to files explore_automation_events*.md
 * UPD: Explore Node-RED - updated installation information as Node-RED installation/update script has changed (Linux Installers for Node-RED)
-* UPD: Function Radiator Thermostat reworked; new plugin HmIP-eTRV; Timers to control heating; New device vale position
+* UPD: Function Radiator Thermostat reworked; new plugin HmIP-eTRV; Timers to control heating; New device valve position
 * UPD: Explore SQL - Chapter reworked and added more SQL select examples
 * UPD: TODO.md
 * UPD: Various smaller enhancements & corrections
