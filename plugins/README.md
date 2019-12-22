@@ -24,3 +24,10 @@ In the Domoticz WebUI (GUI), use the plugin ith its devices, by adding new hardw
 * Set the parameter
 * Add
 * The devices are created - check the devices list GUI > Setup > Devices
+
+#### Update
+Copy from the plugin archive, the file **plugin.py** to the plugin folder.
+Restart Domoticz and check the log for errors.
+If the plugin creates new Domoticz devices, then 
+1. delete the hardware prior restarting Domoticz, followed by 
+2. adding new hardware as described previous.
