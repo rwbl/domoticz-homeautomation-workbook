@@ -43,6 +43,7 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * Security door & window wireless contact detectors.
 * Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
 * Timers for single devices or complex tasks (Automation events dzVents script).
+* Web App Site Control [Info](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI.
 
 ### Explore How To Use
 * Domoticz running on a Raspberry Pi (setup, configure).
@@ -56,7 +57,7 @@ Workbook on how to build a Domoticz Home Automation System on a Raspberry Pi.
 * ESP Easy for sensors.
 * RFXCOM RFXtrx433E USB RF Transceiver for Temperature & Humidity devices, External Wind device (only for RFXCOM tests), Other 433Mhz devices, i.e. door & window contacts.
 * Philips Hue Light Control.
-* homematicIP using RaspberryMatic CCU3 and integrate into Domoticz.
+* Homematic IP using RaspberryMatic CCU3 and integrate into Domoticz.
 * External services
 * Domoticz Android App (native client, to be determined).
 * Advanced User Interfaces, i.e. Node-RED, Bootstrap …

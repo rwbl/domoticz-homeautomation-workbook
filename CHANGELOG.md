@@ -1,3 +1,6 @@
+### 20200112
+* NEW: Function [Domoticz Web App Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED based GUI.
+
 ### 20191222
 * NEW: Function Roomplan - Created roomplans with associated devices; defined device naming convention
 * NEW: Function Timers - Started to use timers for simple tasks like thermostat setting setpoint or switch on|off
