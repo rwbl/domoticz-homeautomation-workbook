@@ -22,8 +22,8 @@ In the Domoticz WebUI (GUI), use the plugin ith its devices, by adding new hardw
 * GUI > Setup > Hardware
 * Select the type, i.e. homematicIP Radiator Thermostat (HmIP-eTRV)
 * Set the parameter
-* Add
-* The devices are created - check the devices list GUI > Setup > Devices
+* Click button Add
+* The devices are created - ensure to check the devices list GUI > Setup > Devices
 
 #### Update
 Copy from the plugin archive, the file **plugin.py** to the plugin folder.
