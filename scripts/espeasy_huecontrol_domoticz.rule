@@ -1,0 +1,34 @@
+// Control Hue light via Potmeter named HUE_Dimmer with value Analog.
+// A dummy device named Varstore (TaskNr 5) is used to store 2 values:
+// Value 1 = HUE_Dimmer for the previous Hue light value
+// Value 2 = HUE_Dimmer_Delta for the absolute delta brightness between Hue light and previous value
+
+
+// Listen to Hue light analog value changes
+on HUE_Dimmer#Analog do
+
+  // Save the delta to dummy variable value 2
+  TaskValueSet 5,2,[HUE_Dimmer#Analog]-[Varstore#HUE_Dimmer]
+  Delay 5
+
+
+  // Get the absolute delta for the new dimmer value
+  // Update the dummy variable #2
+  if [Varstore#HUE_Dimmer_Delta]<0
+
+    TaskValueSet 5,2,[Varstore#HUE_Dimmer_Delta]*-1
+
+  endif
+
+  // Check if delta > 2, this to avoid noise
+  // Submit api rest request to domoticz server to set brightness level
+  if [Varstore#HUE_Dimmer_Delta]>2
+
+    SendToHTTP DOMOTICZ-IP-ADDRESS,8080,/json.htm?type=command&param=switchlight&idx=118&switchcmd=Set%20Level&level=[HUE_Dimmer#Analog]
+
+  endif
+
+  // Update the dummy variable #1
+  TaskValueSet 5,1,[HUE_Dimmer#Analog]
+
+endon

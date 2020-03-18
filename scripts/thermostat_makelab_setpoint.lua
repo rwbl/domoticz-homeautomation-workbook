@@ -1,7 +1,7 @@
 -- thermostat_makelab_setpoint
 -- set the setpoint of the radiator thermostat channel HmIP-eTRV-2 000A18A9A64DAC:1
 -- set a new setpoint via url example:
--- http://ccu-ip-address/config/xmlapi/statechange.cgi?ise_id=1584&new_value=17.0
+-- http://ccu-ip/config/xmlapi/statechange.cgi?ise_id=1584&new_value=17.0
 -- response:
 -- <result><changed id="1584" new_value="17.0"/></result>
 
@@ -13,7 +13,7 @@ local IDX_MAKELAB_THERMOSTAT_SETPOINT = 49;
 local ID_DATAPOINT_SETPOINT = 1584;
 
 -- url of the raspmatic webserver to set the new setpoint
-local URL_RASPMATIC = 'http://192.168.1.225/config/xmlapi/statechange.cgi?ise_id=' ..  ID_DATAPOINT_SETPOINT .. '&new_value='
+local URL_RASPMATIC = 'http://ccu-ip/config/xmlapi/statechange.cgi?ise_id=' ..  ID_DATAPOINT_SETPOINT .. '&new_value='
 
 -- callback of the url request - must be unique across all dzevents - use prefix res + script name
 local RES_RASPMATIC = 'res_makelab_thermostat_setpoint';

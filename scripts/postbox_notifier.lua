@@ -16,7 +16,7 @@
 -- Domoticz Idx
 local IDX_POSTBOXNOTIFIER = 189
 -- homematic device datapoint id
-local URL_RASPMATIC = 'http://192.168.1.225/config/xmlapi/state.cgi?datapoint_id=';
+local URL_RASPMATIC = 'http://ccu-ip/config/xmlapi/state.cgi?datapoint_id=';
 -- datapoint
 JSON = (loadfile "/home/pi/domoticz/scripts/lua/JSON.lua")()  -- For Linux
 local DATAPOINT2543 = JSON:decode('{"name":"Postbox Notifier Voltage","id":2543,"xpath":"//datapoint[@ise_id=2543]/@value","response":"RESPOSTBOXNOTIFIER"}');

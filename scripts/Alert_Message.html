@@ -1,0 +1,94 @@
+<!--
+Domoticz custom page: Alert_Message.html (/home/pi/domoticz/www/templates)
+Purpose: To set the level & text of an alert device.
+Device(s) used: Idx=110,Hardware=VirtualDevices,Name=Alert Message,Type=General,SubType=Alert
+
+The HTML form contains:
+* input field to set the alert message
+* select element as drop-down list for the alert levels (0=gray, 1=green, 2=yellow, 3=orange, 4=red)
+* button to update the Domoticz Alert Device
+
+When the page is loaded, the actual alert message and alert level are set.
+Clicking on the button, after setting the alert message an alert level updates the Domoticz device.
+The Domoticz HTTP API request is used to retrieve and update data.
+This function uses jQuery.getJSON() to load JSON-encoded data from the server using a GET HTTP request.
+
+HTTP API Request Test to set the alert message & level to 3 (yellow):
+http://domoticz-ip:8080/json.htm?type=command&param=udevice&idx=110&nvalue=3&svalue=Hello%20World!
+-->
+
+<h3>Explore Domoticz Custom Pages - Alert Message</h3>
+<p>20200315 rwbL</p>
+<hr>
+
+<form action="">
+	<label for="alertmessage" id="alertmessagelabel">Alert Message: </label><br>
+	<input type="text" id="alertmessage" title="Set the alert message"><br>
+	<label for="alertlevel">Select Alert Level: </label><br>
+	<select id="alertlevel">
+	  <option value="0">Gray</option>
+	  <option value="1">Green</option>
+	  <option value="2">Yellow</option>
+	  <option value="3">Orange</option>
+	  <option value="4">Red</option>
+	</select><br>
+</form>
+<hr>
+<button id="setalertmessage">Submit</button>
+<!-- Test Domoticz Result -->
+<p id="status">Press submit to set the alert message.</p>
+
+<!--
+	JavaScript	
+-->
+<script type="text/javascript" charset="utf-8">
+	// set the url of the domoticz server
+	const AM_URL_DOMOTICZ = "http://domoticz-ip:8080";
+	// set the idx of the device
+	const AM_IDX_ALERTMESSAGE = 110;
+
+	// get the alert message text from the full device properties
+	// update the text of the selector alertmessage
+	function init_alert_message(url, idx){
+		var requestUrl = url + "/json.htm?type=devices&rid=" + idx;
+		console.log(requestUrl);
+		$.getJSON(requestUrl,{format: "json"}, function(data){
+			console.log(data);
+			// Get the alert level & set the selector alertlevels
+			var alertLevel = data.result[0].Level;
+			console.log(alertLevel);
+			$("#alertlevel").val(alertLevel).trigger("chosen:updated");
+			// $("#alertlevel").text(data.result[0].Data);
+			// Get the alert message & set selector alertmessage
+			var alertText = data.result[0].Data;
+			console.log(alertText);
+			$("#alertmessage").val(alertText);
+		}); 
+	}
+
+	function set_alert_message(url, idx){
+		var dateToday = new Date();
+		var strTime = dateToday.format("HH:mm:ss");
+		// Define the request url to submit to the domoticz server
+		var alertLevel = $("#alertlevel").children("option:selected").val();
+		var alertText = $("#alertmessage").val();
+		var requestUrl = url + "/json.htm?type=command&param=udevice&idx=" + idx + "&nvalue=" + alertLevel + "&svalue=" + alertText;
+		console.log(requestUrl);
+		// Submit the request and check the json result. example:
+		// {"status" : "OK","title" : "Update Device"}{
+		// Load JSON-encoded data from the server using a GET HTTP request.
+		// The response JSON keys are accessed using parameter data.status, data.status
+		$.getJSON(requestUrl,{format: "json"}, function(data){
+			// update the selector with id huestatus
+			$("#status").text(strTime + ": Alert Message (idx=" + idx + ") updated. Text: " + alertText + ", Level: " + alertLevel + ", Server response status: " + data.status + ", title: " + data.title);
+		}); 
+	}
+
+	$(document).ready(function(){
+		init_alert_message(AM_URL_DOMOTICZ, AM_IDX_ALERTMESSAGE);
+		// assign the click function to the hue input checkbox with id hueswitch
+		$("#setalertmessage").click(function(){
+			set_alert_message(AM_URL_DOMOTICZ, AM_IDX_ALERTMESSAGE)
+		});
+	});
+</script>

@@ -2,7 +2,7 @@
 -- Get information from the makelab homematicIP thermostat
 -- HmIP-eTRV-2 000A18A9A64DAC:1
 -- Request the datapoint information and extract the value (temperature) from the response
--- http://192.168.1.225/config/xmlapi/state.cgi?datapoint_id=1567
+-- http://ccu-ip/config/xmlapi/state.cgi?datapoint_id=1567
 -- HTTP response showing the datapoints 1567 (temperature)
 -- <?xml version="1.0" encoding="ISO-8859-1"?>
 -- <state>
@@ -16,7 +16,7 @@ local IDX_MAKELAB_THERMOSTAT_TEMP = 65;
 local ID_DATAPOINT = 1567;
 
 -- url of the raspmatic webserver to obtain device information
-local URL_RASPMATIC = 'http://192.168.1.225/config/xmlapi/state.cgi?datapoint_id=' .. ID_DATAPOINT;
+local URL_RASPMATIC = 'http://ccu-ip/config/xmlapi/state.cgi?datapoint_id=' .. ID_DATAPOINT;
 
 -- callback of the url request - must be unique across all automation events
 local RES_RASPMATIC = 'res_makelab_thermostat_temp';

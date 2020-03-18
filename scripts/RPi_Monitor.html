@@ -1,0 +1,94 @@
+<!--
+Domoticz custom page: RPi_Monitor.html (/home/pi/domoticz/www/templates)
+Purpose: To obtain Raspberry Pi CPU & RAM Usage
+Device(s) used (Idx,Hardware,Name,Type,SubType,SwitchType): 
+39,Raspberry Pi,CPU Usage,General,Percentage
+3,,Raspberry Pi,RAM Usage,General,Percentage
+
+The HTML form contains:
+* Labels for CPU & RAM Usage
+
+The Domoticz HTTP API request is used to retrieve and update data.
+This function uses ajax request to load JSON-encoded data from the server using a GET HTTP request.
+
+HTTP API Request Test for single device to obtain properties in json format:
+http://domoticz-ip:8080/json.htm?type=devices&rid=9
+
+TODO:
+* Instead setting hardcoded label with text use the device property Name (data.result[0].name).
+* Check message (F12): Use of XMLHttpRequest with the synchronous flag set to true is deprecated due to its impact on user-perceived site performance.
+-->
+
+<h3>Explore Domoticz Custom Webpages - RPi Monitor (updates every 10 seconds)</h3>
+<p>20200315 rwbL</p>
+<hr>
+
+<form action="">
+	<label for="cpuusage" id="cpuusagelabel">CPU Usage: </label>
+	<label id="cpuusage"></label><br>
+	<br>
+	<label for="ramusage" id="ramusagelabel">RAM Usage: </label>
+	<label id="ramusage"></label><br>
+</form>
+<hr>
+<p id="status"></p>
+
+<!--
+	JavaScript	
+-->
+<script type="text/javascript" charset="utf-8">
+	// set the url of the domoticz server
+	var RM_URL_DOMOTICZ = "http://domoticz-ip:8080";
+	// set the idx of the devices
+	var RM_IDX_RAM_USAGE = 3;
+	var RM_IDX_CPU_USAGE = 39;
+
+	// update the selector with id status
+	function setStatus(msg) {
+		$("#status").html(msg);
+		// console.log(msg);
+	}
+
+	// get a device property from the array result with 1 entry (index 0)
+	// example: get_device_property(idxCPUUsage, "Data","#cpuusage");
+	function get_device_property(url, idx,property,selector) {
+		$.ajax({
+			url: url + "/json.htm?type=devices&rid=" + idx,
+			async: false,
+			dataType: 'json',
+			success: function (data) {
+				propertyValue = data.result[0][property];
+				console.log(propertyValue);
+				$(selector).html(propertyValue);
+				serverTime = data.ServerTime
+				// bootbox.alert(propertyValue + "<br>" + serverTime);
+			},
+			error: function () {
+				bootbox.alert("Error communicating to server!");
+				return false;
+			}
+		});
+		return true;
+	}
+
+	// get the device properties and update the html selector
+	function refresh_data(){
+		clearInterval($.refreshTimer);
+		get_device_property(RM_URL_DOMOTICZ, RM_IDX_CPU_USAGE, "Data","#cpuusage");
+		get_device_property(RM_URL_DOMOTICZ, RM_IDX_RAM_USAGE, "Data","#ramusage");
+		setStatus("Last update: " + serverTime);
+		$.refreshTimer = setInterval(refresh_data, 10000);
+	}
+
+	$(document).ready(function(){
+		// Testing without refresh_data
+		/*
+		get_device_property(RM_URL_DOMOTICZ, RM_IDX_CPU_USAGE, "Data","#cpuusage");
+		get_device_property(RM_URL_DOMOTICZ, RM_IDX_RAM_USAGE, "Data","#ramusage");
+		setStatus("Last update: " + serverTime);
+		*/
+		
+		// Regular updates
+		refresh_data();
+	});
+</script>

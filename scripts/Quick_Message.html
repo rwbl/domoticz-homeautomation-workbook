@@ -1,0 +1,65 @@
+<!--
+Domoticz custom page: Quick_Message.html (/home/pi/domoticz/www/templates)
+Purpose: To set the text & level of an alert device by using bootbox dialog.
+Device(s) used: Idx=110,Hardware=VirtualDevices,Name=Alert Message,Type=General,SubType=Alert
+20200315 by RwbL
+-->
+
+<!--
+	JavaScript	
+-->
+<script type="text/javascript" charset="utf-8">
+	// set the url of the domoticz server
+	const QM_URL_DOMOTICZ = "http://domoticz-ip:8080";
+	const QM_IDX_ALERT_MESSAGE = 110;
+	const QM_ALERT_TITLE = "Set the Alert Message";
+	
+	const formDefinition = '<form>'+
+		'<label for="message" id="messagelabel">Message:</label><br>'+
+		'<input type="text" id="message" placeholder="Message" title="Set the message" style="width: 100%;max-width: 86%;"><br><br>'+
+		'<label for="level" id="levellabel">Level (0=gray, 1=green, 2=yellow, 3=orange, 4=red):</label><br>'+
+		'<input type="number" id="level" min="0" max="4" placeholder="1" value="1" title="Set the message level"><br>'+
+		'</form>';
+
+	function setMessage(title,url,idx) {
+		var form = $(formDefinition);
+		bootbox.confirm({
+			title: title,
+			message: form,
+			callback: function (result) {
+				console.log('This was logged in the callback: ' + result);
+				if (result === true) {
+					var alertMessage = form.find('input[id=message]').val();
+					var alertLevel = form.find('input[id=level]').val();
+					var requestUrl = url + "/json.htm?type=command&param=udevice&idx=" + idx + "&nvalue=" + alertLevel + "&svalue=" + alertMessage;
+					console.log(requestUrl);
+					$.ajax({
+						url: requestUrl,
+						async: false,
+						dataType: 'json',
+						success: function (data) {
+							console.log("Set alert message successfully (status: " + data.status + ", title: " + data.title + ").");
+							/*	Console log example:
+								This was logged in the callback: true
+								http://dom/ip:8080/json.htm?type=command&param=udevice&idx=110&nvalue=1&svalue=This is a new message
+								Set alert message successfully (status: OK, title: Update Device).
+							*/
+						},
+						error: function () {
+							console.log("[ERROR] Set alert message. Can not communicate to the Domoticz server!");
+							return false;
+						}
+					});
+				}
+				else {
+					console.log("Set alert message cancelled.");
+				}
+			}
+		});
+	}
+	
+	$(document).ready(function(){
+		setMessage(QM_ALERT_TITLE, QM_URL_DOMOTICZ, QM_IDX_ALERT_MESSAGE)
+	});
+	
+</script>

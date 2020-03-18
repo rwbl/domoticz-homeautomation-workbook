@@ -1,4 +1,6 @@
-## Domoticz Homeautomation Workbook Scripts
+## Domoticz Homeautomation Workbook - Source
+
+Information related to the files in the folder **src**.
 
 ### Explore Scripting
 The files _explore_automation_events_name.md_ contain various test or initially used scripts, whilst exploring dzVents Lua, Lua, Python and Blockly.
@@ -16,7 +18,7 @@ The files _utils.lua_ and _msgbox.lua_ are external libraries containing helper 
 ***NOTE***: These libaries are not used anymore and replaced by the internal shared helper _global_data.lua_.
 
 ### Node-RED
-The files with exsention _.flow_ are Node-RED flows.
+The files with extension _.flow_ are Node-RED flows.
 The flows can be inported in Node-RED via the settings menu > import (paste).
 
 ### Python
@@ -27,10 +29,16 @@ Example: The files starting with _sql-_ are Python test scrpts for SQL operation
 The files with extension _.rule_ are ESP Easy rules.
 
 ### RaspberryMatic
-The file with extention _.script_ are RaspMatic scripts used in programs.
+The files with extension _.script_ are RaspMatic scripts used in various function and chapter "Explore RaspberryMatic".
 
 ### Archives
 The files with extension _.zip_ are archives named as the function.
 The archive contains the required files with subfolders.
-Example: emailcontrol.zip.
+Example: email_control.zip.
+
+### HTML
+The files with extension _.html_ are custom pages from the chapter "Explore Custom Pages".
+
+### Tinkerforge
+The files starting with _tf_ are scripts (dzVents, Python, Bash) from the chapter "Explore Tinkerforge".
 

@@ -1,0 +1,16 @@
+// Check ambient light device named ESPEasy_BH1750 value Lux (see devices properties).
+// If Lux value less then threshold (i.e. 100), switch the LED ON else OFF.
+// The LED is connected to pin D5 (GPIO14).
+// Command syntax: gpio, gpio number, 1|0 - 1=ON;0=OFF
+
+on ESPEasy_BH1750#Lux do
+
+  if [ESPEasy_BH1750#Lux] < 100
+    gpio,14,1
+  else
+    gpio,14,0
+  endif
+
+
+endon
+

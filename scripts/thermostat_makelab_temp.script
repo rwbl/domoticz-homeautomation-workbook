@@ -15,11 +15,11 @@ string svalue = dom.GetObject("HmIP-RF.000A18A9A64DAC:1.ACTUAL_TEMPERATURE").Sta
 ! for tests: string svalue = 20;
 
 ! Build the domoticz http api request url to set the actual temperature on the domoticz device
-! Example: http://192.168.1.179:8080/json.htm?type=command¶m=udevice&idx=65&nvalue=0&svalue=20.89
+! Example: http://domoticz-ip:8080/json.htm?type=command¶m=udevice&idx=65&nvalue=0&svalue=20.89
 string amp = "&";
-string urldom = "'http://192.168.1.179:8080/json.htm"; ! Production=60,Development=179
+string urldom = "'http://domoticz-ip:8080/json.htm"; ! Production=60,Development=179
 string urlrequest = urldom#"?type=command"#amp#"param=udevice"#amp#"idx="#idx#amp#"nvalue="#nvalue#amp#"svalue="#svalue#"'";
-! For Tests. Output like 'http://192.168.1.179:8080/json.htm?type=command¶m=udevice&idx=65&nvalue=0&svalue=21.700000'
+! For Tests. Output like 'http://domoticz-ip:8080/json.htm?type=command¶m=udevice&idx=65&nvalue=0&svalue=21.700000'
 WriteLine(urlrequest);
 
 ! OPTION: Run the command without a return result

@@ -13,7 +13,7 @@ string sText = "Postbox%20opened%20(" # sDate # "%20" # sTime # ")";
 
 ! Build the domoticz http rest request url
 string cAmp = "&";
-string sDomUrl = "'http://192.168.1.60:8080/json.htm"; ! Production
+string sDomUrl = "'http://domoticz-ip:8080/json.htm"; ! Production
 string sUrl = sDomUrl#"?type=command"#cAmp#"param=switchlight"#cAmp#"idx="#nIdx#cAmp#"switchcmd="#sOn#"'";
 WriteLine(sUrl);
 

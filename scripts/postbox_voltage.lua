@@ -1,10 +1,10 @@
 --[[
-    raspmatic_monitor.lua
-    Perform checks on the RaspberryMatic server.
-    Update the alert message.
+    postbox_voltage.lua
+    Check the voltage of the homematicIP device SWDO built into the postbox.
+    Update the alert message if voltage is below theshold.
     Issue:
-    If using the XML-API request on the statelist, the response item.data size is too large to be handled.
-    Workaround: XM-API requests on datapoints.
+    If using the XML-API request on the statelist, the response item.data size is oo large to be handled.
+    Workaround: XM-API requests on the datapoint.
     
     Project: domoticz-homeautomation-workbook
     Interpreter: dzVents
@@ -12,18 +12,19 @@
     Version: 20191209
 ]]--
 
--- homematic device datapoint id's
+-- homematic http xml-api request url
 local URL_RASPMATIC = 'http://ccu-ip/config/xmlapi/state.cgi?datapoint_id=';
--- datapoints
+-- datapoint
 JSON = (loadfile "/home/pi/domoticz/scripts/lua/JSON.lua")()  -- For Linux
-local DATAPOINT2543 = JSON:decode('{"name":"Postbox Notifier Voltage","id":2543,"xpath":"//datapoint[@ise_id=2543]/@value","response":"RESRASPMATICMONITOR2543"}');
--- swdo devices: low voltage threshold
+local DATAPOINT2543 = JSON:decode('{"name":"Postbox Voltage","id":2543,"xpath":"//datapoint[@ise_id=2543]/@value","response":"RESPOSTBOXVOLTAGE"}');
+-- swdo device: set low voltage threshold (same as the RaspberryMatic device parameter. Can be defined as user variable.
 local TH_SWDO_LOW_VOLTAGE = 1.0;
 
 return {
 	on = {
 	    timer = {
-	        'every 30 minutes'    
+	        'every minute'      -- for tests
+	        -- 'every 30 minutes'    
         },
 		httpResponses = {
 			DATAPOINT2543.response,
@@ -41,16 +42,16 @@ return {
 
                 domoticz.log(item.data);
 
-                -- Select the callback
+                -- Select the callback - in case several datapoints
                 if (item.callback == DATAPOINT2543.response) then
                     -- OPERATING_VOLTAGE Postbox Notifier Datapoint 2543
                     -- <datapoint ise_id="2543" name="HmIP-RF.0000DA498D5859:0.OPERATING_VOLTAGE" operations="5" timestamp="1575914670" valueunit="" valuetype="4" value="1.500000" type="OPERATING_VOLTAGE"/>
-                    -- local voltage = tonumber(domoticz_applyXPath(item.data,'//datapoint[@ise_id="2543"]/@value'))
                     local voltage = tonumber(domoticz_applyXPath(item.data, DATAPOINT2543.xpath))
                     domoticz.log(DATAPOINT2543.name .. ': ' .. voltage) 
                     if voltage < TH_SWDO_LOW_VOLTAGE then
                         local message= DATAPOINT2543.name .. ':Low Voltage ' .. voltage .. ' ' .. domoticz.helpers.isnowhhmm(domoticz)
                         domoticz.log(message) 
+                        -- in production system the set alert
                         -- domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_GREEN, message)
                     end
                 end
@@ -61,4 +62,3 @@ return {
 
     end
 }
-
