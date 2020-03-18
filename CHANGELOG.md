@@ -11,6 +11,7 @@
 * NEW: Explore Tinkerforge - Various concepts how to interact between Domoticz and the [Tinkerforge](http://www.tinkerforge.com) Building Blocks.
 * NEW: Tool: RaspberryMatic Statelist - Obtain the datapoint id's for all RaspberryMatic devices configured on the CCU.
 * UPD: Function [Domoticz Web App Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Dark theme instead default light blue.
+* UPD: Function Hardware Monitor - fixed get RAM data for Raspberry Pi Buster.
 * UPD: Function Postbox Notifier - At midnight reset notification in case not done manually.
 * UPD: Function Waste Calendar - Renamed to Key Dates Calendar as also including other key dates in the list. Removed interval entry.
 * UPD: Tool MQTT Logger - Node-RED solution completely reworked; select MQTT broker Domoticz Production or Development.
