@@ -8,9 +8,9 @@ To build a Home Automation & Information System, based on the Domoticz Home Auto
 * Use this workbook as a reference.
 
 ### Remarks
-* [b]This is a working document[/b] - concept changes, new idea’s & to-do’s whilst progressing.
+* **This is a working document** - concept changes, new idea’s & to-do’s whilst progressing.
 * There might be better solutions for what is shared - updates or changes depending learning curve.
-* Source code for scripts, flows & apps not fully shared or have changed - check the GitHub src folder for the latest sources.
+* Source code for scripts, flows & apps not fully shared or have changed - check the GitHub _src_ folder for latest sources.
 * Automation events developed as dzVents Lua script events.
 * Domoticz Hardware Plugin development in Python.
 * Custom pages with JavaScript.
