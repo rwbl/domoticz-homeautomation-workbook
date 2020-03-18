@@ -1,3 +1,23 @@
+# Changelog domoticz-home-automation-workbook
+
+### 20200318
+* NEW: Function Notes - Create notes with a subject & content and save, copy or notify.
+* NEW: Function Philips Hue - Examples to direct access a device using HTTP API.
+* NEW: Function Time Control - Track & control time spent in hours, per activity block (with start- & end-time) and total/day, on a generic task.
+* NEW: Explore Custom Pages - First examples setting & getting data; Alert Message, Quick Check Raspberry Pi data, Switch Light.
+* UPD: Explore MQTT > Python: Scripts reworked.
+* UPD: Explore RaspberryMatic - Release 3.51.6.20200229; Additional examples to get data & set Domoticz devices.
+* NEW: Explore SQL - read from file; execute sql-command-line using Lua; more examples.
+* NEW: Explore Tinkerforge - Various concepts how to interact between Domoticz and the [Tinkerforge](http://www.tinkerforge.com) Building Blocks.
+* NEW: Tool: RaspberryMatic Statelist - Obtain the datapoint id's for all RaspberryMatic devices configured on the CCU.
+* UPD: Function [Domoticz Web App Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Dark theme instead default light blue.
+* UPD: Function Postbox Notifier - At midnight reset notification in case not done manually.
+* UPD: Function Waste Calendar - Renamed to Key Dates Calendar as also including other key dates in the list. Removed interval entry.
+* UPD: Tool MQTT Logger - Node-RED solution completely reworked; select MQTT broker Domoticz Production or Development.
+* UPD: Setup > Raspberry Pi > Samba - Added full log installing Samba and set share.
+* UPD: User Variables > List > Python: Script reworked; improved error handling for the request, HTTP & URL.
+* UPD: Various chapters reviewed and smaller updates including scripts, flows.
+
 ### 20200112
 * NEW: Function [Domoticz Web App Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED based GUI.
 
