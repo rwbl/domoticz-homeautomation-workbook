@@ -1,28 +1,32 @@
 # ToDo domoticz-home-automation-workbook
-Status: 20200316
+Status: 20200318
 
 #### FIX: EMail Notification Error: SMTPSEND.BareLinefeedsAreIllegal
 Since few weeks, when sending a notification via email, got SMTPSEND error mesage:
 ```
 SMTPSEND.BareLinefeedsAreIllegal; message contains bare linefeeds, which cannot be sent via DATA and receiving system does not support BDAT 
 ```
-
 Prioriy: High
 _Status_
 Investigating but no solution found..
 
 #### NEW: Function Notes Delete Selected Log Entry
-Delete the selected note from the deive log history.
-Tested:
-Delete Datapoint HTTP API Request
+Delete the selected note from the device log history.
+Tested: Delete Datapoint HTTP API Request but _NOT WORKING_ as the function deletedatapoint does not delete from table lightinglog.
+```
 http://domoticz-ip:8080/json.htm?date=2020-03-15+11:17:28&idx=111&param=deletedatapoint&type=command
-NOT WORKING as the function deletedatapoint does not delete from table lightinglog.
-
-Only all device entries can be deleted from table ligthinglog for the given idx.
-Clear log entries HTTP API Request
+```
+Only all device entries can be deleted from table ligthinglog for the given idx. Clear all log entries HTTP API Request:
+```
 http://domoticz-ip:8080/json.htm?idx=111&param=clearlightlog&type=command
+```
 
-TODO: Find way to delete the selected logentry
+Priority: Low
+_Status_
+Not started
+
+#### NEW: Function Notes Copy All Notes
+Button to copy all notes from the device log history to the clipboard
 
 Priority: Low
 _Status_
