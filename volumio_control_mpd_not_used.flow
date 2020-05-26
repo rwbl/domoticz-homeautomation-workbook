@@ -1,0 +1,362 @@
+[
+    {
+        "id": "a61e843b.319488",
+        "type": "tab",
+        "label": "Volumio MPD Test",
+        "disabled": true,
+        "info": ""
+    },
+    {
+        "id": "f368317b.0e98a8",
+        "type": "mpd in",
+        "z": "a61e843b.319488",
+        "name": "Volumio Status Change",
+        "topic": "",
+        "server": "8bcffc8e.e0487",
+        "x": 140,
+        "y": 240,
+        "wires": [
+            [
+                "b7cbed70.7d22b8"
+            ]
+        ]
+    },
+    {
+        "id": "9e1db9bc.aeff1",
+        "type": "debug",
+        "z": "a61e843b.319488",
+        "name": "Domoticz Update Current Song",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 870,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "5b4827f3.6bbda",
+        "type": "mpd out",
+        "z": "a61e843b.319488",
+        "name": "Send Command Volumio",
+        "topic": "",
+        "server": "8bcffc8e.e0487",
+        "x": 150,
+        "y": 440,
+        "wires": [
+            [
+                "2e58f044.dcb4e"
+            ]
+        ]
+    },
+    {
+        "id": "daf4836d.32b3e",
+        "type": "inject",
+        "z": "a61e843b.319488",
+        "name": "Request Current Song playing",
+        "topic": "",
+        "payload": "currentsong",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 160,
+        "y": 380,
+        "wires": [
+            [
+                "5b4827f3.6bbda"
+            ]
+        ]
+    },
+    {
+        "id": "2a898ee9.fa077a",
+        "type": "debug",
+        "z": "a61e843b.319488",
+        "name": "Current Song Playing",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 880,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "2e58f044.dcb4e",
+        "type": "json",
+        "z": "a61e843b.319488",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 350,
+        "y": 440,
+        "wires": [
+            [
+                "99a3d178.1d61f"
+            ]
+        ]
+    },
+    {
+        "id": "b7cbed70.7d22b8",
+        "type": "function",
+        "z": "a61e843b.319488",
+        "name": "Define Domoticz MQTT Command",
+        "func": "// Create domoticz MQTT command to update the Domoticz Volumio Devices showing the song played or Not Playing.\nvar idx = 144;\n\nif (msg.payload.status.state == \"play\") \n{\n    msg.payload = {\"command\": \"udevice\", \"idx\": idx, \"svalue\": msg.payload.currentsong.Name + \" ~ \" + msg.payload.currentsong.Title};\n}\nelse \n{\n    msg.payload = {\"command\": \"udevice\", \"idx\": idx, \"svalue\": \"Volumio not playing\"};\n}\n    \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 420,
+        "y": 240,
+        "wires": [
+            [
+                "a65d551e.3868c"
+            ]
+        ]
+    },
+    {
+        "id": "a65d551e.3868c",
+        "type": "rbe",
+        "z": "a61e843b.319488",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 650,
+        "y": 240,
+        "wires": [
+            [
+                "9e1db9bc.aeff1",
+                "94b71cb1.3f77a"
+            ]
+        ]
+    },
+    {
+        "id": "94b71cb1.3f77a",
+        "type": "mqtt out",
+        "z": "a61e843b.319488",
+        "name": "Domoticz Update Current Song",
+        "topic": "domoticz/in",
+        "qos": "",
+        "retain": "",
+        "broker": "f7c80436.a43f2",
+        "x": 870,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "fa5460c5.2c0278",
+        "type": "debug",
+        "z": "a61e843b.319488",
+        "name": "Debug Volumio Running Check",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 870,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "a252a738.bc9958",
+        "type": "function",
+        "z": "a61e843b.319488",
+        "name": "Volumio Is Running Check",
+        "func": "// Check if the Volumio server is running.\n\n// Create domoticz MQTT command to update the Domoticz Volumio Device which shows the song playing.\n// In case the Volumio server is not reachable, a message payload is send.\nvar idx = 144;\nvar msgvolumiooff = 'Volumio turned OFF';\n\nif (msg.payload === false) {\n    msg.payload = {\"command\": \"udevice\", \"idx\": idx, \"svalue\": msgvolumiooff};\n    return msg;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 400,
+        "y": 140,
+        "wires": [
+            [
+                "add1a5ff.e0f2b"
+            ]
+        ]
+    },
+    {
+        "id": "add1a5ff.e0f2b",
+        "type": "rbe",
+        "z": "a61e843b.319488",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 650,
+        "y": 140,
+        "wires": [
+            [
+                "fa5460c5.2c0278",
+                "94b71cb1.3f77a"
+            ]
+        ]
+    },
+    {
+        "id": "667cf01f.f3327",
+        "type": "adv ping",
+        "z": "a61e843b.319488",
+        "name": "Ping Volumio",
+        "host": "VOLUMIO-SERVER--IP-ADDRESS",
+        "x": 110,
+        "y": 140,
+        "wires": [
+            [
+                "a252a738.bc9958"
+            ]
+        ]
+    },
+    {
+        "id": "a382704d.f62ed8",
+        "type": "inject",
+        "z": "a61e843b.319488",
+        "name": "Initiate Volumio Running Check",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 170,
+        "y": 80,
+        "wires": [
+            [
+                "667cf01f.f3327"
+            ]
+        ]
+    },
+    {
+        "id": "99a3d178.1d61f",
+        "type": "rbe",
+        "z": "a61e843b.319488",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 490,
+        "y": 440,
+        "wires": [
+            [
+                "c02c63a6.8880e"
+            ]
+        ]
+    },
+    {
+        "id": "c02c63a6.8880e",
+        "type": "function",
+        "z": "a61e843b.319488",
+        "name": "Get Song Title",
+        "func": "// Get the title of the current song playing\n// The msg payload is getting from JSON node\n// The msg payload is an array with 1 entry.\n// Example:\n// [{\"file\":\"http://37.59.14.77:8352/stream\",\"Title\":\"The Sonny Moorman Group - Up To My Neck In The Blues\",\"Name\":\"Blues Radio\",\"Pos\":\"0\",\"Id\":\"1\"}]\n\n// Assign the msg payload to an object holding the data\nvar data = msg.payload;\n\n// Parse the JSON object data to an object array\nvar songobj = JSON.parse(data);\n\n// Get the song title  from the first entry of the array\nmsg.payload = songobj[0].Title;\n\n// For debugging show a warn\n// node.warn(msg.payload);\n\n// Return the message\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 660,
+        "y": 440,
+        "wires": [
+            [
+                "2a898ee9.fa077a"
+            ]
+        ]
+    },
+    {
+        "id": "ba9e246a.cbcc7",
+        "type": "inject",
+        "z": "a61e843b.319488",
+        "name": "Set Volume 80",
+        "topic": "",
+        "payload": "status",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 120,
+        "y": 540,
+        "wires": [
+            [
+                "4467748d.a5cc94"
+            ]
+        ]
+    },
+    {
+        "id": "4467748d.a5cc94",
+        "type": "mpd out",
+        "z": "a61e843b.319488",
+        "name": "Send Command Volumio",
+        "topic": "",
+        "server": "8bcffc8e.e0487",
+        "x": 150,
+        "y": 600,
+        "wires": [
+            [
+                "7486e3bb.8d8154"
+            ]
+        ]
+    },
+    {
+        "id": "6c2e08e3.87ad48",
+        "type": "debug",
+        "z": "a61e843b.319488",
+        "name": "Set Volume",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 850,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "7486e3bb.8d8154",
+        "type": "json",
+        "z": "a61e843b.319488",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 350,
+        "y": 600,
+        "wires": [
+            [
+                "6c2e08e3.87ad48"
+            ]
+        ]
+    },
+    {
+        "id": "8bcffc8e.e0487",
+        "type": "mpd-server",
+        "z": "",
+        "host": "volumio.local",
+        "port": "6600"
+    },
+    {
+        "id": "f7c80436.a43f2",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Domoticz MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]

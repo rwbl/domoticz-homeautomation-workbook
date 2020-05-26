@@ -1,0 +1,65 @@
+--[[
+    raspmatic_dutycycle_monitor.lua
+    Perform checks on the RaspberryMatic systemvariable "DutyCycle"
+    Update the alert message.
+    Project: domoticz-homeautomation-workbook
+    Interpreter: dzVents
+    Author: Robert W.B. Linn
+    Version: 20200428
+]]--
+
+-- url http xml-api request system variable 
+local URL_RASPMATIC = 'http://ccu-ip//addons/xmlapi/sysvar.cgi?ise_id=';
+-- define the unique (across all dzVents) callback
+local RES_RASPMATIC = "RES_RASPMATIC_DUTYCYCLE_MONITOR";
+-- set the datapoint ise_id of the "DutyCycle" with ise_id 1390
+local DATAPOINT_ISE_ID = 1390;
+-- domoticz dutycycle device
+local IDX_RASPMATIC_DUTYCYCLE = 116;
+-- set the alert message if dutycycle value is above threshold
+local TH_DUTYCYCLE = 4;
+
+function round(number, decimals)
+    local power = 10^decimals
+    return math.floor(number * power) / power
+end
+
+return {
+	on = {
+	    timer = {
+	        'every 3 minutes'    
+        },
+		httpResponses = {
+			RES_RASPMATIC,
+		}
+	},
+	execute = function(domoticz, item)
+        -- check if the item is a device, then request information
+		if (item.isTimer) then
+		    domoticz.openURL({url = URL_RASPMATIC .. DATAPOINT_ISE_ID, method = 'GET', callback = RES_RASPMATIC,})
+		end
+
+        -- check if the item is a httpresponse from the openurl callback
+		if (item.isHTTPResponse) then
+			if (item.statusCode == 200) then
+                domoticz.log(item.data);
+                -- Select the callback - in this case there is only one (but for any next developments here might be more)
+                if (item.callback == RES_RASPMATIC) then
+                    -- get the key value from the http response
+                    -- <systemVariable value_name_1="" value_name_0="" timestamp="1587970920" subtype="0" type="4" unit="%" max="100" min="-1" ise_id="1390" value_text="" value_list="" value="3.000000" variable="3.000000" name="DutyCycle"/>
+                    local value = tonumber(domoticz_applyXPath(item.data,'//systemVariable[@ise_id="'..DATAPOINT_ISE_ID..'"]/@value'))
+					domoticz.devices(IDX_RASPMATIC_DUTYCYCLE).updatePercentage(value);
+                    domoticz.log(string.format("Duty Cycle: %.0f", value));
+                    if value > TH_DUTYCYCLE then
+                        local message= string.format("DutyCycle above threshold:%.0f (%s)", value, domoticz.helpers.isnowhhmm(domoticz));
+                        domoticz.log(message) 
+                        -- domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_GREEN, message)
+                    end
+                end
+			else
+				domoticz.log('[ERROR] Request:' .. item.statusText, domoticz.LOG_ERROR)
+			end
+		end
+
+    end
+}

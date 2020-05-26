@@ -1,0 +1,443 @@
+--[[
+-- music_player.lua
+-- A simple Kodi music player front end. Functionality:
+-- Playback - play,pause,next,previous
+-- Volume - set the volume between 0 - 100%
+-- System - stop or shutdown the player
+-- State - Use the player on or off
+-- Playing - If playing, show artist - title (updated every minute or if button play selected), else state information
+-- Progress - If plying, sho progress percentage, time played, time total
+-- Communication with the player via Kodi JSONRPC HTTP requests containing commands in JSON format (see constants below).
+-- The base request url is defined as user variable: URL_JSONRPC from type string and value "http://player-ip:8080/jsonrpc".
+-- Solution tested on an old Raspberberry Pi 2Bv1.1 with LibreELEC running Kodi 18.6.
+-- The player must iniated by selecting on followed by play.
+-- The progress is updated every 10sec initiated by pressing play and handled by http responses (callbacks)
+-- To get an adhoc update, either use MQTT to trigger the playback device (level play) or define a custom event.
+-- Both could be realized by for example Node-RED flow or a python script.
+-- To select another player, chenge the ip address defined as uservar "URL_JSONRPC" (this could also be handled by a selector switch).
+-- For more information on this player solution, see the Domoticz Workbook written by the author.
+-- 20200524 rwbl
+]]--
+
+-- Flag to extensively debug to the domoticz log
+local DEBUG = 0;
+
+-- Define the url for the domoticz system (used to clear the progress text device)
+local UV_URL_DOMOTICZ = "URL_DOMOTICZ"  -- uservar, string, http://domoticz-ip:8080/json.htm
+-- Define the url for the kodi jsonrpc get request (the parameter '?request=' is added)
+local UV_URL_PLAYER = "URL_PLAYER"  -- uservar, string, http://player-ip:8080/jsonrpc
+-- HTTP request unique callback (prefix=kodi suffix=jsonrpc method in uppercase without underscores)
+local CALLBACK_GETITEM = "PLAYERGETITEM"
+local CALLBACK_GETPROPERTIES = "PLAYERGETPROPERTIES"
+local CALLBACK_PLAYBACK = "PLAYERPLAYBACK"
+local CALLBACK_SYSTEM = "PLAYERSYSTEM"
+
+-- Request for method Player.GetItem for artist:title
+-- Note: Player.GetItem still responses artist:title if the song is paused.
+local JSONRPC_GETITEM = '{"jsonrpc":"2.0","method":"Player.GetItem","params":{"properties":["title","album","artist","duration"],"playerid":0},"id":"AudioGetItem"}'
+-- http://player-ip:8080/jsonrpc?request={"jsonrpc":"2.0","method":"Player.GetItem","params":{"properties":["title","album","artist","duration"],"playerid":0},"id":1}
+-- {"id":1,"jsonrpc":"2.0","result":{"item":{"album":"ALBUM","artist":["ARTIST"],"duration":274,"id":227,"label":"LABEL","title":"TITLE","type":"song"}}}
+-- Key Properties leave empty [] gets property label only:
+-- http://player-ip:8080/jsonrpc?request={"jsonrpc":"2.0","method":"Player.GetItem","params":{"properties":[],"playerid":0},"id":1}
+-- {"id":1,"jsonrpc":"2.0","result":{"item":{"id":2345,"label":"LABEL","type":"song"}}}
+-- Key Properties to get album and albumid
+-- http://player-ip:8080/jsonrpc?request={"jsonrpc":"2.0","method":"Player.GetItem","params":{"properties":["album","albumid"],"playerid":0},"id":1}
+-- {"id":1,"jsonrpc":"2.0","result":{"item":{"album":"ALBUM","albumid":NNN,"id":NNNN,"label":"LABEL","type":"song"}}}
+
+-- Request for method Player.GetProperties for the total time and time played for the current song playing
+local JSONRPC_GETPROPERTIES = '{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetProperties\", \"params\" :{ \"playerid\": 0, \"properties\":[\"speed\", \"percentage\",\"time\", \"totaltime\"]},\"id\": \"AudioGetItem\"}'
+-- http://player-ip:8080/jsonrpc?request={\"jsonrpc\": \"2.0\", \"method\": \"Player.GetProperties\", \"params\" :{ \"playerid\": 0, \"properties\":[\"speed\", \"percentage\",\"time\", \"totaltime\"]},\"id\": \"AudioGetItem\"}
+-- {"id":"AudioGetItem","jsonrpc":"2.0","result":{"percentage":25.5638370513916,"speed":1,"time":{"hours":0,"milliseconds":268,"minutes":1,"seconds":4},"totaltime":{"hours":0,"milliseconds":402,"minutes":4,"seconds":11}}}
+
+-- Request for method to set the player to play, pause, next, prev
+local JSONRPC_PLAY = "{\"jsonrpc\":\"2.0\",\"method\":\"Player.PlayPause\",\"params\":{\"playerid\":0,\"play\":true},\"id\":\"AudioGetItem\"}"
+local JSONRPC_PAUSE = "{\"jsonrpc\":\"2.0\",\"method\":\"Player.PlayPause\",\"params\":{\"playerid\":0,\"play\":false},\"id\":\"AudioGetItem\"}"
+local JSONRPC_GOTONEXT = "{\"jsonrpc\":\"2.0\",\"method\":\"Player.GoTo\",\"params\":{\"playerid\":0,\"to\":\"next\"},\"id\":\"AudioGetItem\"}"
+local JSONRPC_GOTOPREVIOUS = "{\"jsonrpc\":\"2.0\",\"method\":\"Player.GoTo\",\"params\":{\"playerid\":0,\"to\":\"previous\"},\"id\":\"AudioGetItem\"}"
+
+-- Request to set the volume
+local JSONRPC_SETVOLUME = "{\"jsonrpc\":\"2.0\",\"method\":\"Application.SetVolume\",\"params\":{\"volume\":%d},\"id\":\"AudioGetItem\"}"
+-- local JSONRPC_SETVOLUME = "{\"jsonrpc\":\"2.0\",\"method\":\"Application.SetVolume\",\"params\":{\"volume\":%d},\"id\":\"AudioGetItem\"}"
+
+local JSONRPC_STOP = "{\"jsonrpc\":\"2.0\",\"method\":\"Player.Stop\",\"params\":{\"playerid\":0},\"id\":\"AudioGetItem\"}"
+local JSONRPC_SHUTDOWN = " {\"jsonrpc\":\"2.0\",\"method\":\"System.Shutdown\",\"id\":\"AudioGetItem\"}"
+
+-- Domoticz devices (idx,hardware,name,type,subtype,switchtype,data)
+
+-- Text for song playing artist:title
+-- 117,VirtualDevices,Player Playing,General,Text,PLAYING
+local IDX_PLAYING = 117
+-- Selector Switch for mode play,pause,next,prev
+-- 118,VirtualDevices,Player Playback,Light/Switch,Selector Switch,Set Level: 10 %
+local IDX_PLAYBACK = 118
+-- Assign the playback selector levels to constants used to select the JSONRPC action
+-- If the level in the selector switch change, adjust the levels below
+-- If the level in the selector switch change, adjust the levels below
+-- Level 0 OFF is used to hide the selected state
+local PLAYBACK_LEVEL_OFF = 0
+local PLAYBACK_LEVEL_PLAY = 10
+local PLAYBACK_LEVEL_PAUSE = 20
+local PLAYBACK_LEVEL_PREVIOUS = 30
+local PLAYBACK_LEVEL_NEXT = 40
+-- Set the progress
+-- 123,VirtualDevices,Player Progress,General,Text,PROGRESS
+local IDX_PROGRESS = 123
+-- Set the volume 
+-- 124,VirtualDevices,Player Volume,Light/Switch,Switch,Dimmer,Off
+local IDX_SETVOLUME = 124
+-- System commands and level
+-- 125,VirtualDevices,Player System,Light/Switch,Selector Switch,Set Level: 10 %
+local IDX_SYSTEM = 125
+-- If the level in the selector switch change, adjust the levels below
+-- Level 0 OFF is used to hide the selected state
+local SYSTEM_LEVEL_OFF = 0
+local SYSTEM_LEVEL_STOP = 10
+local SYSTEM_LEVEL_SHUTDOWN = 20
+-- Switch to enable or disable the player
+-- 126,VirtualDevices,Player Remote Control,Light/Switch,Switch,Off
+local IDX_REMOTECONTROL = 126
+-- Switch to select the player
+-- 127,VirtualDevices,Player Selection,Light/Switch,Selector Switch,Set Level: 10 %
+local IDX_PLAYERSELECTION = 127
+
+-- Msg
+local MSG_CONNECTIONFAILED = "Couldn't connect to server"
+local MSG_PLAYER_PAUSE = "Player paused"
+local MSG_NOTPLAYING = "Not playing"
+local MSG_INITPROGRESS = "0%"
+local MSG_SYSTEM_STOP = "Player stopped"
+local MSG_SYSTEM_SHUTDOWN = "Player shutdown"
+local MSG_PLAYERTURNEDOFF = "Remote Control turned Off"
+local MSG_PLAYERTURNEDON = "Remote Control turned On, press Play to listen"
+local MSG_PLAYERSELECTED = "Selected another player, press On and Play to listen"
+
+-- Refresh Artist:Title & Progress Rate every NN seconds - afterSec(NNN)
+local REFRESHRATE = 10
+
+-- PLANNED = Playerstate enumeration
+-- Usage: local playerState = PlayerStateType.OFF
+-- local enum PlayerStateType { ON, OFF, STOP, PLAY, PAUSE, PREV, NEXT }
+
+-- State of the remote control 1(ON) or 0(OFF)
+local playerRemoteControl = 0
+
+-- JSONRPC command send (GET or POST) to the Kodi player
+local jsonrpcCommand = ''
+
+--
+-- FUNCTIONS
+--
+
+-- Log a string to the domoticzlog depending DEBUG flag
+local function toLog(domoticz, s)
+    if (DEBUG == 1) then
+        domoticz.log(s)
+    end
+end
+
+-- Place a jsonrpc get request because want to read data
+-- Example: Refresh the song title, use a delay in case the kodi player changes, i.e. pause > play, play next, play previous
+-- getRequest(JSONRPC_GETITEM, CALLBACK_GETITEM, 1)
+local function getRequest(domoticz, command, callback, delay)
+    local ip = domoticz.variables(UV_URL_PLAYER).value
+    local url = string.format("%s?request=%s", ip, command)
+    toLog(domoticz, string.format("GET:%s=%s:%s;delay=%d", callback, url, command, delay))
+    if (delay > 0) then
+        domoticz.openURL({
+            url = url, method = 'GET', 
+            callback = callback}).afterSec(delay)
+    else
+        domoticz.openURL({
+            url = url, method = 'GET', 
+            callback = callback})
+    end
+end
+
+-- Place a jsonrpc post request because want to write data, i.e. make a change
+-- Example: Set mode to play
+-- postRequest(JSONRPC_PLAY, CALLBACK_PLAYBACK)
+local function postRequest(domoticz, command, callback, delay)
+    local ip = domoticz.variables(UV_URL_PLAYER).value
+    local url = string.format("%s", ip)
+    toLog(domoticz, string.format("POST:%s=%s:%s;delay=%d", callback, url, command, delay))
+    if (delay > 0) then
+        domoticz.openURL({
+            url = url, method = 'POST',
+            headers = { ['content-type'] = 'application/json' }, 
+            callback = callback, postData = command}).afterSec(delay)
+    else
+        domoticz.openURL({
+            url = url, method = 'POST',
+            headers = { ['content-type'] = 'application/json' }, 
+            callback = callback, postData = command})
+    end
+end
+
+-- clear the various device logs to limit database size with not needed entries
+local function clearDeviceLogs(domoticz)
+    local ip = domoticz.variables(UV_URL_DOMOTICZ).value
+	local urlBase = string.format('%s?type=command&param=clearlightlog&idx=', ip)
+
+    devices = {IDX_PROGRESS, IDX_PLAYBACK, IDX_SYSTEM, IDX_SETVOLUME, IDX_REMOTECONTROL}
+    for key,idx in ipairs(devices) do
+        domoticz.openURL({
+            url = string.format('%s%d', urlBase, idx), 
+            method = 'GET'
+        })
+	    toLog(domoticz, string.format('%d Device log cleared', idx))
+        -- print(key, idx)
+    end
+end
+
+return {
+	on = {
+		timer = { 'every hour' },
+        devices = { IDX_PLAYBACK, IDX_SETVOLUME, IDX_SYSTEM, IDX_REMOTECONTROL, IDX_PLAYERSELECTION },
+        httpResponses = { CALLBACK_GETITEM, CALLBACK_GETPROPERTIES, CALLBACK_PLAYBACK },
+    },
+    data = { 
+        songprevious  = { initial = "" },
+        songcurrent =  { initial = "" }
+    },
+	execute = function(domoticz, item)
+
+        -- Get the player remote control state
+        playerRemoteControl = domoticz.devices(IDX_REMOTECONTROL).nValue
+
+	    --
+	    -- TIMER trigger
+	    ---
+	    if (item.isTimer and playerRemoteControl == 1) then
+            -- hourly log clearance if playerRemoteControl is on
+	        if (item.trigger == 'every hour') then
+                clearDeviceLogs(domoticz)
+            end
+        end
+
+        --
+        -- DEVICE trigger
+        --
+
+        -- PLAYERSELECTION = switch to select the player
+        -- The player selection url's are defined in the device levels
+	    if (item.isDevice and item.idx == IDX_PLAYERSELECTION) then
+                domoticz.devices(IDX_PLAYING).updateText(MSG_PLAYERSELECTED)
+                domoticz.devices(IDX_PROGRESS).updateText(MSG_INITPROGRESS)
+                -- set all selector switches to off
+                domoticz.devices(IDX_REMOTECONTROL).switchOff().silent()
+                domoticz.devices(IDX_PLAYBACK).switchOff().silent()
+                domoticz.devices(IDX_SYSTEM).switchOff().silent()
+        end
+    
+        -- REMOTECONTROL = switch to use the timer, i.e. remote control the player depending nValue
+        -- nValue = 0 (off), 1 = (on)
+	    if (item.isDevice and item.idx == IDX_REMOTECONTROL) then
+	        toLog(domoticz, string.format("%s=%s|%d|%s",item.name,item.state,item.nValue,item.sValue))
+            -- Player remote control turned OFF
+            if (playerRemoteControl == 0) then
+		        -- update text devices
+                domoticz.devices(IDX_PLAYING).updateText(MSG_PLAYERTURNEDOFF)
+                domoticz.devices(IDX_PROGRESS).updateText(MSG_INITPROGRESS)
+                -- set all selector switches to off
+                domoticz.devices(IDX_PLAYBACK).switchOff().silent()
+                domoticz.devices(IDX_SYSTEM).switchOff().silent()
+            else
+                -- Player remote control turned ON
+		        -- update text devices
+                domoticz.devices(IDX_PLAYING).updateText(MSG_PLAYERTURNEDON)
+                domoticz.devices(IDX_PROGRESS).updateText(MSG_INITPROGRESS)
+            end
+            -- reset songprevious
+            domoticz.data.songprevious = ""
+        end
+    
+	    -- PLAYBACK = selector switch to set state play,pause,next,previous
+	    if (item.isDevice and item.idx == IDX_PLAYBACK) then
+	        toLog(domoticz, string.format("%s=%s|%d|%s|%d",item.name,item.state,item.nValue,item.sValue,item.level))
+	        toLog(domoticz, string.format("PlayerRemoteControl: %d", playerRemoteControl))
+            -- check if the player remote control is off = set playback switch to off and leave
+            if (playerRemoteControl == 0) then
+                domoticz.devices(IDX_PLAYBACK).switchOff().silent()
+                return 
+            end
+            -- set the jsonrpccommand
+	        if (item.level == PLAYBACK_LEVEL_PLAY) then  jsonrpcCommand = JSONRPC_PLAY  end
+	        if (item.level == PLAYBACK_LEVEL_PAUSE) then jsonrpcCommand = JSONRPC_PAUSE end
+	        if (item.level == PLAYBACK_LEVEL_NEXT) then jsonrpcCommand = JSONRPC_GOTONEXT end
+	        if (item.level == PLAYBACK_LEVEL_PREVIOUS) then jsonrpcCommand = JSONRPC_GOTOPREVIOUS end
+            -- submit url post request
+            postRequest(domoticz, jsonrpcCommand, CALLBACK_PLAYBACK, 0)
+            -- Hide the system command
+            domoticz.devices(IDX_SYSTEM).switchOff().silent()
+        end 
+
+        -- SETVOLUME = set volume between 0 - 100%
+	    if (item.isDevice and item.idx == IDX_SETVOLUME) then
+	        toLog(domoticz, string.format("%s=%s|%d|%s|%d",item.name,item.state,item.nValue,item.sValue,item.level))
+            -- check if the player remote control is off = do nothing and leave
+            if (playerRemoteControl == 0) then
+                return 
+            end
+            local volume = item.level
+            -- if state is switch off, then set volume to 0 else the volume remains as item.level which could be > 0
+            if (item.nValue == 0) then volume = 0 end
+	        jsonrpcCommand = string.format(JSONRPC_SETVOLUME, volume)
+            postRequest(domoticz, jsonrpcCommand, CALLBACK_PLAYBACK, 0)
+        end
+
+        -- SYSTEM = System commands
+        -- Hint: the remote control must be ON to use system commands
+	    if (item.isDevice and item.idx == IDX_SYSTEM) then
+	        toLog(domoticz, string.format("%s=%s|%d|%s|%d",item.name,item.state,item.nValue,item.sValue,item.level))
+            -- check if the player remote control is off = set system switch to off and leave
+            if (playerRemoteControl == 0) then
+                domoticz.devices(IDX_SYSTEM).switchOff().silent()
+                return 
+            end
+            local levelselected = item.level
+	        if (levelselected == SYSTEM_LEVEL_STOP) then 
+	            jsonrpcCommand = JSONRPC_STOP
+    		    domoticz.devices(IDX_PLAYING).updateText(MSG_SYSTEM_STOP)
+            end
+	        if (levelselected == SYSTEM_LEVEL_SHUTDOWN) then 
+	            jsonrpcCommand = JSONRPC_SHUTDOWN
+    		    domoticz.devices(IDX_PLAYING).updateText(MSG_SYSTEM_SHUTDOWN)
+                domoticz.devices(IDX_REMOTECONTROL).switchOff().silent()
+            end
+            -- Hide the playback state and progress info
+            domoticz.devices(IDX_PLAYBACK).switchOff().silent()
+            domoticz.devices(IDX_PROGRESS).updateText(MSG_INITPROGRESS)
+            domoticz.data.songcurrent = ""
+            domoticz.data.songprevious = ""
+            postRequest(domoticz, jsonrpcCommand, CALLBACK_SYSTEM, 0)
+        end
+
+        -- 
+        -- HTTP CALLBACK
+        -- 
+		if (item.isHTTPResponse) then
+            toLog(domoticz, string.format('%s Status Code = %s', item.callback, item.statusCode))
+		    toLog(domoticz, string.format('Item data: %s', item.data))
+
+            -- Statuscode
+			if (item.statusCode == 200) then
+
+                --
+                -- PLAYBACK trigger next getrequest
+                --
+			    if (item.callback == CALLBACK_PLAYBACK and item.isJSON) then
+                    getRequest(domoticz, JSONRPC_GETITEM, CALLBACK_GETITEM, 0)
+                end
+
+			    --
+			    -- GETITEM followed by GETPROPERTIES
+			    --
+			    -- {"id":"AudioGetItem","jsonrpc":"2.0","result":{"item":{"album":"ALBUM","artist":["ARTIST"],"duration":277,"id":233,"label":"LABEL","title":"TITLE","type":"song"}}}
+			    if (item.callback == CALLBACK_GETITEM and item.isJSON) then
+				    -- Pick from the property result.item the properties artist & title 
+				    local song = item.json.result.item
+                    -- Check if there is a title
+                    if (song.title ~= "") then
+                        -- note the artist is the first entry (1) of the artist array
+    				    domoticz.data.songcurrent = string.format("%s - %s", song.artist[1], song.title)
+                    end
+                    -- GETPROPERTIES = Refresh the progress text device from the method getproperties
+                    getRequest(domoticz, JSONRPC_GETPROPERTIES, CALLBACK_GETPROPERTIES, 0)
+                end
+               
+                -- 
+                -- GETPROPERTIES followed by GETITEM after NN seconds
+                --
+                -- {"id":"AudioGetItem","jsonrpc":"2.0","result":{"percentage":81.16373443603516,"speed":1,"time":{"hours":0,"milliseconds":561,"minutes":4,"seconds":29},"totaltime":{"hours":0,"milliseconds":120,"minutes":5,"seconds":32}}}
+                if (item.callback == CALLBACK_GETPROPERTIES and item.isJSON) then
+				    -- init percentage with 0% (mode stop)
+                    local progress = string.format("%s", "0%")
+                    -- check seconds played
+                    if (item.json.result.time.seconds > 0) then
+                        -- set progress with percentage, time played and totaltime
+    				    progress = string.format('%.1f%% / %02d:%02d:%02d / %02d:%02d:%02d',
+        			        item.json.result.percentage,
+        			        item.json.result.time.hours, item.json.result.time.minutes, item.json.result.time.seconds,
+    	    		        item.json.result.totaltime.hours, item.json.result.totaltime.minutes,item. json.result.totaltime.seconds
+    		    	        )
+                        -- PLAYBACK = PLAY: check the selector switches in case playing (speed > 0) is triggered by the timer with manual playback selection
+    		            if (item.json.result.speed > 0) then
+    		                -- Set playback state to play
+                            if (domoticz.devices(IDX_PLAYBACK).level ~= PLAYBACK_LEVEL_PLAY) then
+                                domoticz.devices(IDX_PLAYBACK).setLevel(PLAYBACK_LEVEL_PLAY).silent()
+                            end
+                        end
+                        -- PLAYBACK = PAUSED: there are seconds played, set progress with prefix Paused, if player paused (speed 0)
+    		            if (item.json.result.speed == 0) then
+    		                progress = string.format("%s - %s", MSG_PLAYER_PAUSE, progress)
+    		                -- Set playback state to paused
+                            if (domoticz.devices(IDX_PLAYBACK).level ~= PLAYBACK_LEVEL_PAUSE) then
+                                domoticz.devices(IDX_PLAYBACK).setLevel(PLAYBACK_LEVEL_PAUSE).silent()
+                            end
+                        end
+                    end
+                    -- Update the progress device
+                    domoticz.devices(IDX_PROGRESS).updateText(progress)
+
+                    -- check if the song has changed to update the device playing
+                    toLog(domoticz, string.format("PLAYING PREV/CURR: %s = %s", domoticz.data.songprevious, domoticz.data.songcurrent))
+                    if (domoticz.data.songcurrent ~= domoticz.data.songprevious) then
+                        toLog(domoticz, string.format("Kodi playing changed: %s to %s", domoticz.data.songprevious, domoticz.data.songcurrent))
+	    	            -- Update the text device
+		    	        domoticz.devices(IDX_PLAYING).updateText(domoticz.data.songcurrent)
+			            -- Update the data with the current song playing
+			            domoticz.data.songprevious = domoticz.data.songcurrent
+                    end
+
+                    -- check if player has stopped = set the device from "playing" to "not playing"
+                    if (item.json.result.speed == 0 and item.json.result.time.hours == 0 and item.json.result.time.minutes == 0 and item.json.result.time.seconds == 0) then
+		        	    domoticz.devices(IDX_PLAYING).updateText(MSG_NOTPLAYING)
+                        domoticz.devices(IDX_PLAYBACK).switchOff().silent()
+                    end
+
+                    -- Hide the system state
+                    if (domoticz.devices(IDX_SYSTEM).level ~= SYSTEM_LEVEL_OFF) then
+                        domoticz.devices(IDX_SYSTEM).switchOff().silent()
+                    end
+                    
+                    -- Initiate next GETITEM request after NN seconds
+                    -- GETITEM = Update the artist:title (method) and update progress (method getproperties triggers by getitem http response)
+                    toLog(string.format("NEXT GETITEM PlayerRemoteControl: %d", playerRemoteControl))
+                    if (playerRemoteControl == 1) then
+                        getRequest(domoticz, JSONRPC_GETITEM, CALLBACK_GETITEM, REFRESHRATE)
+                    else
+                        -- there could be an overlap in timing between turning the remote control off,
+                        -- therefor update text devices (again) to go for sure
+                        domoticz.devices(IDX_PLAYING).updateText(MSG_PLAYERTURNEDOFF)
+                        domoticz.devices(IDX_PROGRESS).updateText(MSG_INITPROGRESS)
+                        -- set all selector switches to off
+                        domoticz.devices(IDX_PLAYBACK).switchOff().silent()
+                        domoticz.devices(IDX_SYSTEM).switchOff().silent()
+                    end
+
+                end
+
+            end
+
+            --
+            -- ERROR handling
+            --
+            -- Handling communication or other errors
+			if (item.statusCode ~= 200) then
+			    if (domoticz.devices(IDX_PLAYING).text ~= MSG_CONNECTIONFAILED) then
+			        -- update text devices
+                    domoticz.devices(IDX_PLAYING).updateText(string.format("%s - %s", item.statusText, MSG_PLAYERTURNEDOFF))
+                    domoticz.devices(IDX_PROGRESS).updateText(MSG_INITPROGRESS)
+                    -- set all selector switches to off
+                    domoticz.devices(IDX_REMOTECONTROL).switchOff().silent()
+                    domoticz.devices(IDX_PLAYBACK).switchOff().silent()
+                    domoticz.devices(IDX_SYSTEM).switchOff().silent()
+				end
+				domoticz.log(string.format('[ERROR] Handling the request:%s', item.statusText))
+				-- domoticz.log(item, domoticz.LOG_ERROR)
+			end
+
+		end
+
+    end
+}

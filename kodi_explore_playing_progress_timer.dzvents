@@ -1,0 +1,91 @@
+--[[
+-- kodi_explore_playing_progress_timer.dzvents
+-- Get the current song playing and the progress percentage, time, totaltime from the Kodi Media Center and display in two text devices.
+-- 20200523 rwbl
+]]--
+
+-- Define the url for the kodi jsonrpc get request (the parameter '?request=' is added)
+local REQUEST_URL = "http://player-ip:8080/jsonrpc"
+-- Event unique callbacks
+local REQUEST_GETITEM_CALLBACK = "KODIEXPLOREPLAYINGPROGRESSGETITEM"
+local REQUEST_GETPROPERTIES_CALLBACK = "KODIEXPLOREPLAYINGPROGRESSGETPROPERTIES"
+-- Request for method Player.GetItem for artist:title
+local JSONRPC_GETITEM = "{\"jsonrpc\":\"2.0\",\"method\":\"Player.GetItem\",\"params\":{\"properties\":[\"title\",\"album\",\"artist\",\"duration\"],\"playerid\":0},\"id\":\"AudioGetItem\"}"
+-- Request for method Player.GetProperties for the total time and time played for the current song playing
+local JSONRPC_GETPROPERTIES = '{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetProperties\", \"params\" :{ \"playerid\": 0, \"properties\":[\"speed\", \"percentage\",\"time\", \"totaltime\"]},\"id\": \"AudioGetItem\"}'
+
+-- Domoticz devices
+local IDX_PLAYING = 117     -- text song playing artist:title
+local IDX_PROGRESS = 123    -- percentage, time, totaltime
+
+return {
+	on = { 
+	    timer = { 'every minute' }, 
+	    httpResponses = { REQUEST_GETITEM_CALLBACK, REQUEST_GETPROPERTIES_CALLBACK } 
+	    },
+    data = { 
+        songprevious  = { initial = "" } 
+        },
+	execute = function(domoticz, item)
+	    -- timer every minute
+	    if (item.isTimer) then 
+			domoticz.openURL({
+			    url = string.format("%s?request=%s", REQUEST_URL, JSONRPC_GETITEM),
+			    method = 'GET', 
+			    callback = REQUEST_GETITEM_CALLBACK})
+		end 
+    
+		if (item.isHTTPResponse) then
+            domoticz.log(string.format('Callback: %s, Status Code = %s', item.callback, item.statusCode))
+		    domoticz.log(string.format('Item data: %s', item.data))
+			if (item.statusCode == 200) then
+			    
+			    if (item.callback == REQUEST_GETITEM_CALLBACK and item.isJSON) then
+                    -- {"id":"AudioGetItem","jsonrpc":"2.0","result":{"item":{"album":"ALBUM","artist":["ARTIST"],"duration":254,"id":1531,"label":"LABEL","title":"TITLE","type":"song"}}} 
+				    -- Pick the song artist & title 
+				    local song = item.json.result.item
+                    -- Check if there is a title
+                    local songcurrent = "Nothing playing"
+                    if (song.title ~= "") then
+                        -- note the artist is the first entry (1) of the artist array
+	        			songcurrent = string.format("%s:%s", song.artist[1], song.title)
+                    end
+                    domoticz.log(string.format("Song playing: %s", songcurrent))
+                    -- check if the song has changed
+                    if (songcurrent ~= domoticz.data.songprevious) then
+                        domoticz.log(string.format("Song playing changed: %s to %s", domoticz.data.songprevious, songcurrent))
+    			        -- Update the text device
+	    			    domoticz.devices(IDX_PLAYING).updateText(songcurrent)
+	    			    -- Update the data
+	    			    domoticz.data.songprevious = songcurrent
+                    end
+        			domoticz.openURL({
+	        		    url = string.format("%s?request=%s", REQUEST_URL, JSONRPC_GETPROPERTIES),
+		        	    method = 'GET', 
+			            callback = REQUEST_GETPROPERTIES_CALLBACK})
+		        end
+		        
+			    if (item.callback == REQUEST_GETPROPERTIES_CALLBACK and item.isJSON) then
+                    -- {"id":"AudioGetItem","jsonrpc":"2.0","result":{"percentage":25.5638370513916,"speed":1,"time":{"hours":0,"milliseconds":268,"minutes":1,"seconds":4},"totaltime":{"hours":0,"milliseconds":402,"minutes":4,"seconds":11}}}
+				    -- init percentage with 0%
+                    local progress = string.format("%s", "0%")
+                    -- check seconds played
+                    if (item.json.result.time.seconds > 0) then
+                        -- set progress with percentage, time played and totaltime
+    				    progress = string.format('%.1f%% / %02d:%02d:%02d / %02d:%02d:%02d',
+        			        item.json.result.percentage,
+        			        item.json.result.time.hours, item.json.result.time.minutes, item.json.result.time.seconds,
+    	    		        item.json.result.totaltime.hours, item.json.result.totaltime.minutes,item. json.result.totaltime.seconds
+    		    	        )
+                    end
+                    domoticz.devices(IDX_PROGRESS).updateText(progress)
+                end
+			else
+                domoticz.devices(IDX_PLAYING).updateText(item.statusText)
+			    domoticz.log(string.format("[ERROR] Handling request: %s", item.statusText), domoticz.LOG_ERROR)
+		        return
+			end
+		end
+
+    end
+}

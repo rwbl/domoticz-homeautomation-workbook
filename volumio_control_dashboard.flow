@@ -1,0 +1,523 @@
+[
+    {
+        "id": "4229c2ed.036b9c",
+        "type": "tab",
+        "label": "Volumio Control Dashboard",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "67cc5f09.0d39e",
+        "type": "ui_slider",
+        "z": "4229c2ed.036b9c",
+        "name": "Volumio Volume Slider",
+        "label": "",
+        "tooltip": "",
+        "group": "2fc02c44.1ddac4",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "end",
+        "topic": "",
+        "min": 0,
+        "max": "100",
+        "step": 1,
+        "x": 480,
+        "y": 220,
+        "wires": [
+            [
+                "b23bcd73.b6e58",
+                "ccc8265b.61ab5"
+            ]
+        ]
+    },
+    {
+        "id": "93c7fe0a.25ad4",
+        "type": "comment",
+        "z": "4229c2ed.036b9c",
+        "name": "Volumio Control Dashboard via Domoticz r190210",
+        "info": "",
+        "x": 220,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "ccc8265b.61ab5",
+        "type": "ui_text",
+        "z": "4229c2ed.036b9c",
+        "group": "2fc02c44.1ddac4",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Volumio Volume Indicator",
+        "label": "Level",
+        "format": "{{msg.payload}} &percnt;",
+        "layout": "row-spread",
+        "x": 730,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "52d513b4.e03cbc",
+        "type": "ui_switch",
+        "z": "4229c2ed.036b9c",
+        "name": "Volumio Play Switch",
+        "label": "Play",
+        "tooltip": "",
+        "group": "18226cc4.f5e6e3",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "play",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "stop",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "x": 480,
+        "y": 140,
+        "wires": [
+            [
+                "5654a86.947b258"
+            ]
+        ]
+    },
+    {
+        "id": "b23bcd73.b6e58",
+        "type": "change",
+        "z": "4229c2ed.036b9c",
+        "name": "Set Volumio Volume REST Request URL",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$join(['volumio.local/api/v1/commands/?cmd=volume&volume=',$string(msg.payload)])",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 780,
+        "y": 220,
+        "wires": [
+            [
+                "bb6dcad9.37a848"
+            ]
+        ]
+    },
+    {
+        "id": "bb6dcad9.37a848",
+        "type": "http request",
+        "z": "4229c2ed.036b9c",
+        "name": "REST Request Volumio Set Volume",
+        "method": "GET",
+        "ret": "txt",
+        "url": "",
+        "tls": "",
+        "x": 1120,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a4d58bcc.7603b8",
+        "type": "http request",
+        "z": "4229c2ed.036b9c",
+        "name": "REST Request Volumio Set Play or Stop",
+        "method": "GET",
+        "ret": "txt",
+        "url": "",
+        "tls": "",
+        "x": 1140,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5654a86.947b258",
+        "type": "change",
+        "z": "4229c2ed.036b9c",
+        "name": "Set Volumio Status Play or Stop",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "$join(['volumio.local/api/v1/commands/?cmd=',msg.payload])",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 750,
+        "y": 140,
+        "wires": [
+            [
+                "a4d58bcc.7603b8"
+            ]
+        ]
+    },
+    {
+        "id": "6d78ef5d.0f879",
+        "type": "ui_text",
+        "z": "4229c2ed.036b9c",
+        "group": "4f6c647.b8b3a9c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Volumio Current Song Text",
+        "label": "",
+        "format": "{{msg.payload.svalue}}",
+        "layout": "col-center",
+        "x": 740,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "298dd66c.2cca02",
+        "type": "ui_text",
+        "z": "4229c2ed.036b9c",
+        "group": "18226cc4.f5e6e3",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "Volumio Status Text",
+        "label": "Status",
+        "format": "{{msg.payload.svalue}}",
+        "layout": "row-spread",
+        "x": 710,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "c240c7b2.3eb938",
+        "type": "ui_button",
+        "z": "4229c2ed.036b9c",
+        "name": "Volumio Bookmark Button",
+        "group": "4f6c647.b8b3a9c",
+        "order": 2,
+        "width": "0",
+        "height": "0",
+        "passthru": false,
+        "label": "<font size=3 color=gray>Bookmark</font>",
+        "tooltip": "Add the current song to the bookmark list",
+        "color": "#000000",
+        "bgcolor": "#C0C0C0",
+        "icon": "playlist_add",
+        "payload": "currentsong",
+        "payloadType": "flow",
+        "topic": "",
+        "x": 470,
+        "y": 420,
+        "wires": [
+            [
+                "549667c8.7aaa8"
+            ]
+        ]
+    },
+    {
+        "id": "cac2b41f.ad92c8",
+        "type": "ui_text",
+        "z": "4229c2ed.036b9c",
+        "group": "4f6c647.b8b3a9c",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Volumio Bookmark Text",
+        "label": "",
+        "format": "<font size=3 color=\"gray\">Last Bookmark:<br>{{msg.payload}}</font>",
+        "layout": "col-center",
+        "x": 730,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "da5b4faa.159ce8",
+        "type": "mqtt in",
+        "z": "4229c2ed.036b9c",
+        "name": "Listen VolumioControl MQTT Messages",
+        "topic": "volumiocontrol/currentsong",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 190,
+        "y": 320,
+        "wires": [
+            [
+                "b7565cda.33e59"
+            ]
+        ]
+    },
+    {
+        "id": "cd3999e4.b94d18",
+        "type": "mqtt in",
+        "z": "4229c2ed.036b9c",
+        "name": "Listen VolumioControl MQTT Messages",
+        "topic": "volumiocontrol/status",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 190,
+        "y": 80,
+        "wires": [
+            [
+                "4b1a9d64.586d1c"
+            ]
+        ]
+    },
+    {
+        "id": "b7565cda.33e59",
+        "type": "json",
+        "z": "4229c2ed.036b9c",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 430,
+        "y": 320,
+        "wires": [
+            [
+                "6d78ef5d.0f879",
+                "12e52816.643848"
+            ]
+        ]
+    },
+    {
+        "id": "4b1a9d64.586d1c",
+        "type": "json",
+        "z": "4229c2ed.036b9c",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 430,
+        "y": 80,
+        "wires": [
+            [
+                "298dd66c.2cca02"
+            ]
+        ]
+    },
+    {
+        "id": "9d4b348a.480c18",
+        "type": "mqtt out",
+        "z": "4229c2ed.036b9c",
+        "name": "Domoticz Update Volumio Favorites (idx=146)",
+        "topic": "domoticz/in",
+        "qos": "",
+        "retain": "",
+        "broker": "f7c80436.a43f2",
+        "x": 1200,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "35868089.b311c",
+        "type": "function",
+        "z": "4229c2ed.036b9c",
+        "name": "Set Domoticz MQTT payload Volumio Favorites",
+        "func": "// Bookmark the current song playing\n\nvar idxvolumiofavorites = 146;\nvar msgvolumiofavorites = {};\nmsgvolumiofavorites.payload = {\"command\": \"udevice\", \"idx\": idxvolumiofavorites, \"nvalue\":0, \"svalue\": msg.payload};\n\nreturn [msgvolumiofavorites];\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 800,
+        "y": 500,
+        "wires": [
+            [
+                "5adbee5f.5688e",
+                "9d4b348a.480c18"
+            ]
+        ]
+    },
+    {
+        "id": "5adbee5f.5688e",
+        "type": "debug",
+        "z": "4229c2ed.036b9c",
+        "name": "Debug Volumio Bookmark Button",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 1160,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "12e52816.643848",
+        "type": "change",
+        "z": "4229c2ed.036b9c",
+        "name": "Set Flow Current Song",
+        "rules": [
+            {
+                "t": "set",
+                "p": "currentsong",
+                "pt": "flow",
+                "to": "payload.svalue",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 720,
+        "y": 360,
+        "wires": [
+            [
+                "c240c7b2.3eb938"
+            ]
+        ]
+    },
+    {
+        "id": "549667c8.7aaa8",
+        "type": "rbe",
+        "z": "4229c2ed.036b9c",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 670,
+        "y": 420,
+        "wires": [
+            [
+                "35868089.b311c",
+                "1edbf47f.c91be4"
+            ]
+        ]
+    },
+    {
+        "id": "1edbf47f.c91be4",
+        "type": "ui_template",
+        "z": "4229c2ed.036b9c",
+        "group": "4f6c647.b8b3a9c",
+        "name": "",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "format": "<style>\n    .nr-dashboard-theme .nr-dashboard-button .md-button {\n        text-transform:capitalize;\n    }\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 820,
+        "y": 420,
+        "wires": [
+            [
+                "cac2b41f.ad92c8"
+            ]
+        ]
+    },
+    {
+        "id": "5ec34ecd.8c83d8",
+        "type": "mqtt in",
+        "z": "4229c2ed.036b9c",
+        "name": "Listen VolumioControl MQTT Messages",
+        "topic": "volumiocontrol/volume",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 190,
+        "y": 220,
+        "wires": [
+            [
+                "67cc5f09.0d39e",
+                "ccc8265b.61ab5"
+            ]
+        ]
+    },
+    {
+        "id": "d85f21b3.2607f8",
+        "type": "mqtt in",
+        "z": "4229c2ed.036b9c",
+        "name": "Listen VolumioControl MQTT Messages",
+        "topic": "volumiocontrol/status",
+        "qos": "2",
+        "broker": "f7c80436.a43f2",
+        "x": 190,
+        "y": 140,
+        "wires": [
+            [
+                "52d513b4.e03cbc"
+            ]
+        ]
+    },
+    {
+        "id": "2fc02c44.1ddac4",
+        "type": "ui_group",
+        "z": "",
+        "name": "Volume",
+        "tab": "857c7743.758528",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "18226cc4.f5e6e3",
+        "type": "ui_group",
+        "z": "",
+        "name": "Status",
+        "tab": "857c7743.758528",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "4f6c647.b8b3a9c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Current Song & Bookmark",
+        "tab": "857c7743.758528",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "f7c80436.a43f2",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "Domoticz MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "857c7743.758528",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Volumio Control",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

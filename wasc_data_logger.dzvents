@@ -1,0 +1,94 @@
+--[[
+    wasc_data_logger.lua
+    Get data from WASC - a Node-RED tailor made home automation & information system.
+    Assign selected key values to domoticz hardware virtualsensors devices.
+    Example HTTP GET request with HTTP Response
+    HTTP Request:
+    http://nnode-red-ip:1880/wasc
+    HTTP Response: JSON format with groups weather, energy ...
+    {
+        "weather":{"temperature":16.3,"humidity":70,"windspeed":3,"windgust":3,"winddirection":"SSW","windbearing":202,"airpressure":1000,"timestamp":"15:55"},
+        "energy":{"house":274,"makelab":8,"timestamp":"15:56"}
+    }
+    Project: domoticz-homeautomation-workbook
+    Interpreter: dzVents
+    Author: Robert W.B. Linn
+    Version: 20200430
+]]--
+
+local URL_DOMOTICZ = 'http://domoticz-ip:8080'
+local URL_WASC_DATA = 'http://node-red-ip:1880/wasc';
+local RES_WASC_DATA = 'RES_WASC_DATA';
+
+-- HTTP reponse main keys
+local KEY_WEATHER = 'weather';
+local KEY_ENERGY = 'energy';
+
+-- Domoticz devices = must be virtual sensors
+-- Weather
+-- 117,VirtualSensors,Windstärke,Wind,WTGR800,203;SSW;10;21.0;14.0;14.0
+local IDX_WIND = 117;
+-- 116,VirtualSensors,Luftdruck,General,Barometer,999 hPa
+local IDX_AIRPRESSURE = 116;
+-- 300, VirtualSensors, Außentemperatur, Temp + Humidity, THGN122/123/132, THGR122/228/238/268, 0.0 C, 50 %
+local IDX_OUTDOORTEMPHUM = 300;
+-- Energy
+-- 171,VirtualSensors,Energie Haus,General,kWh,2250.074 kWh
+local IDX_ELECTRICUSAGEHOUSE = 171  -- Type=General, SubType=kWh
+-- local IDX_POWERCONSUMPTION = 44  -- Type=Usage, SubType=Electric !NOT USED
+
+return {
+	on = {
+		-- timer = { 'every 5 minutes' },
+		timer = { 'every minute' }, -- for tests
+		httpResponses = { RES_WASC_DATA, }
+    },
+	execute = function(domoticz, item)
+	
+		if (item.isTimer) then
+			domoticz.openURL({url = URL_WASC_DATA, method = 'GET', callback = RES_WASC_DATA,})
+		end
+
+		if (item.isHTTPResponse) then
+            -- domoticz.log('Status Code = ' .. item.statusCode .. ', Name=' .. item.callback);
+            domoticz.log('Status Code = ' .. item.statusCode .. ', Name=' .. item.callback .. ', Data=' .. item.data);
+			if (item.statusCode == 200) then
+                --
+                -- weather
+                -- {["timestamp"]="16:24", ["temperature"]=15.7, ["windgust"]=6, ["humidity"]=70, ["winddirection"]="N", ["windspeed"]=7, ["airpressure"]=1000, ["windbearing"]=0}
+                -- wind
+                local weatherData = item.json[KEY_WEATHER];
+                domoticz.devices(IDX_WIND).updateWind(weatherData.windbearing, weatherData.winddirection, weatherData.windspeed / 3.6, weatherData.windgust / 3.6, weatherData.temperature, weatherData.temperature);
+                domoticz.log(string.format('%s: %.1f, %.1f', domoticz.devices(IDX_WIND).name, weatherData.windspeed / 3.6, weatherData.temperature));
+                -- temp + hum
+                local status = -1; -- status can be domoticz.HUM_NORMAL, HUM_COMFORTABLE, HUM_DRY, HUM_WET.
+                domoticz.devices(IDX_OUTDOORTEMPHUM).updateTempHum(weatherData.temperature, weatherData.humidity, status);
+                domoticz.log(string.format('%s: %.1f, %.1f', domoticz.devices(IDX_OUTDOORTEMPHUM).name, weatherData.temperature, weatherData.humidity));
+                -- airpressure
+                local forcast = -1; -- domoticz.BARO_STABLE, BARO_SUNNY, BARO_CLOUDY, BARO_UNSTABLE, BARO_THUNDERSTORM.
+        		domoticz.devices(IDX_AIRPRESSURE).updateBarometer(weatherData.airpressure, forecast)
+                domoticz.log(string.format('%s: %.0f', domoticz.devices(IDX_AIRPRESSURE).name, weatherData.airpressure));
+
+                --
+                -- Energy
+                -- "energy":{"house":274,"makelab":8,"timestamp":"15:56"}
+                local energyData = item.json[KEY_ENERGY];
+                -- WORKAROUND solution using HTTP API /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=POWER;ENERGY
+                -- POWER=W; ENERGY=Wh. The device option "Energy read" is set to computed
+                local power = math.floor(energyData.house);
+                domoticz.openURL({url = string.format('%s/json.htm?type=command&param=udevice&idx=%d&nvalue=0&svalue=%d;0', URL_DOMOTICZ, IDX_ELECTRICUSAGEHOUSE, power), method = 'GET'})
+                -- domoticz.openURL({url = '' .. URL_DOMOTICZ .. '/json.htm?type=command&param=udevice&idx=' .. IDX_ELECTRICUSAGEHOUSE .. '&nvalue=0&svalue=' ..  tostring(power) .. ';0', method = 'GET'})
+    	        message = (domoticz.devices(IDX_ELECTRICUSAGEHOUSE).name .. ': Wh = Actual: %.0f, Today: %.0f, Total: %.0f'):format(domoticz.devices(IDX_ELECTRICUSAGEHOUSE).WhActual, domoticz.devices(IDX_ELECTRICUSAGEHOUSE).WhToday,domoticz.devices(IDX_ELECTRICUSAGEHOUSE).WhTotal)
+                domoticz.log(message, domoticz.LOG_INFO)
+
+		        return
+			else
+				domoticz.log('[ERROR]:' .. item.statusText, domoticz.LOG_ERROR)
+				-- domoticz.log(item, domoticz.LOG_ERROR)
+		        return
+			end
+
+		end
+
+    end
+}

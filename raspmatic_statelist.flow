@@ -1,0 +1,352 @@
+[
+    {
+        "id": "2711d0.ba10fe3",
+        "type": "tab",
+        "label": "RaspMaticStateList",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "941a3179.d6383",
+        "type": "xml",
+        "z": "2711d0.ba10fe3",
+        "name": "Convert XML JavaScript Object",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 210,
+        "y": 260,
+        "wires": [
+            [
+                "2c18a676.54797a"
+            ]
+        ]
+    },
+    {
+        "id": "aac50db4.8d2e5",
+        "type": "comment",
+        "z": "2711d0.ba10fe3",
+        "name": "RaspMatic Statelist V20200310",
+        "info": "Get the statelist from RaspMatic:\nhttp://CCU-IP/config/xmlapi/statelist.cgi\n",
+        "x": 150,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "2c18a676.54797a",
+        "type": "function",
+        "z": "2711d0.ba10fe3",
+        "name": "Get Devices and Datapoints",
+        "func": "/*\n* return a json array with devices used for the ui_dropdown\n* set flow context \"datapoints\" for the ui_template to display the datapoints for the selected device id\nNotes: \n* Example device entry: deviceobj[\"Briefkasten Status\"]=2530;\n* Example datapoint entry: device:\"2530\",datapoint:{\"id\":\"2532\",\"type\":\"CONFIG_PENDING\",\"value\":\"false\",\"name\":\"HmIP-RF.0000DA498D5859:0.CONFIG_PENDING\"}\n* the second array below is not used as replaced by the flow context \"datapoints\" - but is kept in case any enhancements planned\n*/\n\nconst DEBUG = false;\n// get the statelist from xml into json format\nstatelist = msg.payload.stateList;\n// Get the statelist with the devices\nif (DEBUG) node.warn(statelist);\n// Get the devices array\ndevices = statelist.device\nif (DEBUG) node.warn(devices.length);\narrdevices = [];\narrdatapoints = [];\n// Loop over the devices\ndevices.forEach(function(device) {\n    // node.warn(device);\n    devicename = device.$.name;\n    deviceise_id = device.$.ise_id;\n    deviceobj = {}\n    deviceobj[devicename]=deviceise_id;\n    arrdevices.push(deviceobj);\n    //\n    channels = device.channel;\n    if (DEBUG) node.warn(\"Channel Name:\" + device.$.name);\n    channels.forEach(function(channel){\n        channeldatapoints = channel.datapoint;\n        if (channeldatapoints !== undefined) {\n            // node.warn(\"Channel datapoints: \" + channeldatapoints);\n            channeldatapoints.forEach(function(datapoint){\n                //node.warn(datapoint);\n                obj = datapoint.$;\n                if (obj !== undefined) {\n                    if (DEBUG) node.warn(devicename + \": datapoints=\" + obj.ise_id + \":\" + obj.type + \"=\" + obj.value);\n                    dpobj = {\n                        \"device\":deviceise_id,\n                        \"datapoint\": {\n                            \"id\":obj.ise_id,\"type\":obj.type,\"value\":obj.value,\"name\":obj.name\n                        }\n                    };\n                    arrdatapoints.push(dpobj);\n                    // dpstring = \"device:\"+devicename+\", dp:\"+obj.ise_id+\",type:\"+obj.type+\",value:\"+obj.value;\n                    // arrdatapoints.push(dpstring);\n                }\n            });\n        }\n    });\n});\nif (DEBUG) node.warn(arrdatapoints.length);\nflow.set(\"datapoints\",arrdatapoints);\nif (DEBUG) node.warn(flow.get(\"datapoints\"));\n\nmsgdevices = {};\nmsgdevices.options = arrdevices;\nif (DEBUG) node.warn(msgdevices.options)\n\nmsgdatapoints = {};\nmsgdatapoints.payload = arrdatapoints;\n\nreturn [msgdevices,msgdatapoints];\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 500,
+        "y": 260,
+        "wires": [
+            [
+                "82dadb1d.ee70c8"
+            ]
+        ]
+    },
+    {
+        "id": "7fb3d0fb.dcdd7",
+        "type": "http request",
+        "z": "2711d0.ba10fe3",
+        "name": "Request Statelist",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": false,
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 370,
+        "y": 180,
+        "wires": [
+            [
+                "52fa91c4.f668f"
+            ]
+        ]
+    },
+    {
+        "id": "52fa91c4.f668f",
+        "type": "function",
+        "z": "2711d0.ba10fe3",
+        "name": "Correct Datapoints",
+        "func": "// Correct strings in the datapoints XML response.\nvar statelist = msg.payload;\n\n// \"\"\"\" to be replaced to \"\"\nstatelist.replace(\"\\\"\\\"\",\"\");\n// Assign the corrected statelist\nmsg.payload = statelist;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 590,
+        "y": 180,
+        "wires": [
+            [
+                "941a3179.d6383"
+            ]
+        ]
+    },
+    {
+        "id": "820c9527.de3278",
+        "type": "inject",
+        "z": "2711d0.ba10fe3",
+        "name": "Request",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "0.2",
+        "x": 100,
+        "y": 120,
+        "wires": [
+            [
+                "78d0bbe9.a557b4"
+            ]
+        ]
+    },
+    {
+        "id": "82dadb1d.ee70c8",
+        "type": "ui_dropdown",
+        "z": "2711d0.ba10fe3",
+        "name": "Select Device",
+        "label": "",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "ad74834e.2f062",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "options": [
+            {
+                "label": "",
+                "value": "",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "x": 740,
+        "y": 260,
+        "wires": [
+            [
+                "4df7ccdd.6f3ab4"
+            ]
+        ]
+    },
+    {
+        "id": "294f4d24.b52cc2",
+        "type": "ui_template",
+        "z": "2711d0.ba10fe3",
+        "group": "ad74834e.2f062",
+        "name": "Device Datapoints",
+        "order": 2,
+        "width": "6",
+        "height": "6",
+        "format": "<div style=\"margin:0 0 0 -40px;\">\n    <ul>\n        <li ng-repeat=\"datapoint in msg.payload\" style=\"list-style-type: none;font-size:0.8em;\">\n            <label>{{datapoint}}\n            </label>\n        </li>\n    </ul>\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 1210,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4df7ccdd.6f3ab4",
+        "type": "function",
+        "z": "2711d0.ba10fe3",
+        "name": "Select Device Datapoints",
+        "func": "/*\nThe purpose of this function is to\n* get all datapoints for the selected device using the device id (ise_id)\n* return an array with datapoint entries: id: type=value\n\nNotes:\n* The type is the short name of the datapoint\n* The array is used for the ui_template html list\n*/\nconst DEBUG = false;\n// get the device id, i.e. 2530 for the selected device\nvar deviceid = msg.payload;\nif (DEBUG) node.warn(\"Selected: \" + deviceid);\n\nif (deviceid === null) return [];\n\n// get all the datapoints by device\n// device:\"2530\",datapoint:{\"id\":\"2532\",\"type\":\"CONFIG_PENDING\",\"value\":\"false\",\"name\":\"HmIP-RF.0000DA498D5859:0.CONFIG_PENDING\"}\ndatapoints = flow.get(\"datapoints\");\n\ndevicedatapoints = [];\ndatapoints.forEach(function(datapoint){\n    if (datapoint.device == deviceid) {\n        dp = datapoint.datapoint;\n        var entry = dp.id + \": \" + dp.type + \"=\" + dp.value;\n        devicedatapoints.push(entry);\n        if (DEBUG) node.warn(\"Added: \" +  entry);\n    }    \n});\n\nmsg.payload = devicedatapoints;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 970,
+        "y": 260,
+        "wires": [
+            [
+                "294f4d24.b52cc2"
+            ]
+        ]
+    },
+    {
+        "id": "ef71b5d.e83c748",
+        "type": "ui_text",
+        "z": "2711d0.ba10fe3",
+        "group": "ad74834e.2f062",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "Last Update",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "x": 1190,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "78d0bbe9.a557b4",
+        "type": "ui_button",
+        "z": "2711d0.ba10fe3",
+        "name": "Refresh Data",
+        "group": "ad74834e.2f062",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "label": "Refresh",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 730,
+        "y": 120,
+        "wires": [
+            [
+                "294f4d24.b52cc2",
+                "87568dac.c8784",
+                "aff0c34f.52bd6"
+            ]
+        ]
+    },
+    {
+        "id": "87568dac.c8784",
+        "type": "function",
+        "z": "2711d0.ba10fe3",
+        "name": "Data Refreshed",
+        "func": "// Get the actual date & time in format YYYY-MM-DD HH:MM:SS.\n// See also various formats possible.\n// Function to convert the unix datetimestamp to string\nfunction GetDateTime(){\n    var now     = new Date();\n    var year    = now.getFullYear();\n    var month   = now.getMonth() + 1; \n    var day     = now.getDate();\n    var hours   = now.getHours();\n    var minutes = now.getMinutes();\n    var seconds = now.getSeconds(); \n\n    if(month.toString().length == 1) {         \n      month = '0'+month;\n    }\n    if(day.toString().length == 1) {         \n      day = '0'+day;\n    }   \n    if(hours.toString().length == 1) {\n      hours = '0'+hours;\n    }\n    if(minutes.toString().length == 1) {\n      minutes = '0'+minutes;\n    }\n    if(seconds.toString().length == 1) {\n      seconds = '0'+seconds;\n    }   \n  \n    // YYYY-MM-DD HH:MM:SS\n    var dts = year+'-'+month+'-'+day+' '+hours+':'+minutes+':'+seconds;\n    \n    // Other Formats\n    // HH:MM:SS\n    // var dts = hours+\":\"+minutes+\":\"+seconds;\n    // YYYYMMDDHHMMSS\n    //var dts = year+month+day+hours+minutes+seconds;\n\n    return dts;\n}           \n\nmsg.payload = \"Last Update \" + GetDateTime();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 940,
+        "y": 120,
+        "wires": [
+            [
+                "ef71b5d.e83c748"
+            ]
+        ]
+    },
+    {
+        "id": "adefbb74.fe2db8",
+        "type": "ui_text_input",
+        "z": "2711d0.ba10fe3",
+        "name": "Set CCU IP",
+        "label": "CCU IP:",
+        "tooltip": "CCU IP Address",
+        "group": "ad74834e.2f062",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": "300",
+        "topic": "",
+        "x": 730,
+        "y": 60,
+        "wires": [
+            [
+                "fcd2ea74.538d08"
+            ]
+        ]
+    },
+    {
+        "id": "aff0c34f.52bd6",
+        "type": "function",
+        "z": "2711d0.ba10fe3",
+        "name": "Set URL",
+        "func": "\nmsg.url = \"http://\" + flow.get(\"ccuip\") + \"/config/xmlapi/statelist.cgi\";\nnode.warn(msg.url);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "7fb3d0fb.dcdd7"
+            ]
+        ]
+    },
+    {
+        "id": "fcd2ea74.538d08",
+        "type": "change",
+        "z": "2711d0.ba10fe3",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ccuip",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 930,
+        "y": 60,
+        "wires": [
+            [
+                "b850ddfc.cdea5"
+            ]
+        ]
+    },
+    {
+        "id": "b850ddfc.cdea5",
+        "type": "debug",
+        "z": "2711d0.ba10fe3",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1190,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "a77c0a41.6534f8",
+        "type": "inject",
+        "z": "2711d0.ba10fe3",
+        "name": "Init CCU IP",
+        "topic": "",
+        "payload": "CCU-IP",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "adefbb74.fe2db8"
+            ]
+        ]
+    },
+    {
+        "id": "ad74834e.2f062",
+        "type": "ui_group",
+        "z": "",
+        "name": "Datapoints",
+        "tab": "29b3a1b2.01210e",
+        "disp": false,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "29b3a1b2.01210e",
+        "type": "ui_tab",
+        "z": "",
+        "name": "RaspberryMatic Statelist",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
