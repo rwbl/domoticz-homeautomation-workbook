@@ -4,8 +4,8 @@
 * NEW: Function Music Player - Control Kodi music player(s) by a single automation event (dzVents Lua) and several virtual sensors.
 * NEW: Function Notes: Export the notes file (JSON format) to local file (text format).
 * NEW: Function Radiator Thermostat - Simple solution using the Domoticz devices Select Switch & Thermostat with a sinle automation event (dzVents Lua, no Python plugins required).
-* NEW: Explore Kodi Music Player - Explore setting up Kod Music Player and communicate/control by Domoticz
-* NEW: Explore RaspberryMatic - Monitor the CCU Duty Cycle Monitor two separate solutions Node-RED Dashboard and Domoticz Dashboard.
+* NEW: Explore Kodi Music Player - Explore setting up Kodi Music Player and communicate/control by Domoticz
+* NEW: Explore RaspberryMatic - Monitor the CCU Duty Cycle; two separate solutions Node-RED Dashboard and Domoticz Dashboard.
 * UPD: Explore Node-RED - Reworked chapter and the example flows; added new flow Domoticz as Node-RED data logger.
 * UPD: Explore RaspberryMatic - Release 3.51.6.20200420.
 
