@@ -1,5 +1,5 @@
 # ToDo domoticz-home-automation-workbook
-Status: 20200318
+Status: 20200524
 
 #### FIX: EMail Notification Error: SMTPSEND.BareLinefeedsAreIllegal
 Since few weeks, when sending a notification via email, got SMTPSEND error mesage:
@@ -8,29 +8,29 @@ SMTPSEND.BareLinefeedsAreIllegal; message contains bare linefeeds, which cannot 
 ```
 Prioriy: High
 _Status_
-Investigating but no solution found..
+Investigating but no solution found.
 
 #### NEW: Function Notes Delete Selected Log Entry
-Delete the selected note from the device log history.
-Tested: Delete Datapoint HTTP API Request but _NOT WORKING_ as the function deletedatapoint does not delete from table lightinglog.
+Delete the selected note from the device log history. The note is stored in a text device.
+**Tested**
+Deleted a datapoint from a graph and checked via browser developer settings (F12) the URL used by Domoticz.
+Then tried for a text device with idx=111:
 ```
 http://domoticz-ip:8080/json.htm?date=2020-03-15+11:17:28&idx=111&param=deletedatapoint&type=command
 ```
-Only all device entries can be deleted from table ligthinglog for the given idx. Clear all log entries HTTP API Request:
+Thought if possible to delete a datapoint via graph, then give a try for a text device.
+Checked the Domoticz source main\SQLHelper.cpp, function CSQLHelper::DeleteDataPoint.
+This function applies to the tables Rain, Wind, UV, Temperature, Meter, MultiMeter, Percentage, Fan and their _Calendar tables.
+The text device data is stored in table lightinglog which is not supported by the function deletedatapoint.
+Only ALL device entries can be deleted from table ligthinglog for the given idx.
+Example to clear all log entries for idx=111 using HTTP API request:
 ```
 http://domoticz-ip:8080/json.htm?idx=111&param=clearlightlog&type=command
 ```
-
 Priority: Low
 _Status_
-Not started
-
-#### NEW: Function Notes Copy All Notes
-Button to copy all notes from the device log history to the clipboard
-
-Priority: Low
-_Status_
-Not started
+Waiting for any new Domoticz releases to check out if possible to use the function deletedatapoint for table lightinglog.
+An option could be to use a Python script with parameter to delete entries from table lightinglog.
 
 #### NEW: Plugin homematicIP Device HmIP/SWDM
 Develop a plugin for the Window and Door Contact with magnet.
