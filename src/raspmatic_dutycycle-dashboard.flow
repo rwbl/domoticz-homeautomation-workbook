@@ -1,0 +1,331 @@
+[
+    {
+        "id": "fd0fdf67.cdaf7",
+        "type": "inject",
+        "z": "714a68c.1f72f98",
+        "name": "Get Sysvar DutyCycle",
+        "topic": "",
+        "payload": "1390",
+        "payloadType": "num",
+        "repeat": "120",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 150,
+        "y": 80,
+        "wires": [
+            [
+                "27819888.288758"
+            ]
+        ]
+    },
+    {
+        "id": "4a1db918.9e1b88",
+        "type": "http request",
+        "z": "714a68c.1f72f98",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": false,
+        "url": "",
+        "persist": false,
+        "authType": "",
+        "x": 330,
+        "y": 140,
+        "wires": [
+            [
+                "70fe9f22.2fb9f"
+            ]
+        ]
+    },
+    {
+        "id": "5816a94.1040d58",
+        "type": "debug",
+        "z": "714a68c.1f72f98",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 750,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "27819888.288758",
+        "type": "change",
+        "z": "714a68c.1f72f98",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "\"http://ccu-ip/addons/xmlapi/sysvar.cgi?ise_id=\" & $.payload",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 150,
+        "y": 140,
+        "wires": [
+            [
+                "4a1db918.9e1b88"
+            ]
+        ]
+    },
+    {
+        "id": "70fe9f22.2fb9f",
+        "type": "xml",
+        "z": "714a68c.1f72f98",
+        "name": "",
+        "property": "payload",
+        "attr": "",
+        "chr": "",
+        "x": 490,
+        "y": 140,
+        "wires": [
+            [
+                "f4c25fac.ea9fe"
+            ]
+        ]
+    },
+    {
+        "id": "f4c25fac.ea9fe",
+        "type": "function",
+        "z": "714a68c.1f72f98",
+        "name": "SET Data",
+        "func": "/* \nGet in regular intervals the Raspberry matic System Variable Duty Cycle.\n{\"systemVariables\":\n\t{\"systemVariable\":[\n\t\t{\"$\":{\"name\":\"DutyCycle\",\"variable\":\"2.000000\",\"value\":\"2.000000\",\"value_list\":\"\",\"value_text\":\"\",\"ise_id\":\"1390\",\"min\":\"-1\",\"max\":\"100\",\"unit\":\"%\",\"type\":\"4\",\"subtype\":\"0\",\"timestamp\":\"1587971040\",\"value_name_0\":\"\",\"value_name_1\":\"\"}}\n\t\t]\n\t}\n}\nThe msg.payload is an object i.e.\n{\"ise_id\":\"1390\",\"name\":\"DutyCycle\",\"value\":\"1.000000\",\"min\":0,\"max\":2,\"seg1\":2,\"seg2\":5,\"timestamp\":\"10:06\"}\nThe gauge scaling is set dynamic depending dutycycle value.\n*/\n\n// const DEBUG = true;\nconst DEBUG = false;\n\nvar maxValue = 5;\n\n// Helpers\nvar getTimeStamp = function(timestamp,usesecs){\n    dateObj = new Date(timestamp * 1000);\n    hours = dateObj.getHours();\n    minutes = dateObj.getMinutes();\n    seconds = dateObj.getSeconds();\n    var result = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');\n    result = (usesecs) ? result + ':' + seconds.toString().padStart(2, '0') : result;\n    return result\n}\n\n// Get the systemvariable from systemvariabless JSON array. There is (should) a single entry\nvar systemVariable = msg.payload.systemVariables.systemVariable[0].$;\nif (DEBUG) node.warn(\"SystemVariable:\" + systemVariable);\n\n// Get selected key:value pairs\n// Create JSON object to return as payload and used by gauge, charts etc.\n// Example: {\"ise_id\":\"1390\",\"name\":\"DutyCycle\",\"value\":\"1.000000\",\"min\":0,\"max\":2,\"seg1\":2,\"seg2\":5}\ndata = {}\ndata.ise_id = systemVariable.ise_id;\ndata.name = systemVariable.name;\ndata.value = Math.round(systemVariable.value,0);             // should be low range 1-2%\nmaxValue = (data.value * 2 > maxValue) ? data.value * 2 : maxValue;\ndata.min = 0;\ndata.max = maxValue;\ndata.ymax = data.max;\ndata.seg1 = 2;\ndata.seg2 = 5;\ndata.timestamp = getTimeStamp(systemVariable.timestamp, false);\n\nmsg = {payload:data, ui_control:{min:data.min, max:data.max, seg1:data.seg1, seg2:data.seg2, ymax:data.max}, topic:data.name};\nif (DEBUG) node.warn(msg)\n\nnode.status({fill:\"green\",shape:\"dot\",text:msg.payload.value + \", \" + msg.payload.timestamp});\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 320,
+        "y": 220,
+        "wires": [
+            [
+                "da407c0b.27fcc",
+                "4a7ca4fb.8b021c",
+                "bdd19133.a58db"
+            ]
+        ]
+    },
+    {
+        "id": "efec06da.b7feb8",
+        "type": "ui_gauge",
+        "z": "714a68c.1f72f98",
+        "name": "Gauge DutyCycle",
+        "group": "dbbcfb61.e45c58",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "",
+        "label": "%",
+        "format": "{{msg.payload | number:1}}",
+        "min": 0,
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "10",
+        "seg2": "30",
+        "x": 770,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "3fefc755.775c38",
+        "type": "ui_chart",
+        "z": "714a68c.1f72f98",
+        "name": "Chart DutyCycle",
+        "group": "dbbcfb61.e45c58",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "bezier",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "50",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 760,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "da407c0b.27fcc",
+        "type": "change",
+        "z": "714a68c.1f72f98",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.value",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 520,
+        "y": 260,
+        "wires": [
+            [
+                "efec06da.b7feb8",
+                "3fefc755.775c38"
+            ]
+        ]
+    },
+    {
+        "id": "3d38fe0.7caee02",
+        "type": "inject",
+        "z": "714a68c.1f72f98",
+        "name": "Clear Chart",
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 530,
+        "y": 300,
+        "wires": [
+            [
+                "3fefc755.775c38"
+            ]
+        ]
+    },
+    {
+        "id": "4a7ca4fb.8b021c",
+        "type": "ui_text",
+        "z": "714a68c.1f72f98",
+        "group": "dbbcfb61.e45c58",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Last Update",
+        "label": "<i class=\"fa fa-refresh fa-1x\"></i> 2 min",
+        "format": "{{msg.payload.timestamp}}",
+        "layout": "row-spread",
+        "x": 750,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "b84773d8.36128",
+        "type": "comment",
+        "z": "714a68c.1f72f98",
+        "name": "MQTT Domoticz",
+        "info": "Publish the dutycycle value to the Domoticz system.\n\n# Domoticz\nCreate a virtual sensor for hardware Virtual Devices\nName: RaspMatic Duty Cycle\nSensor Type: Percentage\nAfter adding, the Domoticz devices list has new entry.\nIdx:116, Hardware:VirtualDevices, Name:RaspMatic Duty Cycle, Type:General, SubType:Percentage, Data:\n0%.\n\n# Node-RED\n## Function Node\nThe function node creates the mqtt message for domoticz.\n`/*\nCreate the domoticz mqtt message to publish.\nnote the key svalue must be a string!\nDomoticz log entry receiving mqtt message:\n2020-04-28 09:29:48.380 MQTT: Topic: domoticz/in, Message: {\"command\":\"udevice\",\"idx\":116,\"nvalue\":0,\"svalue\":\"2\"}\n*/\nconst DEBUG = true;\n\nvar value = msg.payload.value;\nvar msgDomoticz = {};\nmsgDomoticz.topic = \"domoticz/in\";\nmsgDomoticz.payload = {\n    \"command\":\"udevice\",\n    \"idx\":116,\n    \"nvalue\":0,\n    \"svalue\": value.toString(10)\n}\n\nnode.status({fill:\"green\",shape:\"dot\",text:\"Duty Cycle: \" + value});\n\nif (DEBUG) node.warn(msgDomoticz);\n\nreturn msgDomoticz;\n`\n\n## mqtt out node\nThe msg is sent to the domoticz mqtt broker.\n",
+        "x": 520,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "bdd19133.a58db",
+        "type": "function",
+        "z": "714a68c.1f72f98",
+        "name": "Set MQTT Domoticz",
+        "func": "/*\nCreate the domoticz mqtt message to publish.\nnote the key svalue must be a string!\nDomoticz log entry receiving mqtt message:\n2020-04-28 09:29:48.380 MQTT: Topic: domoticz/in, Message: {\"command\":\"udevice\",\"idx\":116,\"nvalue\":0,\"svalue\":\"2\"}\n*/\n// const DEBUG = true;\nconst DEBUG = false;\n\nvar value = msg.payload.value;\nvar msgDomoticz = {};\nmsgDomoticz.topic = \"domoticz/in\";\nmsgDomoticz.payload = {\n    \"command\":\"udevice\",\n    \"idx\":116,\n    \"nvalue\":0,\n    \"svalue\": value.toString(10)\n}\n\nnode.status({fill:\"green\",shape:\"dot\",text:\"Duty Cycle: \" + value});\n\nif (DEBUG) node.warn(msgDomoticz);\n\nreturn msgDomoticz;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 540,
+        "y": 400,
+        "wires": [
+            [
+                "ec8a07ef.5ba9a8"
+            ]
+        ]
+    },
+    {
+        "id": "ec8a07ef.5ba9a8",
+        "type": "mqtt out",
+        "z": "714a68c.1f72f98",
+        "name": "MQTT to Domoticz DutyCycle",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "broker": "ebcacb7e.fb7ce8",
+        "x": 810,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "dbbcfb61.e45c58",
+        "type": "ui_group",
+        "z": "",
+        "name": "DutyCycle",
+        "tab": "70c0abce.afabc4",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "ebcacb7e.fb7ce8",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "MQTT DoDev",
+        "broker": "domoticz-ip",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "70c0abce.afabc4",
+        "type": "ui_tab",
+        "z": "",
+        "name": "RaspMatic Monitor",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]

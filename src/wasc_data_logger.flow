@@ -1,0 +1,238 @@
+[
+    {
+        "id": "9f7a9c73.1e834",
+        "type": "tab",
+        "label": "WASC-Interface",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "2ba701d5.de8a5e",
+        "type": "mqtt in",
+        "z": "9f7a9c73.1e834",
+        "name": "",
+        "topic": "wasc/climate/#",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "832b8555.067c18",
+        "x": 120,
+        "y": 120,
+        "wires": [
+            [
+                "b9643bf4.563b58"
+            ]
+        ]
+    },
+    {
+        "id": "b9643bf4.563b58",
+        "type": "function",
+        "z": "9f7a9c73.1e834",
+        "name": "Update flow.wascdata weather",
+        "func": "/* WascData - Weather\nUpdates JSON:\n{\"weather\":{temperature\":16.1,\"humidity\":70,\"windspeed\":3,\"windgust\":5,\"winddirection\":\"SW\",\"windbearing\":225,\"airpressure\":1000,\"timestamp\":\"15:57\"}}\n*/\nconst DEBUG = global.get(\"debug\");\n// const DEBUG = true;\n\nvar wascdata = flow.get(\"wascdata\");\n\n/*\n{\n\"temperature\":9.7,\"humidity\":45,\"windspeed\":1.4,\"winddirection\":\"NNE\",\"airpressure\":1018,\"timestamp\":\"15:16\"\n}\n*/\nwascdata[\"weather\"] = msg.payload;\nflow.set(\"wascdata\", wascdata);\n\nmsg.payload = wascdata;\n\nif (DEBUG) node.warn(\"Weather Update:\"+ wascdata);\n\nreturn [msg];\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 450,
+        "y": 120,
+        "wires": [
+            [
+                "da41734f.a6d39"
+            ]
+        ]
+    },
+    {
+        "id": "f20be8eb.452ad8",
+        "type": "inject",
+        "z": "9f7a9c73.1e834",
+        "name": "Init Set WascData",
+        "topic": "",
+        "payload": "{\"weather\":{\"temperature\":-1,\"humidity\":-1,\"windgust\":-1,\"winddirection\":\"\",\"airpressure\":-1,\"timestamp\":\"\"},\"energy\":{\"house\":-1,\"makelab\":-1,\"timestamp\":\"\"}}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "e6e0beb2.10ff1"
+            ]
+        ]
+    },
+    {
+        "id": "e6e0beb2.10ff1",
+        "type": "change",
+        "z": "9f7a9c73.1e834",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "wascdata",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 410,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "da41734f.a6d39",
+        "type": "debug",
+        "z": "9f7a9c73.1e834",
+        "name": "DEBUG WASCINTERFACE",
+        "active": true,
+        "tosidebar": false,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 760,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "f5561e88.f6d96",
+        "type": "http in",
+        "z": "9f7a9c73.1e834",
+        "name": "Listen WascData Request",
+        "url": "/wasc",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 360,
+        "wires": [
+            [
+                "cfbcf49c.73e778"
+            ]
+        ]
+    },
+    {
+        "id": "4cab5ef3.98703",
+        "type": "http response",
+        "z": "9f7a9c73.1e834",
+        "name": "Response WascData",
+        "statusCode": "",
+        "headers": {},
+        "x": 740,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "74e06253.26bf5c",
+        "type": "mqtt in",
+        "z": "9f7a9c73.1e834",
+        "name": "",
+        "topic": "wasc/energy/#",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "832b8555.067c18",
+        "x": 110,
+        "y": 180,
+        "wires": [
+            [
+                "f62caa19.7d07a8"
+            ]
+        ]
+    },
+    {
+        "id": "f62caa19.7d07a8",
+        "type": "function",
+        "z": "9f7a9c73.1e834",
+        "name": "Update flow.wascdata energy",
+        "func": "/* WascData - Energy\nUpdates JSON:\n{\"energy\":{house\":272,\"makelab\":7,\"timestamp\":\"15:58\"}}\n*/\n\nconst DEBUG = global.get(\"debug\");\n// const DEBUG = false;\n\nvar wascdata = flow.get(\"wascdata\");\n\n// {house\":272,\"makelab\":7,\"timestamp\":\"15:58\"}\nwascdata[\"energy\"] = msg.payload;\nflow.set(\"wascdata\", wascdata);\n\nmsg.payload = wascdata;\n\nif (DEBUG) node.warn(\"Energy Update:\" + wascdata);\n\nreturn [msg];\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 440,
+        "y": 180,
+        "wires": [
+            [
+                "da41734f.a6d39"
+            ]
+        ]
+    },
+    {
+        "id": "cfbcf49c.73e778",
+        "type": "change",
+        "z": "9f7a9c73.1e834",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "wascdata",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 360,
+        "wires": [
+            [
+                "4cab5ef3.98703",
+                "eef5aa86.857898"
+            ]
+        ]
+    },
+    {
+        "id": "f54338d1.face58",
+        "type": "comment",
+        "z": "9f7a9c73.1e834",
+        "name": "WascData Request",
+        "info": "Listen to HTTP GET Request with parameter /wasc.\n\n### HTTP Request\nhttp://node-red-ip:1880/wasc\n\n### HTTP Response\nJSON format\n`{\"weather\":{\"temperature\":16.3,\"humidity\":70,\"windspeed\":3,\"windgust\":3,\"winddirection\":\"SSW\",\"windbearing\":202,\"airpressure\":1000,\"timestamp\":\"15:55\"},\"energy\":{\"house\":274,\"makelab\":8,\"timestamp\":\"15:56\"}}\n`",
+        "x": 130,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "eef5aa86.857898",
+        "type": "debug",
+        "z": "9f7a9c73.1e834",
+        "name": "DEBUG WASCREQUEST",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 750,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "832b8555.067c18",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "MQTT Broker WASC",
+        "broker": "domoticz-ip",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]

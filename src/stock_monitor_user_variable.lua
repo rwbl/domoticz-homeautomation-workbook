@@ -1,7 +1,7 @@
 --[[
     monitor_stocks.lua
     Monitor if a stock has reached its threshold and send out a notification.
-	This version uses a user variable to keep track if notified toavoid constant notifying if data has changed.
+    This version use a user variable the check if reaching/below threshold has been notified.
     Project: atHome
     Interpreter: dzVents, Device
     See: athome.pdf
