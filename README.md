@@ -6,10 +6,10 @@ To build a Home Automation & Information System, based on the Domoticz Home Auto
 * Build a Home Automation & Information System.
 * Write up & share experiences during development.
 * Use this workbook as a supplemental reference.
-* Lookup [url=https://github.com/rwbl/domoticz-homeautomation-workbook/blob/master/CHANGELOG.md]Changelog[/url].
+* Lookup [Changelog)[https://github.com/rwbl/domoticz-homeautomation-workbook/blob/master/CHANGELOG.md].
 
 ### Remarks
-* **This is a working document**- concept changes, new idea’s & to-do’s whilst progressing.
+* **This is a working document** - whilst progressing: concept changes, new idea’s & to-do’s.
 * There might be better solutions for what is shared - updates or changes depending learning curve.
 * Source code for scripts, flows & apps not fully shared or have changed - check the GitHub _src_ folder for latest sources.
 * Automation events developed as dzVents Lua script events.
