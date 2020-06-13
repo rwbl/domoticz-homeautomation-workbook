@@ -1,6 +1,6 @@
 # Changelog domoticz-home-automation-workbook
 
-### 2020MMDD
+### 20200612
 * FIX: EMail Notification Error: SMTPSEND.BareLinefeedsAreIllegal with Outlook - reinstalled Domoticz.
 * NEW: Explore Events dzVents Lua - Solutions for timer update less one minute (Timer,Device,MQTT).
 * NEW: Explore GPIO - Use GPIO with Raspberry Pi Python libraries RPi.GPIO (CLI, Device Actions, Automation Events, Plugins) & GPIOZero (Plugins) and (just to test) Node-RED flow.
