@@ -1,24 +1,31 @@
 # Changelog domoticz-home-automation-workbook
 
+### 2020MMDD
+* FIX: EMail Notification Error: SMTPSEND.BareLinefeedsAreIllegal with Outlook - reinstalled Domoticz.
+* NEW: Explore Events dzVents Lua - Solutions for timer update less one minute (Timer,Device,MQTT).
+* NEW: Explore GPIO - Use GPIO with Raspberry Pi Python libraries RPi.GPIO (CLI, Device Actions, Automation Events, Plugins) & GPIOZero (Plugins) and (just to test) Node-RED flow.
+* UPD: Function Notes - Explored alternative solution using User Variables (not used further).
+* UPD: Explore SQL - Update device examples.
+
 ### 20200526
 * NEW: Function Music Player - Control Kodi music player(s) by a single automation event (dzVents Lua) and several virtual sensors.
 * NEW: Function Notes: Export the notes file (JSON format) to local file (text format).
 * NEW: Function Radiator Thermostat - Simple solution using the Domoticz devices Select Switch & Thermostat with a sinle automation event (dzVents Lua, no Python plugins required).
-* NEW: Explore Kodi Music Player - Explore setting up Kodi Music Player and communicate/control by Domoticz
-* NEW: Explore RaspberryMatic - Monitor the CCU Duty Cycle; two separate solutions Node-RED Dashboard and Domoticz Dashboard.
+* NEW: Explore Kodi Music Player - Explore setting up Kod Music Player and communicate/control by Domoticz
+* NEW: Explore RaspberryMatic - Monitor the CCU Duty Cycle Monitor two separate solutions Node-RED Dashboard and Domoticz Dashboard.
 * UPD: Explore Node-RED - Reworked chapter and the example flows; added new flow Domoticz as Node-RED data logger.
 * UPD: Explore RaspberryMatic - Release 3.51.6.20200420.
 
 ### 20200318
+* NEW: Explore Custom Pages - First examples setting & getting data; Alert Message, Quick Check Raspberry Pi data, Switch Light.
+* NEW: Explore SQL - read from file; execute sql-command-line using Lua; more examples.
+* NEW: Explore Tinkerforge - Various concepts how to interact between Domoticz and the [Tinkerforge](http://www.tinkerforge.com) Building Blocks.
 * NEW: Function Notes - Create notes with a subject & content and save, copy or notify.
 * NEW: Function Philips Hue - Examples to direct access a device using HTTP API.
 * NEW: Function Time Control - Track & control time spent in hours, per activity block (with start- & end-time) and total/day, on a generic task.
-* NEW: Explore Custom Pages - First examples setting & getting data; Alert Message, Quick Check Raspberry Pi data, Switch Light.
+* NEW: Tool: RaspberryMatic Statelist - Obtain the datapoint id's for all RaspberryMatic devices configured on the CCU.
 * UPD: Explore MQTT > Python: Scripts reworked.
 * UPD: Explore RaspberryMatic - Release 3.51.6.20200229; Additional examples to get data & set Domoticz devices.
-* NEW: Explore SQL - read from file; execute sql-command-line using Lua; more examples.
-* NEW: Explore Tinkerforge - Various concepts how to interact between Domoticz and the [Tinkerforge](http://www.tinkerforge.com) Building Blocks.
-* NEW: Tool: RaspberryMatic Statelist - Obtain the datapoint id's for all RaspberryMatic devices configured on the CCU.
 * UPD: Function [Domoticz Web App Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Dark theme instead default light blue.
 * UPD: Function Hardware Monitor - fixed get RAM data for Raspberry Pi Buster.
 * UPD: Function Postbox Notifier - At midnight reset notification in case not done manually.
