@@ -1,0 +1,221 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# domoticz-home-automation-workbook - explore GPIOZero
+# WARNING: ensure the plugin key is unique across all plugins.
+# author: rwbl
+"""
+<plugin key="gpiozerobtntrigger" name="GPIOZero Push-Button Trigger" author="rwbl" version="0.5.0" wikilink="" externallink="">
+    <description>
+        <h2>GPIOZero Push-Button Trigger</h2>
+        Explore the Raspberry Pi GPIOZero library.<br/> This plugin
+        <ul style="list-style-type:square">
+            <li>explores how to use the GPIO input (including callback handling) and output.</li>
+            <li>is a base template for exploring further plugin solutions.</li>
+        </ul>
+        <h3>Features</h3>
+        <ul style="list-style-type:square">
+            <li>Components: Push-Button (input) connected to GPIO23 (default), LED (output) connected to GPIO18 (default).</li>
+            <li>Creates the GPIO pins and set the GPIO numbering mode to BCM.</li>
+            <li>By pressing the push-button, the LED state changes to ON or OFF (depending LED state) and a Domoticz Alert Device gets updated.</li>
+            <li>When the Domoticz Alert Device gets updated, a dzVents script is executed.</li>
+        </ul>
+        <h3>Devices</h3>
+        <ul style="list-style-type:square">
+            <li>GPIO Status - Text device logging the LED state change.</li>
+        </ul>
+        <h3>Configuration</h3>
+        Caution: Make sure the GPIO pin numbers are not used by other applications. The pin numbers use BCM format, i.e. GPIOnn (checkout for the board used).<br/>
+        <ul style="list-style-type:square">
+            <li>LED GPIO Pin Number (default: 18)</li>
+            <li>Button GPIO Pin Number (default: 23)</li>
+        </ul>
+    </description>
+    <params>
+        <param field="Mode1" label="LED GPIO" width="75px" required="true" default="18"/>
+        <param field="Mode2" label="Button GPIO" width="75px" required="true" default="23"/>
+        <param field="Mode6" label="Debug" width="75px">
+            <options>
+                <option label="True" value="Debug" default="true"/>
+                <option label="False" value="Normal"/>
+            </options>
+        </param>
+     </params>
+</plugin>
+"""
+import Domoticz
+import os
+import datetime
+from gpiozero import LED, Button
+
+# Set the plugin version
+PLUGINVERSION = "v0.5.0"
+PLUGINSHORTDESCRIPTON = "GPIOZero Push-Button LED OnOff"
+
+# Units for the devices used
+UNITALERT = 1  # alert device
+
+# Alert Levels
+ALERTON = 4     # red
+ALERTOFF = 1    # green
+
+class BasePlugin:
+
+    def __init__(self):
+        # Define the GPIO Pins. Will be assigned from the parameters mode1 and mode2 (see below).
+        self.ledpin = 0     # default = 18
+        self.buttonpin = 0  # default = 23
+        # Define the alert state as set by the alertlevels
+        # This will be used to turn the led on (alert level ALERTON) or off (alert level ALERTOFF)
+        self.alertlevel = ALERTOFF
+        return
+
+    def onStart(self):
+        Domoticz.Debug(PLUGINSHORTDESCRIPTON + " " + PLUGINVERSION)
+        Domoticz.Debug("onStart called")
+        Domoticz.Debug("Debug Mode:" + Parameters["Mode6"])
+
+        #Check debug mode
+        if Parameters["Mode6"] == "Debug":
+            self.debug = True
+            Domoticz.Debugging(1)
+            dump_config_to_log()
+
+        #Setting up GPIO, i.e. get the pin numbers, set mode BCM, warnings off, set the pin mode and events
+        self.ledpin = int(Parameters["Mode1"])
+        self.buttonpin = int(Parameters["Mode2"])
+        # Domoticz.Debug("Setting up GPIO:LED=" + Parameters["Mode1"] + ", Button=" + Parameters["Mode2"])
+        Domoticz.Debug("Setting up GPIO:LED=" + str(self.ledpin) + ", Button=" + str(self.buttonpin))    
+        try:
+            # GPIOZero define led (output) & push-button (input)
+            self.led = LED(self.ledpin)
+            # define the button as pull down else pressed & released are reversed
+            self.button = Button(self.buttonpin, pull_up = False, hold_time = 1)
+            # assign the callback functions without ()!
+            # ensure onButtonCallback is in the same class and has self, channel as signature
+            self.button.when_pressed = self.onButtonCallback
+            self.led.off()
+            self.alertlevel = ALERTOFF
+            Domoticz.Debug("Setting up GPIO: Done")
+        except:
+            Domoticz.Error("Error setting up GPIO pins.")
+            
+        #Create device if needed
+        # Domoticz.Debug("Devices:" + str(len(Devices)) )
+        if (len(Devices) == 0):
+            Domoticz.Debug("Creating device(s)")
+            Domoticz.Device(Name="GPIO Alert", Unit=UNITALERT, TypeName="Alert", Used=1).Create()
+            # nValue = Level(0=gray, 1=green, 2=yellow, 3=orange, 4=red), sValue = TEXT (to display)
+            Devices[UNITALERT].Update(nValue=ALERTOFF, sValue="LED OFF")
+            Domoticz.Debug("Device created: "+Devices[UNITALERT].Name)
+
+    def onStop(self):
+        Domoticz.Debug("onStop called: Shut down the device and release all associated resources (IMPORTANT)")
+        self.button.close()
+        self.led.close()
+
+    def onConnect(self, Connection, Status, Description):
+        Domoticz.Debug("onConnect called")
+
+    def onMessage(self, Connection, Data):
+        Domoticz.Debug("onMessage called")
+
+    def onCommand(self, Unit, Command, Level, Hue):
+        Domoticz.Debug("onCommand called for Unit " + str(Unit) + ": Parameter '" + str(Command) + "', Level: " + str(Level))
+
+    def onNotification(self, Name, Subject, Text, Status, Priority, Sound, ImageFile):
+        Domoticz.Debug("Notification: " + Name + "," + Subject + "," + Text + "," + Status + "," + str(Priority) + "," + Sound + "," + ImageFile)
+
+    def onDeviceModified(self, Unit):
+        Domoticz.Debug("onDeviceModified called for Unit " + str(Unit))
+
+    def onDisconnect(self, Connection):
+        Domoticz.Debug("onDisconnect called")
+
+    def onHeartbeat(self):
+        Domoticz.Debug("onHeartbeat called")
+
+    """
+    Handle button changes.
+    Button pressed (button.is_pressed) = if LED on, then LED off v.v.
+    Button released is not used.
+    This function must be in the same class as onStart because it uses the self object to access the objects.
+    """
+    def onButtonCallback(self):
+        Domoticz.Debug("onButtonCallback called")
+        if self.button.is_pressed:
+            # Check the alert level and change the led state to on or off
+            # The alert level is off > set to on and turn LED ON
+            if self.alertlevel == ALERTOFF:
+                self.led.on()
+                self.alertlevel = ALERTON
+                ledstate = "ON"
+            elif self.alertlevel == ALERTON:
+            # The alert level is on > set to off and turn LED OFF
+                self.led.off()
+                self.alertlevel = ALERTOFF
+                ledstate = "OFF"
+            else:
+                ledstate = "UNKNOWN"
+            Domoticz.Debug("Button was pressed. LED changed: {}, Alert Level: {}".format(ledstate, self.alertlevel))
+            isnow = datetime.datetime.now().strftime("%Y%m%d %X")
+            msg = "LED state {} (Alert level {}) @ {}.".format(ledstate, self.alertlevel, isnow)
+            Devices[UNITALERT].Update(nValue=self.alertlevel, sValue=msg)
+            Domoticz.Log(msg)
+        Domoticz.Debug("onButtonCallback done")
+
+global _plugin
+_plugin = BasePlugin()
+
+def onStart():
+    global _plugin
+    _plugin.onStart()
+
+def onStop():
+    global _plugin
+    _plugin.onStop()
+
+def onConnect(Connection, Status, Description):
+    global _plugin
+    _plugin.onConnect(Connection, Status, Description)
+
+def onMessage(Connection, Data):
+    global _plugin
+    _plugin.onMessage(Connection, Data)
+
+def onCommand(Unit, Command, Level, Hue):
+    global _plugin
+    _plugin.onCommand(Unit, Command, Level, Hue)
+
+def onNotification(Name, Subject, Text, Status, Priority, Sound, ImageFile):
+    global _plugin
+    _plugin.onNotification(Name, Subject, Text, Status, Priority, Sound, ImageFile)
+
+def onDeviceModified(Unit):
+    global _plugin
+    _plugin.onDeviceModified(Unit)
+
+def onDisconnect(Connection):
+    global _plugin
+    _plugin.onDisconnect(Connection)
+
+def onHeartbeat():
+    global _plugin
+    _plugin.onHeartbeat()
+
+# Generic helper functions
+"""
+Dump the config parameters of the plugin to the Domoticz log.
+"""
+def dump_config_to_log():
+    for x in Parameters:
+        if Parameters[x] != "":
+            Domoticz.Log( "'" + x + "':'" + str(Parameters[x]) + "'")
+    Domoticz.Debug("Device count: " + str(len(Devices)))
+    for x in Devices:
+        Domoticz.Log("Device:           " + str(x) + " - " + str(Devices[x]))
+        Domoticz.Log("Device ID:       '" + str(Devices[x].ID) + "'")
+        Domoticz.Log("Device Name:     '" + Devices[x].Name + "'")
+        Domoticz.Log("Device nValue:    " + str(Devices[x].nValue))
+        Domoticz.Log("Device sValue:   '" + Devices[x].sValue + "'")
+        Domoticz.Log("Device LastLevel: " + str(Devices[x].LastLevel))
+    return

@@ -35,7 +35,9 @@ The flows can be inported in Node-RED via the settings menu > import (paste).
 
 ### Python
 The files with extension _.py_ are function specific. 
-Example: The files starting with _sql-_ are Python test scrpts for SQL operations.
+Example: The files starting with _sql-_ are Python test scripts for SQL operations.
+The files with extension _.python_event_ are Automation Events. 
+The files with extension _.plugin_ are plugins using the Domoticy Python Plugin Framework. 
 
 ### RaspberryMatic
 The files with extension _.script_ are RaspMatic scripts used in various function and chapter "Explore RaspberryMatic".

@@ -1,0 +1,97 @@
+[
+    {
+        "id": "3a87ec7e.80ac04",
+        "type": "tab",
+        "label": "Domoticz FastEvent Custom",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "f71de853.4e76b8",
+        "type": "inject",
+        "z": "3a87ec7e.80ac04",
+        "name": "Init Custom Event",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 150,
+        "y": 100,
+        "wires": [
+            [
+                "c4fbe82b.2dd328"
+            ]
+        ]
+    },
+    {
+        "id": "726be65b.9ee3b8",
+        "type": "mqtt out",
+        "z": "3a87ec7e.80ac04",
+        "name": "",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "broker": "ebcacb7e.fb7ce8",
+        "x": 710,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "c4fbe82b.2dd328",
+        "type": "random",
+        "z": "3a87ec7e.80ac04",
+        "name": "Random 1-10",
+        "low": "1",
+        "high": "10",
+        "inte": "true",
+        "property": "payload",
+        "x": 360,
+        "y": 100,
+        "wires": [
+            [
+                "4ecc64c5.1e2dcc"
+            ]
+        ]
+    },
+    {
+        "id": "4ecc64c5.1e2dcc",
+        "type": "function",
+        "z": "3a87ec7e.80ac04",
+        "name": "Set Payload",
+        "func": "var vvalue = msg.payload;\nmsg.topic = \"domoticz/in\";\nmsg.payload = {\n    \"command\": \"customevent\",\n    \"event\": \"explore_fastevent_custom\",\n    \"data\": \"{\\\"idx\\\":29,\\\"value\\\":\" + vvalue + \"}\"\n    // \"data\": {idx:29, value: vvalue}\n    // \"data\": {\"idx\":29, \"value\":vvalue}\n    // \"data\": \"{\\\"idx\\\":29,\\\"value\\\":\" + vvalue + \"}\"\n};\n\nnode.warn(msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 550,
+        "y": 100,
+        "wires": [
+            [
+                "726be65b.9ee3b8"
+            ]
+        ]
+    },
+    {
+        "id": "ebcacb7e.fb7ce8",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "MQTT DoDev",
+        "broker": "domoticz-ip",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]

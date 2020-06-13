@@ -1,0 +1,70 @@
+--[[
+-- explore_fastevent_timer.dzvents
+-- Timer event with a For Loop, acting as a subtimer handled by the function openURL() with extra option delay via the function afterSec().
+-- 20200603 rwbl
+]]--
+
+local URL_DOMOTICZ = "http://domoticz-ip:8080"
+local CALLBACK_TIMER = 'EXPLOREFASTTIMER'
+local TIMERTRIGGERSECS = 60         -- timer runs every minute (NN seconds)
+local TIMERLOOPINTERVALSECS = 20    -- subtimer for loop every NN seconds
+-- the subtimer runs 3 times within a minute
+
+local subtimerCounter = 0
+
+math.randomseed(os.time())
+
+return 
+{
+    on = 
+    {
+        timer = {
+            -- 'every 5 minutes' 
+            'every minute'
+        },
+        httpResponses = { 
+            CALLBACK_TIMER
+        },
+    },
+
+    execute = function(domoticz, item)
+        
+        --
+        -- TIMER
+        --
+        if item.isTimer then
+            domoticz.log("***TIMER TRIGGER START")
+            -- Need to do something to trigger the for loop in the timer, i.e. acting as a subtimer
+			-- Lets add a domoticz log message via function openURL and handle the callback to trigger the final action
+			-- The for loop uses the function openURL.afterSec(interval) to enable the subtimer
+            local url = string.format("%s/json.htm?type=command&param=addlogmessage&message=trigger_%s", URL_DOMOTICZ, CALLBACK_TIMER)
+            -- domoticz.log(url)
+
+            -- The loop uses for var=start_value, end_value, step_value do something end
+            -- For a timer running every minute with subtimer interval of 20: start with 0 step 20 until 40 , i.e. running 3 times
+            subtimerCounter = 0
+            for seconds = 0, TIMERTRIGGERSECS - TIMERLOOPINTERVALSECS, TIMERLOOPINTERVALSECS do
+                subtimerCounter = subtimerCounter + 1
+                domoticz.log(string.format("Subtimer trigger: %d = %d", subtimerCounter, seconds))
+                domoticz.openURL({url = url, callback = CALLBACK_TIMER }).afterSec(seconds)
+            end
+            domoticz.log("***TIMER TRIGGER END")
+        end
+    
+        --
+        -- HTTP CALLBACK
+        -- 
+		if (item.isHTTPResponse) then
+            domoticz.log(string.format('***HTTP RESPONSE %s Status Code = %s', item.callback, item.statusCode))
+		    -- domoticz.log(string.format('Item data: %s', item.data))
+
+            -- Final action to take
+            -- Update a device with a random value
+            domoticz.log(string.format("New value = %d", math.random(0,9)))
+        end
+        -- local cmd1 = ('/home/pi/domoticz/scripts/adc.py 72 0 32')
+        -- dz.log('***TIMER_10SEC_TEST***')
+        -- os.execute(cmd1) 
+    
+    end
+}

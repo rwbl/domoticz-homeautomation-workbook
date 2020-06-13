@@ -1,0 +1,305 @@
+[
+    {
+        "id": "fa831a94.f8fd58",
+        "type": "tab",
+        "label": "GPIOZero BtnLED",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "eae63afa.7e54a",
+        "type": "rpi-gpio in",
+        "z": "fa831a94.f8fd58",
+        "name": "Push-Button (GPIO23)",
+        "pin": "16",
+        "intype": "down",
+        "debounce": "25",
+        "read": true,
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "e8875f18.f8a1b"
+            ]
+        ]
+    },
+    {
+        "id": "daca0d6c.eec6c",
+        "type": "rpi-gpio out",
+        "z": "fa831a94.f8fd58",
+        "name": "LED (GPIO18)",
+        "pin": "12",
+        "set": "",
+        "level": "0",
+        "freq": "",
+        "out": "out",
+        "x": 1040,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "c4a6ea9f.41e828",
+        "type": "inject",
+        "z": "fa831a94.f8fd58",
+        "name": "init",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 90,
+        "y": 80,
+        "wires": [
+            [
+                "a9c79027.60c59"
+            ]
+        ]
+    },
+    {
+        "id": "a9c79027.60c59",
+        "type": "change",
+        "z": "fa831a94.f8fd58",
+        "name": "set flow context",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ledstate",
+                "pt": "flow",
+                "to": "0",
+                "tot": "num"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "ledstate",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 820,
+        "y": 80,
+        "wires": [
+            [
+                "daca0d6c.eec6c"
+            ]
+        ]
+    },
+    {
+        "id": "d90a48ca.06c79",
+        "type": "switch",
+        "z": "fa831a94.f8fd58",
+        "name": "select ledstate",
+        "property": "ledstate",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 380,
+        "y": 240,
+        "wires": [
+            [
+                "5765641.2b32c9c"
+            ],
+            [
+                "74356e73.44ec6"
+            ]
+        ]
+    },
+    {
+        "id": "5765641.2b32c9c",
+        "type": "change",
+        "z": "fa831a94.f8fd58",
+        "name": "set flow ledstate 1",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ledstate",
+                "pt": "flow",
+                "to": "1",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 610,
+        "y": 220,
+        "wires": [
+            [
+                "1a15f00b.23919"
+            ]
+        ]
+    },
+    {
+        "id": "74356e73.44ec6",
+        "type": "change",
+        "z": "fa831a94.f8fd58",
+        "name": "set flow ledstate 0",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ledstate",
+                "pt": "flow",
+                "to": "0",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 610,
+        "y": 260,
+        "wires": [
+            [
+                "1a15f00b.23919"
+            ]
+        ]
+    },
+    {
+        "id": "1a15f00b.23919",
+        "type": "change",
+        "z": "fa831a94.f8fd58",
+        "name": "set gpiostate 0|1",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "ledstate",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 820,
+        "y": 240,
+        "wires": [
+            [
+                "daca0d6c.eec6c",
+                "98c691bf.fe3bc8"
+            ]
+        ]
+    },
+    {
+        "id": "e8875f18.f8a1b",
+        "type": "switch",
+        "z": "fa831a94.f8fd58",
+        "name": "select gpiostate 1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 390,
+        "y": 160,
+        "wires": [
+            [
+                "d90a48ca.06c79"
+            ]
+        ]
+    },
+    {
+        "id": "98c691bf.fe3bc8",
+        "type": "function",
+        "z": "fa831a94.f8fd58",
+        "name": "Create Domoticz Msg",
+        "func": "// Create the msg.payload to update the domoticz alert device.\n// The msg.payload is JSON format (using the JSON/API syntax)\n// Device: \n// 132,RPiGPIO,RPiGPIO - GPIO Alert,General,Alert,LED state OFF (Alert level 1) @ 20200612 14:36:33.\n// Topic:\n// domoticz/in\n// Payload:\n// {\"command\": \"udevice\", \"idx\" : 132, \"nvalue\" : 1, \"svalue\" : \"LED state OFF (Alert level 1) @ 20200612 14:36:33\"}\n// {\"command\": \"udevice\", \"idx\" : 132, \"nvalue\" : 4, \"svalue\" : \"LED state ON (Alert level 4) @ 20200612 14:59:33\"}\n\nconst IDX_ALERT = 132;\nconst ALERTON = 4;\nconst ALERTOFF = 1;\nconst LEDON = \"ON\";\nconst LEDOFF = \"OFF\";\n\nvar getNow = function() {  \n    const dnow = new Date();\n    const offsetMs = dnow.getTimezoneOffset() * 60 * 1000;\n    const d = new Date(dnow.getTime() - offsetMs);\n    var now = d.toJSON().replace(/(\\d+)\\-(\\d+)-(\\d+)T(\\d+):(\\d+):(\\d+).*/, function (_, y, m, d, h, i, s) {\n        return y + m + d + \" \" + h + \":\" + i + \":\" + s;\n    });\n    return now\n}\n\nconst ledstate = msg.payload;\nvar alertlevel = (ledstate === 0) ? ALERTOFF : ALERTON;\nvar ledstatestr = (ledstate === 0) ? LEDOFF : LEDON;\n// \"LED state OFF (Alert level 1) @ 20200612 14:36:33\"}\nvar alertmsg = \"LED state \" + ledstatestr + \" (Alert level \" + parseInt(alertlevel) + \") @ \" + getNow();\nnode.warn(alertmsg);\nmsg.payload = {\"command\": \"udevice\", \"idx\" : IDX_ALERT, \"nvalue\" : alertlevel, \"svalue\" : alertmsg}\n// node.warn(msg.payload);\nnode.status({fill:\"green\",shape:\"dot\",text:alertmsg});\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 800,
+        "y": 320,
+        "wires": [
+            [
+                "d3665573.bcb93"
+            ]
+        ]
+    },
+    {
+        "id": "d3665573.bcb93",
+        "type": "mqtt out",
+        "z": "fa831a94.f8fd58",
+        "name": "",
+        "topic": "domoticz/in",
+        "qos": "",
+        "retain": "",
+        "broker": "ebcacb7e.fb7ce8",
+        "x": 1030,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "6d154e5e.4b0be",
+        "type": "inject",
+        "z": "fa831a94.f8fd58",
+        "name": "Push-Button pressed",
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 200,
+        "wires": [
+            [
+                "e8875f18.f8a1b"
+            ]
+        ]
+    },
+    {
+        "id": "ebcacb7e.fb7ce8",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "MQTT DoDev",
+        "broker": "192.168.1.179",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]

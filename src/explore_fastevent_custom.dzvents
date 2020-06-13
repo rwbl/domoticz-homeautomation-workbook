@@ -1,0 +1,52 @@
+--[[
+explore_fastevent_custom.dzvents
+Trigger an action from Node-RED handled by a custom event.
+With this option its possible to send messages to domoticz which are picked up immediately by dzVents scripts.
+This avoids using a timer to pull for data, but use custom events to received pushed data.
+Node-RED send MQTT message:
+Topic: domoticz/in 
+Payload: {"command":"customevent","event":"MyCustomEvent","data":"{\"idx\":29,\"value\":9}" }
+
+Node-RED Test Flow (explore_fastevent_custom.flow)
+inject: Trigger sending MQTT message
+random: generate a number between 1-10
+function: create the msg with topic and Payloadvar vvalue = msg.payload;
+msg.topic = "domoticz/in";
+msg.payload = {
+    "command": "customevent",
+    "event": "explore_fastevent_custom",
+    "data": "{\"idx\":29,\"value\":" + vvalue + "}"
+    // "data": {idx:29, value: vvalue}
+    // "data": {"idx":29, "value":vvalue}
+    // "data": "{\"idx\":29,\"value\":" + vvalue + "}"
+};
+node.warn(msg.payload);
+return msg;
+mqtt out: send the msg to the MQTT broker (Domoticz)
+
+Domoticz log entry trigged by mqtt message from Node-RED
+2020-06-03 18:03:42.713 MQTT: Topic: domoticz/in, Message: {"command":"customevent","event":"explore_fastevent_custom","data":"{\"idx\":29,\"value\":2}"} 
+2020-06-03 18:03:42.832 Status: dzVents: Info: Handling Domoticz custom event for: "explore_fastevent_custom" 
+2020-06-03 18:03:42.832 Status: dzVents: Info: ------ Start internal script: explore_fastevent_custom: Custom event: "explore_fastevent_custom" 
+2020-06-03 18:03:42.833 Status: dzVents: Info: explore_fastevent_custom:{"idx":29,"value":2} 
+2020-06-03 18:03:42.833 Status: dzVents: Info: IDX:29, Value:2 
+2020-06-03 18:03:42.833 Status: dzVents: Info: ------ Finished explore_fastevent_custom
+
+20200603 rwbl
+]]--
+
+return {
+	on = {
+		customEvents = {
+		    'explore_fastevent_custom'
+		    },
+	},
+	execute = function(domoticz, item)
+        -- Log the trigger and the mqtt message key data (which is a string)
+	    domoticz.log(string.format("%s:%s", item.trigger, item.data))
+	    -- Convert the data string, as a JSON object to a Lua table
+	    local data = domoticz.utils.fromJSON(item.data)
+	    -- Log the key:value pairs from the passed data 
+	    domoticz.log(string.format("IDX:%s, Value:%d", data.idx, data.value))
+	end
+}

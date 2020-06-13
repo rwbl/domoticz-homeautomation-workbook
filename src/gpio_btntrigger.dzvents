@@ -1,0 +1,25 @@
+-- gpio_btntrigger.dzvents
+-- Handle changes of the alert level device
+local IDX_ALERT = 132
+local ALERTON = 4
+local ALERTOFF = 1
+
+return {
+	on = {
+		devices = {
+			IDX_ALERT
+		}
+	},
+	execute = function(domoticz, device)
+		domoticz.log('Device ' .. device.name .. ' was changed', domoticz.LOG_INFO)
+		domoticz.log(string.format('Alert Level: %d, Text: %s', domoticz.devices(IDX_ALERT).color, domoticz.devices(IDX_ALERT).text))
+		-- Action depending Level
+		level = domoticz.devices(IDX_ALERT).color
+		if (level == ALERTON) then
+            domoticz.log('Alert is ON, please take action!')
+		end
+		if (level == ALERTOFF) then
+            domoticz.log('Alert is OFF, No action required.')
+		end
+	end
+}

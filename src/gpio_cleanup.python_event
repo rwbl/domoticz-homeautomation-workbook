@@ -1,0 +1,46 @@
+#!/usr/bin/python3
+"""
+Push On switch to cleanup GPIO ports. All ports are released. Any LEDs are turned off.
+This scrip only works if the ports have been setup by other automation event scripts.
+Trigger: Device
+131,VirtualDevices,GPIO Cleanup,Light/Switch,Switch,Off
+
+Domoticz Log:
+2020-06-10 09:57:31.752 EVENT: explore_gpio_cleanup 
+2020-06-10 09:57:31.752 131,GPIO Cleanup,1,0 
+2020-06-10 09:57:31.752 RPi.GPIO ports cleaned up.
+
+20200610 rwbl
+"""
+
+import domoticz2
+import DomoticzEvents as DE
+import RPi.GPIO as GPIO
+
+# Define the idx of the switch turning led on/off
+IDX_SWITCH = 131
+
+def tolog(msg):
+    domoticz2.log(msg)
+
+# print ("This will only show up in the shell where you start domoticz");
+# print("EVENT: explore_gpio_led")
+msg = "EVENT: explore_gpio_cleanup"
+tolog(msg)
+
+deviceobj = DE.changed_device
+devicename = deviceobj.name
+deviceid = deviceobj.id
+
+if deviceid == IDX_SWITCH:
+    # domoticz.log("Device changed: Name={}, idx={}".format(devicename, deviceid))
+    # get the values
+    msg = "{},{},{},{}".format(deviceobj.id, deviceobj.name, deviceobj.n_value, deviceobj.s_value)
+    tolog(msg)
+    try:
+        GPIO.cleanup()
+        msg = "RPi.GPIO ports cleaned up."
+        tolog(msg)
+    except:
+        msg = "RPi.GPIO ports can not be cleaned up. Possibly not used."
+        tolog(msg)

@@ -1,0 +1,89 @@
+#!/usr/bin/python3
+"""
+Switch an LED connected to GPIO 18 on/off by using a Domoticz Switch Type On/Off.
+
+Domoticz Log
+2020-06-05 17:47:15.987 Status: User: Admin initiated a switch command (128/GPIO-LED/On)
+2020-06-05 17:47:16.153 EVENT: explore_gpio_led
+2020-06-05 17:47:16.153 128 GPIO-LED 1 0
+2020-06-05 17:47:16.155 LED value 1
+2020-06-05 17:47:16.155 Device GPIO-LED is ON
+2020-06-05 17:47:18.166 (VirtualDevices) Light/Switch (GPIO-LED)
+2020-06-05 17:47:18.335 EVENT: explore_gpio_led
+2020-06-05 17:47:18.335 128 GPIO-LED 0 0
+2020-06-05 17:47:18.337 LED value 0
+2020-06-05 17:47:18.337 Device GPIO-LED is OFF
+2020-06-05 17:47:18.159 Status: User: Admin initiated a switch command (128/GPIO-LED/Off) 
+
+The event is running every minute.
+If a device has changed, the device id is greater 0
+If a device has not changed, the device id is 0
+
+Device object properties.
+self.id = id
+self.name = name
+self.type = type
+self.sub_type = sub_type
+self.switch_type = switch_type
+self.n_value = n_value
+self.n_value_string = n_value_string
+self.s_value = s_value
+self.last_update_string = last_update
+
+20200609 rwl
+"""
+
+import domoticz2
+import DomoticzEvents as DE
+import RPi.GPIO as GPIO
+
+# Define the idx of the switch turning led on/off
+IDX_SWITCH = 130
+
+# GPIO pin number
+GPIOPIN = 18
+# LED object
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+GPIO.setup(GPIOPIN,GPIO.OUT)
+
+def tolog(msg):
+    domoticz2.log(msg)
+
+def switch_led(state):
+    state = state.upper()
+    if (state == "ON"):
+        GPIO.output(GPIOPIN,GPIO.HIGH)
+    elif (state == "OFF"):
+        GPIO.output(GPIOPIN,GPIO.LOW)
+    else:
+        state = "UNKNOWN"
+    msg = "LED State: {}".format(state)
+    tolog(msg)
+
+# print ("This will only show up in the shell where you start domoticz");
+# print("EVENT: explore_gpio_led")
+msg = "EVENT: explore_gpio_ledonoff"
+tolog(msg)
+
+deviceobj = DE.changed_device
+devicename = deviceobj.name
+deviceid = deviceobj.id
+
+if deviceid == IDX_SWITCH:
+    # domoticz.log("Device changed: Name={}, idx={}".format(devicename, deviceid))
+    # get the values
+    msg = "{},{},{},{}".format(deviceobj.id, deviceobj.name, deviceobj.n_value, deviceobj.s_value)
+    tolog(msg)
+    # state = on (n_value = 0): 2020-06-05 11:17:53.439 128 GPIO-LED 0 0 
+    # state = off (n_value = 1): 2020-06-05 11:18:04.563 128 GPIO-LED 1 0
+
+    devicestate = deviceobj.n_value
+    if devicestate == 0:
+        switch_led("OFF")
+    if devicestate == 1:
+        switch_led("ON")
+    
+    # NOT USED else led will turn off: led.close()
+    msg = "Device {} turned {}.".format(devicename, devicestate)
+    tolog(msg)
