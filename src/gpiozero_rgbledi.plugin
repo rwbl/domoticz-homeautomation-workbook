@@ -1,0 +1,257 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# domoticz-home-automation-workbook - explore GPIOZero
+## WARNING: ensure the plugin key is unique across all plugins.
+## Installation:
+## Create folder <domoticz-path>/plugins/gpiozerorgbledi/
+## Copy gpiozerorgbledi.plugin to plugin.py in folder gpiozerorgbledi
+## Restart Domoticz (sudo service domoticz.sh restart) and add Hardware
+## 20200715 makeRLinn
+"""
+<plugin key="gpiozerorgbledi" name="GPIOZero RGB LED Interface" author="rwbl" version="1.0.0" wikilink="" externallink="">
+    <description>
+        <h2>GPIOZero RGB LED Inteface</h2>
+        Set the color Red,Green,Blue, brightness (Level) and blinking (On|Off) of a full color RGB LED component.<br/>
+        The values are set by modifying a virtual sensor text device holding the parameter value to set the RGB Color via the GPIOZero Interfaca.<br/>
+        The parameter value is a minus (-) separated string Red-Green-Blue-Level-Blink. Ranges: RGB=0-255, L=0-100, Blink=0|1<br/>
+        The text device value can be modified via dzVents or any other script / method, i.e. it acts as the interface between Domoticz Devices & GPIOZero.<br/>
+        <h3>Features</h3>
+        <ul style="list-style-type:square">
+            <li>Components: RGB LED (output) connected to three GPIO pins and 3V3 pin.</li>
+            <li>Set RGB LED color with brightness and blink.</li>
+        </ul>
+        <h3>Device (Type, SubType, SwitchType, Name)</h3>
+        <ul style="list-style-type:square">
+            <li>General, Text, n/a, Color</li>
+        </ul>
+        <h3>Configuration</h3>
+        Make sure the GPIO pin numbers are not used by other applications. The pin numbers use BCM format, i.e. GPIOnn (checkout for the board used).<br/>
+        The VCC of the RGB LED is connected to 3V3 (do not use 5V).<br/>
+        <ul style="list-style-type:square">
+            <li>RGB LED GPIO Pin Numbers (default): RED=GPIO19, GREEN=GPIO13, BLUE=GPIO6</li>
+        </ul>
+    </description>
+    <params>
+        <param field="Mode1" label="GPIO RED" width="75px" required="true" default="19"/>
+        <param field="Mode2" label="GPIO GREEN" width="75px" required="true" default="13"/>
+        <param field="Mode3" label="GPIO BLUE" width="75px" required="true" default="6"/>
+        <param field="Mode6" label="Debug" width="75px">
+            <options>
+                <option label="True" value="Debug" default="true"/>
+                <option label="False" value="Normal"/>
+            </options>
+        </param>
+     </params>
+</plugin>
+"""
+import Domoticz
+import os
+import sys
+import datetime
+from gpiozero import RGBLED
+import json
+
+# Set the plugin version
+PLUGINVERSION = "v1.0.0"
+PLUGINSHORTDESCRIPTON = "GPIOZero RGB LED Interface"
+
+# Units for the devices used
+UNITRGBLCOLOR = 1
+
+# Colors with several examples
+COLORRED = [0,1,1]
+COLORGREEN = [1,0,1]
+COLORBLUE = [1,1,0]
+COLORYELLOW = [0,0,1]
+COLORORANGE = [0,0.5,1]
+COLORCYAN = [1,0,0]
+COLORBLACK = [1,1,1]
+COLORWHITE = [0,0,0]
+COLORON = [0,0,0]
+COLOROFF = [1,1,1]
+
+# Define the signal and the on or off colors 
+SIGNALCOLORS = [COLOROFF,COLORGREEN,COLORYELLOW,COLORORANGE,COLORRED]
+ONOFFCOLORS = [COLORON,COLOROFF]
+
+class BasePlugin:
+
+    def __init__(self):
+        # Define the GPIO Pins. Will be assigned from the parameters mode1 and mode2 (see below).
+        self.redledpin = 0
+        self.greenledpin = 0
+        self.blueledpin = 0
+        self.rgbled = None
+        self.level = 0
+        self.red = 0
+        self.green = 0
+        self.blue = 0
+        self.blink = 0
+        return
+
+    def onStart(self):
+        Domoticz.Debug(PLUGINSHORTDESCRIPTON + " " + PLUGINVERSION)
+        Domoticz.Debug("onStart called")
+        Domoticz.Debug("Debug Mode:" + Parameters["Mode6"])
+
+        #Check debug mode
+        if Parameters["Mode6"] == "Debug":
+            self.debug = True
+            Domoticz.Debugging(1)
+            dump_config_to_log()
+
+        #Setting up GPIO
+        self.redledpin = int(Parameters["Mode1"])
+        self.greenledpin = int(Parameters["Mode2"])
+        self.blueledpin = int(Parameters["Mode3"])
+        Domoticz.Debug("Setting up GPIO Pins=RED=" + str(self.redledpin) + ", GREEN=" + str(self.greenledpin) + ", BLUE=" + str(self.blueledpin))    
+        try:
+            # RGBLED object
+            self.rgbled = RGBLED(self.redledpin,self.greenledpin,self.blueledpin)
+            self.set_color(COLOROFF)
+            Domoticz.Debug("Setting up GPIO: Done")
+        except:
+            Domoticz.Error("Error setting up GPIO pins.")
+            
+        # Create device if needed
+        # Example: Domoticz.Device(Name="Status",  Unit=1, Type=17,  Switchtype=17).Create()
+        # Domoticz.Debug("Devices:" + str(len(Devices)) )
+        if (len(Devices) == 0):
+            Domoticz.Debug("Creating device(s)")
+            # TypeName=Text = holds the color R-G-B 0-255, Brightness (Level) 0-100 Blink 0|1
+            Domoticz.Device(Name="Color", Unit=UNITRGBLCOLOR, TypeName="Text", Used=1).Create()
+            Devices[UNITRGBLCOLOR].Update( nValue=0, sValue="255-255-255-100-0")
+            Domoticz.Debug("Device created: "+Devices[UNITRGBLCOLOR].Name)
+
+    def onStop(self):
+        Domoticz.Debug("onStop called: Shut down the device and release all associated resources (IMPORTANT)")
+        self.rgbled.close()
+
+    def onConnect(self, Connection, Status, Description):
+        Domoticz.Debug("onConnect called:"+str(Status)+","+Description)
+
+    def onMessage(self, Connection, Data):
+        Domoticz.Debug("onMessage called")
+        if type(Data) == dict:
+            Domoticz.Debug("Data dict:"+Data.decode("utf-8", "ignore"))
+
+    def onCommand(self, Unit, Command, Level, Color):
+        Domoticz.Debug("onCommand called for Unit " + str(Unit) + ": Command '" + str(Command) + "', Level: " + str(Level) + ", Color:" +  str(Color))
+                            
+    def onNotification(self, Name, Subject, Text, Status, Priority, Sound, ImageFile):
+        Domoticz.Debug("Notification: " + Name + "," + Subject + "," + Text + "," + Status + "," + str(Priority) + "," + Sound + "," + ImageFile)
+
+    def onDeviceModified(self, Unit):
+        Domoticz.Debug("onDeviceModified called for Unit " + str(Unit))
+        # Set the color to the R-G-B-L-B value (red-green-blue-level-blink)
+        if Unit == UNITRGBLCOLOR:
+            Domoticz.Debug("RGBLCOLOR:" + Devices[Unit].sValue)
+            colors = Devices[Unit].sValue.split('-')
+            if len(colors) == 5:
+                self.red = int(colors[0])
+                self.green = int(colors[1])
+                self.blue = int(colors[2])
+                self.level = int(colors[3])
+                self.blink = int(colors[4])
+                self.set_color_rgblb(self.red, self.green, self.blue, self.level, self.blink)
+                #Domoticz.Debug(Devices[Unit].Name + ":ID:" + str(Devices[Unit].ID) + ",Color:"  + str(colors))
+            if len(colors) < 5:
+                Domoticz.Log("ERROR: Missing color parameter:"+str(colors))
+
+    def onDisconnect(self, Connection):
+        Domoticz.Debug("onDisconnect called")
+
+    def onHeartbeat(self):
+        Domoticz.Debug("onHeartbeat called")
+
+    """
+    Set the color of the RGB LED
+    Value 0=HIGH (ON), 1=LOW (OFF)
+    """
+    # Set the color using an array [R,G,B]
+    # Example: COLORRED = [0,1,1], set_color(COLORRED)
+    def set_color(self,c):
+        Domoticz.Debug("set_color called:" + str(c))
+        Domoticz.Debug("set_color called: R=" + str(c[0]) + ",G=" + str(c[1]) + ",B=" + str(c[2]))
+        self.rgbled.color = (c[0],c[1],c[2])
+
+    # Set the color, brightness (level), blink (interval 1s) using values for each property
+    # Example: set_color_rgblb(255,0,0,100,1) to set RED max color blinking
+    def set_color_rgblb(self,red,green,blue,level,blink):
+        Domoticz.Debug("set_color_rgbl:RGB 0-255=" + str(red)+"-"+str(green)+"-"+str(blue)+":Level="+str(level)+":Blink="+str(blink))
+        # ajust the level between 0 - 1 to set the color to c = c * l
+        level = level * 0.01
+        # 1=maxcolor; 0=min color
+        rm = mapFromTo(red * level, 0, 255, 1, 0)
+        gm = mapFromTo(green * level,0, 255, 1, 0)
+        bm = mapFromTo(blue * level,0, 255, 1, 0)
+        self.rgbled.color = (rm,gm,bm)
+        # blink: 0=OFF,1=ON
+        if blink == 1:
+            self.rgbled.blink(on_color=(rm,gm,bm),off_color=(1,1,1))
+        Domoticz.Debug("set_color_rgbl:RGB 0-1=" + str(rm) + "," + str(gm) + "," + str(bm) + ",Level="+str(level) + ",Blink="+str(blink))
+
+global _plugin
+_plugin = BasePlugin()
+
+def onStart():
+    global _plugin
+    _plugin.onStart()
+
+def onStop():
+    global _plugin
+    _plugin.onStop()
+
+def onConnect(Connection, Status, Description):
+    global _plugin
+    _plugin.onConnect(Connection, Status, Description)
+
+def onMessage(Connection, Data):
+    global _plugin
+    _plugin.onMessage(Connection, Data)
+
+def onCommand(Unit, Command, Level, Color):
+    global _plugin
+    _plugin.onCommand(Unit, Command, Level, Color)
+
+def onNotification(Name, Subject, Text, Status, Priority, Sound, ImageFile):
+    global _plugin
+    _plugin.onNotification(Name, Subject, Text, Status, Priority, Sound, ImageFile)
+
+def onDeviceModified(Unit):
+    global _plugin
+    _plugin.onDeviceModified(Unit)
+
+def onDisconnect(Connection):
+    global _plugin
+    _plugin.onDisconnect(Connection)
+
+def onHeartbeat():
+    global _plugin
+    _plugin.onHeartbeat()
+
+# Generic helper functions
+"""
+Dump the config parameters of the plugin to the Domoticz log.
+"""
+def dump_config_to_log():
+    for x in Parameters:
+        if Parameters[x] != "":
+            Domoticz.Log( "'" + x + "':'" + str(Parameters[x]) + "'")
+    Domoticz.Debug("Device count: " + str(len(Devices)))
+    for x in Devices:
+        Domoticz.Log("Device:           " + str(x) + " - " + str(Devices[x]))
+        Domoticz.Log("Device ID:       '" + str(Devices[x].ID) + "'")
+        Domoticz.Log("Device Name:     '" + Devices[x].Name + "'")
+        Domoticz.Log("Device nValue:    " + str(Devices[x].nValue))
+        Domoticz.Log("Device sValue:   '" + Devices[x].sValue + "'")
+        Domoticz.Log("Device LastLevel: " + str(Devices[x].LastLevel))
+    return
+
+"""
+mapping a range from to
+newpos=mapFromTo(pos,0,300,0,1024)
+"""
+def mapFromTo(x,a,b,c,d):
+   y=(x-a)/(b-a)*(d-c)+c
+   return y

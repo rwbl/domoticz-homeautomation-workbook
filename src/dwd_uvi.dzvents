@@ -1,0 +1,119 @@
+-- dwd_uvi.dzvents
+-- Get the uv-index (uvi) from dwd service for city Hamburg every day at 12:00
+-- Name virtual sensors are updated with the location and uv category, i.e. Hamburg - Moderate
+-- Request URL: see below
+-- 20200730 rwbl
+
+-- Domoticz device
+-- 19,VirtualSensors,UV Index,UV,UVN128,UV138,5.0 UVI
+local IDX_UV_INDEX = 19
+-- 21,VirtualSensors,UV Alert,General,Alert,Today: 5 (moderate), Tomorrow: 7 (high)
+local IDX_UV_ALERT = 21
+
+-- DWD request url
+local UV_URL = 'https://opendata.dwd.de/climate_environment/health/alerts/uvi.json';
+
+-- callback of the url request - must be unique across all dzevents
+local UV_RES = 'DWDUVINDEX';
+
+-- city uv index
+-- define as user variable: 1, DEF_UV_CITY,String,Hamburg
+-- local UV_CITY = 'Hamburg'
+local IDX_UV_CITY = 1
+
+-- Domoticz URL
+local DOM_URL = 'http://localhost:8080' -- /json.htm?type=setused&idx=%d&name=%s&used=true'
+
+-- get the uv category from the uvindex
+local function getUVCategory(uvindex) 
+    local uvcategory = "unknown"
+    if uvindex >=0 and uvindex <=2 then uvcategory = "low" end
+    if uvindex >=3 and uvindex <=5 then uvcategory = "moderate" end
+    if uvindex >=6 and uvindex <=7 then uvcategory = "high" end
+    if uvindex >=8 and uvindex <=10 then uvcategory = "very high" end
+    if uvindex >=11 then uvcategory = "extreme" end
+    return uvcategory
+end
+
+-- get the uv alert level from the uvindex
+-- note: if uvindex >=8 then level is 4 (red)
+local function getUVAlert(uvindex) 
+    local uvalert = 0
+    if uvindex >=0 and uvindex <=2 then uvalert = 1 end     -- green
+    if uvindex >=3 and uvindex <=5 then uvalert = 2 end     -- yellow
+    if uvindex >=6 and uvindex <=7 then uvalert = 3 end     -- orange
+    if uvindex >=8 and uvindex <=10 then uvalert = 4 end    -- red
+    if uvindex >=11 then uvalert = 4 end
+    return uvalert
+end
+
+return {
+	on = {
+		timer = {
+			-- 'every minute' -- for tests
+			'at 12:00'
+		},
+		httpResponses = {
+			UV_RES
+		}
+	},
+	execute = function(domoticz, item)
+        local uvcity = domoticz.variables(IDX_UV_CITY).value
+
+		if (item.isTimer) then
+			domoticz.openURL({ url = UV_URL, method = 'GET', callback = UV_RES, })
+		end
+
+		if (item.isHTTPResponse) then
+
+			if (item.ok and item.callback == UV_RES) then
+				if (item.isJSON) then
+				    local uvdata = item.json.content
+    				-- domoticz.log(uvdata, domoticz.LOG_INFO)
+                    
+                    -- Loop thru uvdata table to get selected city
+                    local cityfound = 0
+                    for i,line in pairs(uvdata) do
+                    	local city = line.city
+                    	if city == uvcity then
+                    	    cityfound = 1
+                    	    -- Get the forcast table
+                    	    local forecast = line.forecast
+                    	    -- Select uv index for today
+                            local uvindex = forecast.today
+                            -- Select category for today
+                    		local uvcategory = getUVCategory(uvindex) 
+                    		-- Log UVI Hamburg: moderate
+                    		domoticz.log(string.format("UVI %s: %d = %s", uvcity, uvindex, uvcategory))
+                            -- Get uv data - note: the city is shown at the device name
+                            -- The data is for today and tomorrow - the key dayafter_to is not used (forecast.dayafter_to, getUVCategory(forecast.dayafter_to))
+                    	    local uvdata = string.format("Today: %d (%s), Tomorrow: %d (%s)", 
+                    	        forecast.today, uvcategory, 
+                    	        forecast.tomorrow, getUVCategory(forecast.tomorrow)) 
+                    	    domoticz.log(uvdata)
+                    	    -- Update UV devices
+                    	    domoticz.devices(IDX_UV_INDEX).updateUV(uvindex)
+                    	    domoticz.devices(IDX_UV_ALERT).updateAlertSensor(getUVAlert(uvindex), uvdata)
+                    	    -- Rename the UV Index device to show city & uvcategory
+                    	    local newname = domoticz.utils.urlEncode(string.format("UV Index %s - %s", uvcity, uvcategory))
+                    	    local url = string.format("%s/json.htm?type=setused&idx=%d&name=%s&used=true",DOM_URL, IDX_UV_INDEX, newname)
+                			domoticz.openURL({url = url})
+                    	    -- Rename the UV Alert device to show city
+                    	    newname = domoticz.utils.urlEncode(string.format("UV Alert %s", uvcity))
+                    	    url = string.format("%s/json.htm?type=setused&idx=%d&name=%s&used=true",DOM_URL, IDX_UV_ALERT, newname)
+                			domoticz.openURL({url = url}).afterSec(1)
+                    	end -- if city
+                    end
+                    if cityfound == 0 then
+        				domoticz.log(string.format('UV data for %s not found.', uvcity), domoticz.LOG_ERROR)
+                    end
+				end
+			else
+				domoticz.log(string.format('Problem handling the request: %s',UV_URL), domoticz.LOG_ERROR)
+				domoticz.log(item, domoticz.LOG_ERROR)
+			end
+
+		end
+
+	end
+}

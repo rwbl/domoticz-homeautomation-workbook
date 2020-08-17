@@ -1,0 +1,66 @@
+-- gpiozerorgbled_setcolor.dzvents
+-- Listen to device changes to update the RGBL value of the text device RGB Color.
+-- Devices (idx,hardware,name,type,subtype,switchtype):
+-- 4,VirtualSensors,RGB - Color Picker,Color Switch,RGB,Dimmer
+-- 11,VirtualSensors,RGB - Blink,Light/Switch,Switch,On/Off
+-- 20200714 makeRLinn
+
+-- idx of the rgbled device
+local IDX_RGBCOLORPICKER = 4    -- RGB Color device with a color picker (virtual hardware)
+local IDX_RGBBLINK = 11         -- Switch On/Off to let the LED blink (virtual hardware)
+local IDX_RGBLCOLOR = 10        -- text device created by the rgb plugin and gets updated by the RGBCOLORPICKER device
+
+return {
+	on = {
+		devices = {IDX_RGBCOLORPICKER,IDX_RGBBLINK}
+	},
+	execute = function(domoticz, device)
+        -- dump table data used to understand the properties of the tables from rawdata & getcolor
+        local function dumptable(t)
+    		for i,v in pairs(t) do 
+    		    domoticz.log(string.format("%s=%s",i, tostring(v)))
+            end
+        end
+
+        -- check which device is updated
+		domoticz.log(string.format("Device changed: %s; sValue=", device.name, device.sValue), domoticz.LOG_INFO)
+
+        -- get blink state
+        local blink = 0
+        if domoticz.devices(IDX_RGBBLINK).sValue == "On" then blink = 1 end
+
+	    local value
+
+        if device.idx == IDX_RGBCOLORPICKER then
+    		-- get the color as a lua table
+            -- {["cw"]=0, ["green"]=45, ["r"]=255, ["blue"]=26, ["t"]=0, ["ww"]=0, ["isWhite"]=false, 
+            -- ["temperature"]=0, ["value"]=100.0, ["m"]=3, ["hue"]=4.9781659388646, ["b"]=26, ["red"]=255, 
+            -- ["brightness"]=100.0, ["cold white"]=0, ["mode"]=3, ["g"]=45, ["saturation"]=89.803921568627, ["warm white"]=0}
+            local devicecolor = domoticz.devices(IDX_RGBCOLORPICKER).getColor()
+            -- dumptable(devicecolor)            
+    
+            -- get level: taken from the rawData key 1, i.e. 1=29 - this is the first entry
+            -- the level is not included in the properties of device.getcolor()
+            -- TODO: checkout if the rawdata for a RGB switch changes, i.e. the keys might change
+            local level = tonumber(device.rawData[1])
+            -- dumptable(device.rawData)            
+
+    	    value = string.format('%d-%d-%d-%d-%d', devicecolor.r, devicecolor.g, devicecolor.b, level, blink)
+        end
+
+        if device.idx == IDX_RGBBLINK then
+            value = domoticz.devices(IDX_RGBLCOLOR).sValue
+            function replace_char(pos, str, r)
+                return str:sub(1, pos-1) .. r .. str:sub(pos+1)
+            end
+            -- replace last value = blink flag 0|1
+            value = replace_char(string.len(value), value, tostring(blink))
+	    	-- domoticz.log(string.format("Blink changed: %s", value), domoticz.LOG_INFO)
+        end
+
+    	-- update text device color with the new color string r-g-b-l
+    	-- the plugin triggers the function onmodified and updates the LED via GPIOZero
+	    domoticz.devices(IDX_RGBLCOLOR).updateText(value)
+	    domoticz.log(string.format("New color set:%s",value), domoticz.LOG_INFO)
+    end
+}

@@ -1,0 +1,22 @@
+-- gpiozerorgbled_setlevel
+-- Test setting the level of a selector switch controlling a gpiozero rgb IDX_RGBLED
+-- 20200701 rwbl
+
+-- idx of the rgbled device
+local IDX_RGBLED = 1
+
+return {
+	on = {
+		timer = {
+			'every minute'
+		}
+	},
+	execute = function(domoticz, timer)
+		domoticz.log('Timer event was triggered by ' .. timer.trigger, domoticz.LOG_INFO)
+		math.randomseed( os.time() )
+		local newlevel = math.random(4) * 10
+		domoticz.devices(IDX_RGBLED).switchSelector(newlevel)
+		domoticz.log(string.format('New level: %d, %s', newlevel, domoticz.devices(IDX_RGBLED).levelNames[(newlevel / 10) + 1]))
+		-- Note: the new color name from the lua table is an integer starting at 1. the newlevel is divided by 10 and 1 is added to get the range between 1-4.
+	end
+}

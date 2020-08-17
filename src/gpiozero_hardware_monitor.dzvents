@@ -1,0 +1,45 @@
+-- gpiozero_hardware_monitor.dzvents
+-- Check the CPU_Usage and indicate using an RGB LED connected to GPIO the state.
+-- Various settings possible depending state to monitor
+-- Devices (idx,hardware,name,type,subtype,switchtype):
+-- 13,RPi Hardware,CPU_Usage,General,Percentage,5.24%
+-- 20200714 rwbl
+
+-- device idx
+local IDX_CPUUSAGE = 13     -- cpu usage device monitored
+local IDX_RGBLCOLOR = 12    -- text device created by the rgb plugin and gets updated by the RGBCOLORPICKER device
+
+-- cpu threshold - hardcoded but can also be set via user variabe
+local TH_CPUUSAGE = 8.5
+-- rgb led states red-green-blue-brightness-blink
+-- color: 0-255, brightness: 0-100%, blink 0 (OFF) | 1 (ON)
+local STATE_CPUUSAGE_OK = "0-255-0-100-0"   -- green, full brightness, no blink
+local STATE_CPUUSAGE_HIGH = "255-0-0-100-1" -- red, full brightness, blinking
+
+return {
+	on = {
+		devices = {IDX_CPUUSAGE}
+	},
+	execute = function(domoticz, device)
+        -- check which device is updated
+		domoticz.log(string.format("Device changed: %s; sValue=%s", device.name, device.sValue), domoticz.LOG_INFO)
+		state_color = domoticz.devices(IDX_RGBLCOLOR).text
+		domoticz.log(string.format("State color=%s", state_color), domoticz.LOG_INFO)
+
+        if device.idx == IDX_CPUUSAGE then
+    	    -- update text device color with the new color string r-g-b-l
+        	-- the plugin triggers the function onmodified and updates the LED via GPIOZero
+            if tonumber(device.sValue) > TH_CPUUSAGE and state_color ~= STATE_CPUUSAGE_HIGH then
+    	        newcolor = STATE_CPUUSAGE_HIGH
+    	        domoticz.devices(IDX_RGBLCOLOR).updateText(newcolor)
+	            domoticz.log(string.format("Threshold HIGH: Color set:%s",newcolor), domoticz.LOG_INFO)
+    	    end
+            if tonumber(device.sValue) <= TH_CPUUSAGE and state_color ~= STATE_CPUUSAGE_OK then
+    	        newcolor = STATE_CPUUSAGE_OK
+    	        domoticz.devices(IDX_RGBLCOLOR).updateText(newcolor)
+	            domoticz.log(string.format("Threshold OK: Color set:%s",newcolor), domoticz.LOG_INFO)
+            end
+        end
+
+    end
+}

@@ -1,0 +1,137 @@
+-- dwd_pollen.dzvents
+-- Get the uv-index (uvi) from dwd service for city Hamburg every day at 12:00
+-- Name virtual sensors are updated with the location and uv category, i.e. Hamburg - Moderate
+-- Request URL: see below
+-- Example data:
+-- Partregion: Geest, Schleswig-Holstein und Hamburg
+-- Erle=0 keine Belastung
+-- Esche=0 keine Belastung
+-- Graeser=1-2 geringe bis mittlere Belastung
+-- Beifuss=1 geringe Belastung
+-- Birke=0 keine Belastung
+-- Roggen=0 keine Belastung
+-- Hasel=0 keine Belastung
+-- Ambrosia=0 keine Belastung
+-- {"Graeser: geringe bis mittlere Belastung"} 
+-- 20200730 rwbl
+
+-- Domoticz device
+-- 22, VirtualSensors, Pollen Alert, General, Alert, No Alert
+local IDX_POLLEN_ALERT = 22
+
+-- DWD request url
+local POLLEN_URL = 'https://opendata.dwd.de/climate_environment/health/alerts/s31fg.json';
+
+-- callback of the url request - must be unique across all dzevents
+local POLLEN_RES = 'DWDPOLLEN';
+
+-- part region id = 12
+-- define as user variable: 1, DEF_POLLEN_PARTREGION_NAME,String,Geest, Schleswig-Holstein und Hamburg
+local IDX_POLLEN_PARTREGION_NAME = 2
+local IDX_POLLEN_PARTREGION_SHORT = 3
+
+-- Domoticz URL
+local DOM_URL = 'http://localhost:8080' -- /json.htm?type=setused&idx=%d&name=%s&used=true'
+
+-- Get the pollen index description. need to shorten to avoid exceeding > 200 chars for String
+-- The string is used to update the alert devices
+local function getPollenIndexDesc(id)
+    local iddesc = "nicht bekannt"
+    if id == "0" then iddesc = "kein" end
+    if id == "0-1" then iddesc = "kein-gering" end
+    if id == "1" then iddesc = "gering" end
+    if id == "1-2" then iddesc = "gering-mittel" end
+    if id == "2" then iddesc = "mittel" end
+    if id == "2-3" then iddesc = "mittel-hoch" end
+    if id == "3" then iddesc = "hoch" end
+    return iddesc
+end
+
+-- Sets the new pollen alert level in case higher then previous level
+local function setPollenAlertLevel(id, oldlevel)
+    local newlevel = oldlevel
+    local level = 0                                 -- gray
+    if id == "1-2" then level = 1 end               -- green
+    if id == "2" then level = 2 end                 -- yellow
+    if id == "2-3" then level = 3 end               -- orange
+    if id == "3" then level = 4 end                 -- red
+    if level > oldlevel then newlevel = level end
+    return level
+end
+
+return {
+	on = {
+		timer = {
+			-- 'every minute' -- for tests
+			'at 12:00'
+		},
+		httpResponses = {
+			POLLEN_RES
+		}
+	},
+	execute = function(domoticz, item)
+        local partregion = domoticz.variables(IDX_POLLEN_PARTREGION_NAME).value
+        local partregionshort = domoticz.variables(IDX_POLLEN_PARTREGION_SHORT).value
+
+		if (item.isTimer) then
+			domoticz.openURL({ url = POLLEN_URL, method = 'GET', callback = POLLEN_RES, })
+		end
+
+		if (item.isHTTPResponse) then
+
+			if (item.ok and item.callback == POLLEN_RES) then
+				-- domoticz.log(item.json, domoticz.LOG_INFO)
+				if (item.isJSON) then
+				    local content = item.json.content
+    				-- domoticz.log(content, domoticz.LOG_INFO)
+                    -- Loop thru uvdata table to get selected city
+                    local partregionfound = 0
+                    for i,line in pairs(content) do
+                    	local partregionname = line.partregion_name
+                    	if partregionname == partregion then
+            	            domoticz.log(string.format("Partregion: %s", partregionname), domoticz.LOG_INFO)
+                    	    partregionfound = 1
+                    	    -- Get the pollen table
+                    	    local pollenlist = line.Pollen
+                    	    local pollenalertlevel = 0  -- no alert 
+                    	    local pollenalertinfo = ""
+                    	    local count = 0
+            				-- domoticz.log(pollen, domoticz.LOG_INFO)
+            				-- loop over the pollen list
+            				for k, v in next, pollenlist do
+            				    -- k = Pollenname, v = Pollenindex; Graeser=1-2 gering-mittel
+            				    -- domoticz.log(string.format("%s=%s %s",k,v.today, getPollenIndexDesc(v.today)))
+            				    -- if index has higher valie, add to pollenalert table
+            				    if v.today == "1-2" or v.today == "2" or v.today == "2-3" or v.today == "3" then
+                                    count = count + 1
+                                    if count > 1 then
+                                        pollenalertinfo = pollenalertinfo .. ", "
+                                    end
+                                    pollenalertinfo = pollenalertinfo .. string.format("%s: %s", k, getPollenIndexDesc(v.today))
+                                    pollenalertlevel = setPollenAlertLevel(v.today, pollenalertlevel)
+            				    end
+            				end
+                            if count == 0 then pollenalertinfo = "keine Belastung" end
+            				domoticz.log(pollenalertinfo, domoticz.LOG_INFO)
+                    	    -- Update Pollen Alert device
+                    	    domoticz.devices(IDX_POLLEN_ALERT).updateAlertSensor(pollenalertlevel, pollenalertinfo)
+                    	    -- Rename Pollen Alert device to show partregion
+                    	    local newname = domoticz.utils.urlEncode(string.format("Pollen Alert %s", partregionshort))
+                    	    local url = string.format("%s/json.htm?type=setused&idx=%d&name=%s&used=true",DOM_URL, IDX_POLLEN_ALERT, newname)
+                			domoticz.openURL({url = url}).afterSec(1)
+                    	end -- if regionfound
+                    end
+                    if partregionfound == 0 then
+        				domoticz.log(string.format('Pollen data for %s not found.', partregion), domoticz.LOG_ERROR)
+                    end
+				end
+			else
+				domoticz.log(string.format('Problem handling the request: %s',POLLEN_URL), domoticz.LOG_ERROR)
+				domoticz.log(item, domoticz.LOG_ERROR)
+			end
+
+		end
+
+	end
+}
+
