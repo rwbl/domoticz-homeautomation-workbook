@@ -1,5 +1,16 @@
 # Changelog domoticz-home-automation-workbook
 
+### 20200817
+* NEW: Function Climate Environment - UV Index & Category, Pollen Index.
+* NEW: Function Hardware Monitor - GPIO LCD Display, RGB LED Status Indicator.
+* NEW: Explore GPIO - GPIOZero Plugin RGBLED.
+* NEW: Explore GPIO - LCD I2C Control (Python script) with examples clock, hardware monitor & timer/device events
+* UPD: Explore ESP Easy - Firmware update, chapter reworked.
+* UPD: Explore RaspberryMatic - Release 3.51.6.20200621.
+* UPD: User Variables - List using SQLite3.
+* UPD: Various smaller enhancements & corrections.
+* INF: Domoticz Development Raspberry Pi 3B+ replaced by a Raspberry Pi 4B with Raspberry OS Version 10 (Buster) - no issues during setup encountered.
+
 ### 20200612
 * FIX: EMail Notification Error: SMTPSEND.BareLinefeedsAreIllegal with Outlook - reinstalled Domoticz.
 * NEW: Explore Events dzVents Lua - Solutions for timer update less one minute (Timer,Device,MQTT).

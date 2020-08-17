@@ -26,6 +26,7 @@ Abbreviations: GUI = Domoticz UI in browser, HmIP = homematicIP,
 * Air Quality monitor - [Plugin](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor).
 * Ambient light (from ESP8266 running ESP Easy) with threshold.
 * Charts for selective weather items, room temperature & humidity.
+* Climate Environment - UV Index & Category, Pollen Index.
 * Coffee machine monitor – start and end time, info message.
 * Control Somfy roller shutters with RTS motors in rooms.
 * Control Volumio music player whilst listening to web radio.

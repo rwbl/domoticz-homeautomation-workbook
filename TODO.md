@@ -1,5 +1,5 @@
 # ToDo domoticz-home-automation-workbook
-Status: 20200612
+Status: 20200817
 
 ### NEW: Domoticz Workbook Wiki
 The workbook is rather growing. The PDF document has reached in the meantime about 530 pages. 
@@ -8,13 +8,28 @@ Exploring how to do best without the use of a dedicated homepage.
 #### Status
 Not started
 
-### NEW: Function Shed - Rain Tank Level & Temperature Indicator
-Monitor level & temperature rain tank.
+### NEW: Explore Domoticz Standalone
+Setup a Domoticz system on a Raspberry Pi without Internet connection.
+Use the system to control sensors & actuators.
+Idea: RPi to control an Arduino.
+#### Status
+Not started
+
+### NEW: Plugin acting as GPIO Middleware
+A GPIO Plugin as an enabler for several function, i.e. acting as kind of "GPIOMiddleware".
+The GPIO has various devices connected, i.e. LED, LCD display, switch, push-button, sensors...
+The GPIOMiddleware is used by various dzVents automation scripts depending function.
 #### Status
 Not started
 
 ### NEW: Ring Doorbell Monitor
 Monitor the doorbell using a Ring Doorbell 2 device.
+#### Status
+Not started
+
+### UPD: GPIOZero Handle Exceptions
+Ref:
+https://gpiozero.readthedocs.io/en/stable/api_exc.html
 #### Status
 Not started
 
