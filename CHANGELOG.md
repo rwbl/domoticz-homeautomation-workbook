@@ -1,10 +1,26 @@
 # Changelog domoticz-home-automation-workbook
 
+### 202009DD
+* NEW: Function BME280 Temp+Hum+Baro - Monitor server room Temp+Hum. Baro for air pressure weather. Timer triggered.
+* NEW: Function Garage Door Monitor - Open|Close state provided by Raspberrymatic with Homematic IP SWDM device.
+* NEW: Function Key Dates Calendar JSON - New Concept using JSON showing sorted key dates as Alert devices in a room plan. The previous CSV solution kept for reference.
+* NEW: Function RaspberryMatic Duty Cycle Monitor - Monitor the Raspberrymatic systemvariable DutyCycle and log error if above threshold.
+* NEW: Function Web UI Quick Access Mobile - First version of a customized web frontend to control dedicated functions mainly accessed from mobile smartphones devices.
+* NEW: Explore Custom Pages - Example external plugin JustGage embedded in a Bootstrap responsive grid.
+* NEW: Explore Custom UI - Create a custom UI. Started by building a Bootstrap grid example based on locally stored latest Bootrap library.
+* UPD: Function Air Pressure (BME280) - Automation event trigger changed from device to timer as device changes happen N times/minute. dzVents script reworked. Replaced see below.
+* UPD: Function Climate Environment - UV Index & Category, Pollen Index with date; Data in German, Removed city & date in device name.
+* UPD: Function Hardware Monitor - GPIO LCD Display with Information System start, stop, CPU Usage&Temp, HDD Usage, Memory Usage.
+* UPD: Function River Elbe Tide - Converted solution from Node-RED to Automation Event dzVents Lua.
+* UPD: Explore Custom Pages - Reworked chapter & examples; Added hints.
+* UPD: Various smaller enhancements & corrections.
+* INF: Function Air Pressure (BME280) replaced by function BME280 Temp+Hum+Baro.
+
 ### 20200817
 * NEW: Function Climate Environment - UV Index & Category, Pollen Index.
 * NEW: Function Hardware Monitor - GPIO LCD Display, RGB LED Status Indicator.
 * NEW: Explore GPIO - GPIOZero Plugin RGBLED.
-* NEW: Explore GPIO - LCD I2C Control (Python script) with examples clock, hardware monitor & timer/device events
+* NEW: Explore GPIO - LCD I2C Control (Python script) with examples clock, hardware monitor & timer/device events.
 * UPD: Explore ESP Easy - Firmware update, chapter reworked.
 * UPD: Explore RaspberryMatic - Release 3.51.6.20200621.
 * UPD: User Variables - List using SQLite3.

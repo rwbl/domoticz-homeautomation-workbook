@@ -15,6 +15,13 @@ Idea: RPi to control an Arduino.
 #### Status
 Not started
 
+### NEW: Check Device Battery State Regulary
+Check the state of all devices with batteries and send notification in case low.
+Automation event dzVents trigger by timer daily.
+Thoughts to loop over all devices: http job or ???
+#### Status
+Not started
+
 ### NEW: Plugin acting as GPIO Middleware
 A GPIO Plugin as an enabler for several function, i.e. acting as kind of "GPIOMiddleware".
 The GPIO has various devices connected, i.e. LED, LCD display, switch, push-button, sensors...

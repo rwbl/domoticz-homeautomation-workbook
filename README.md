@@ -2,11 +2,12 @@
 To build a Home Automation & Information System, based on the Domoticz Home Automation System, running on the single-board computer Raspberry Pi.
 
 ### Objectives
-* Explore & learn Domoticz & Scripting.
-* Build a Home Automation & Information System.
-* Write up & share experiences during development.
-* Use this workbook as a supplemental reference.
-* Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob/master/CHANGELOG.md).
+* To Explore & Learn Domoticz & Scripting.
+* To build a Home Automation & Information System.
+* To write up & share experiences during development.
+* To use this workbook as a supplemental reference.
+
+Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob/master/CHANGELOG.md).
 
 ### Remarks
 * **This is a working document**- concept changes, new idea’s & to-do’s whilst progressing.
@@ -19,6 +20,7 @@ To build a Home Automation & Information System, based on the Domoticz Home Auto
 * Functions that have been replaced by another solution are kept in this document as reference – could be of use.
 * Screenshots might not be updated as functionality is evolving.
 * To-do’s are tagged with <TODO> - The To-do list, with prefix, i.e. NEW, UPD …, are captured in the file TODO.md.
+* Device names and other are in cases in German as the Domoticz system is used in Germany.
 Abbreviations: GUI = Domoticz UI in browser, HmIP = homematicIP,
 
 ### Functions
@@ -36,6 +38,7 @@ Abbreviations: GUI = Domoticz UI in browser, HmIP = homematicIP,
 * Electricity power & energy for selected devices / rooms (washer, room MakeLab etc.).
 * Electricity power & energy for the house from “volkszaehler” with charts.
 * Event monitor for selected devices.
+* Garage door monitor.
 * Hardware Monitor for the Raspberry Pi's used (see HardwareMonitor.zip).
 * HomeMatic (RaspberryMatic) CCU3 integration with variety of devices and plugins [HmIP-eTRV](https://github.com/rwbl/domoticz-plugin-hmip-etrv), [HmIP-PSM](https://github.com/rwbl/domoticz-plugin-hmip-psm).
 * Hue Light controlled via ESP8266 with slide potentiometer & 4-digit-7-segment-display.
@@ -47,6 +50,7 @@ Abbreviations: GUI = Domoticz UI in browser, HmIP = homematicIP,
 * Notes with a subject & content and save, copy or notify.
 * Philips Hue Lighting System control via Hue Bridge for ZigBee devices.
 * Postbox Notifier.
+* RaspberryMatic DutyCycle monitor.
 * RaspberryMatic Statelist with devices and datapoints (Node-RED).
 * Raspberry Pi system information with charts and threshold email notification.
 * Remote Control Domoticz devices using Email client - includes a simple Android test app 
@@ -54,7 +58,8 @@ Abbreviations: GUI = Domoticz UI in browser, HmIP = homematicIP,
 * Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
 * Time Control to track & control the time spent in hours, per activity block (with start- & end-time) and total/day, on a generic task.
 * Timers for single devices or complex tasks (Automation events dzVents).
-* Web App Site Control [Info](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI.
+* Web UI Quick Access Mobile - customized web frontend to control dedicated functions mainly accessed from mobile smartphones devices.
+* Web App Site Control [Info](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Not developed further as eplaced by Web UI Quick Access Mobile).
 
 ### Explore How To Use
 * Domoticz running on a Raspberry Pi (setup, configure).
