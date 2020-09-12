@@ -1,0 +1,67 @@
+--[[
+    river_elbe_level.dzvents
+    Get the river elbe level Abs NHN and trend (Ebb, No Change, Flood) every 15 minutes.
+    20200911 rwbl
+]]--
+
+-- Domoticz Devices
+-- Idx, Hardware, Name, Type, SubType, Data
+-- 302, VirtualSensors, Elbe Pegel, General, Custom Sensor, 161 cm Abs NHN
+local IDX_RIVER_LEVEL = 302
+
+-- URL HTTP request from German webservice PEGELONLINE.wsv.de
+local REQUEST_URL = 'https://www.pegelonline.wsv.de/webservices/rest-api/v2/stations/SCHULAU.json?includeTimeseries=true&includeCurrentMeasurement=true';
+
+-- callback of the url request - must be unique across all dzevents
+local REQUEST_RES = 'RIVERELBELEVEL';
+
+return {
+	on = {
+		timer = {
+			'every 5 minutes'
+			-- 'every minute' -- for tests
+		},
+		httpResponses = {
+			REQUEST_RES
+		}
+	},
+	execute = function(domoticz, item)
+        -- Timer requesting river level data
+		if (item.isTimer) then
+			domoticz.openURL({ url = REQUEST_URL, method = 'GET', callback = REQUEST_RES, })
+		end
+        -- HTTP Response. Important to check on the callback because for the name update also an HTTP request is used
+		if (item.isHTTPResponse) then
+            -- domoticz.log(item.data)
+			if (item.ok and item.callback == REQUEST_RES) then
+				if (item.isJSON) then
+                    -- Get the first entry of the timeseries. NOTE: starts with 1 and not 0!
+                    timeseries = item.json.timeseries[1]
+                    local riverlevelrelpnp = timeseries.currentMeasurement.value
+                    local riverlevelpnp = timeseries.gaugeZero.value;
+                    local riverlevelabsnhn = riverlevelrelpnp + (riverlevelpnp * 100);
+            	    domoticz.devices(IDX_RIVER_LEVEL).updateCustomSensor(riverlevelabsnhn);
+                    -- Tide
+                    local trend = timeseries.currentMeasurement.trend
+                    local tide = ""
+                    if trend == 1 then tide = "Flut" end
+                    if trend == 0 then tide = "Gleich" end
+                    if trend == -1 then tide = "Ebbe" end
+    				-- Amend the tide information to the device name, i.e. "Elbe Pegel (Flut)"
+                    local newname = domoticz.utils.urlEncode(string.format("Elbe Pegel (%s)", tide))
+                    local urlRequest =      
+                        string.format("http://127.0.0.1:8080/json.htm?type=setused&idx=%d&used=true&name=%s", 
+                            IDX_RIVER_LEVEL, newname)
+                    -- Set the new name via url without response
+                    domoticz.openURL({url = urlRequest})
+    				domoticz.log(string.format("Abs NHN in cm: %.2f (%s)", riverlevelabsnhn, newname), domoticz.LOG_INFO)
+				end
+			else
+				domoticz.log(string.format('Problem handling the request: %s',UV_URL), domoticz.LOG_ERROR)
+				domoticz.log(item, domoticz.LOG_ERROR)
+			end
+
+		end
+
+	end
+}

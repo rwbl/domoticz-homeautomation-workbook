@@ -1,0 +1,52 @@
+--[[
+raspmatic_thermostat_setsetpoint.dzvents
+Project: domoticz-homeautomation-workbook
+Set a new setpoint for a homematicIP thermostat triggered by a Domoticz thermostat device setpoint change.
+20200908 rwbl
+
+]]--
+
+-- url http xml-api request to set a new value 
+local URL_RASPMATIC = 'http://192.168.1.225/addons/xmlapi/statechange.cgi?ise_id=#ISEID#&new_value=#NEWVALUE#';
+-- define the unique (across all dzVents) callback
+local RES_RASPMATIC = "RES_RASPMATIC_THERMOSTAT";
+-- list of the idx of all thermostats (see GUI > Setup > Devices)
+local idxdevicestable = {336,337,338,339,340,341,342};
+
+return {
+	on = {
+		devices = idxdevicestable,
+		httpResponses = { RES_RASPMATIC }
+	},
+	execute = function(domoticz, item)
+
+        -- Device changes a setpoint	    
+	    if (item.isDevice) then
+	        local device = domoticz.devices(item.id)
+    	    local setpoint = device.setPoint;
+    		domoticz.log(string.format('Device %s new setpoint %.0f (%s)', device.name, device.setPoint, device.description), domoticz.LOG_INFO)
+            -- Read and convert the JSON description to a table
+            local jsondesc = domoticz.utils.fromJSON(device.description)
+            -- Get the raspmatic datapoint d for the device setup
+    		local iseid = jsondesc.iseid 
+    		-- Build the url to set the new setpoint in raspmatic
+    		-- Replace the placeholders with the id and newvalue
+    		local url = URL_RASPMATIC:gsub("#ISEID#", iseid):gsub("#NEWVALUE#",setpoint)
+    		domoticz.log(url)
+    		domoticz.openURL({ url = url, method = 'POST', callback = RES_RASPMATIC })
+    	end
+    	-- 
+		if (item.isHTTPResponse) then
+			if (item.ok and item.callback == RES_RASPMATIC ) then
+				-- domoticz.log(item.data, domoticz.LOG_INFO)
+			else
+				domoticz.log(string.format('Problem handling the request: %s',url), domoticz.LOG_ERROR)
+				domoticz.log(item.data, domoticz.LOG_ERROR)
+			end
+
+		end
+		
+		
+		
+	end
+}

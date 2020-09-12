@@ -1,0 +1,36 @@
+--[[
+raspmatic_thermostat_sync.dzvents
+Project: domoticz-homeautomation-workbook
+Sync the domoticz thermostat setpoint with the raspberrymatic thermostat setpoint.
+The event is triggered by raspmatic setpoint change program.
+2020-09-07 17:52:45.286 Status: dzVents: Info: ------ Start internal script: raspmatic_thermostat_sync: Custom event: "raspmatic_thermostat_sync"
+2020-09-07 17:52:45.287 Status: dzVents: Info: {["setpoint"]=22.0, ["idx"]=342, ["sync"]=1, ["id"]=3489, ["temperature"]=22.0}
+2020-09-07 17:52:45.302 Status: dzVents: Info: Thermostat Heizung Dusche synced to 22.00.
+2020-09-07 17:52:45.302 Status: dzVents: Info: ------ Finished raspmatic_thermostat_sync
+20200907 rwbl
+]]--
+
+local CUSTOMEVENT_NAME = "raspmatic_thermostat_sync"
+
+return {
+	on = {
+		customEvents = {
+			CUSTOMEVENT_NAME
+		}
+	},
+	data = {},
+	logging = {},
+	execute = function(domoticz, item)
+		if (item.isCustomEvent) then
+		    -- {["setpoint"]=23.0, ["temperature"]=22.1, ["sync"]=1, ["id"]=3489, ["idx"]=342}
+            domoticz.log(item.data);
+            if item.data.sync == 1 then
+                domoticz.devices(item.data.idx).updateSetPoint(item.data.setpoint).silent()
+                domoticz.log(string.format("Thermostat %s synced to %.2f.", domoticz.devices(item.data.idx).name, item.data.setpoint))
+            end
+		else
+			-- second parameter can be anything, number, string, boolean or table
+			-- domoticz.emitEvent('MyEvent', 'Some data')
+		end
+	end
+}

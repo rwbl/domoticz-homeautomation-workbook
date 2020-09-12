@@ -1,0 +1,69 @@
+--[[
+    somfy_control.dzvents
+    Controlling somfy devices by timer and group.
+    Timer: Open wz group = 2 devices middle + right
+    Device: Handle selector switch for wz group which controls 2 devices middle + right
+    20200908 rwbl
+]]--
+
+local IDX_SOMFY_WZ_GROUP = 335          -- middle + right
+local IDX_SOMFY_WZ_LEFT = 319
+local IDX_SOMFY_WZ_MIDDLE = 320
+local IDX_SOMFY_WZ_RIGHT = 321
+local IDX_SOMFY_SZ = 13
+
+local TIMER_RULE_WZ_GROUP_MORNING = 'at 07:00'
+local TIMER_RULE_WZ_GROUP_EVENING = 'at 22:00'
+
+return {
+	on = {
+	    timer = { TIMER_RULE_WZ_GROUP_MORNING, TIMER_RULE_WZ_GROUP_MORNING },
+		devices = { IDX_SOMFY_WZ_GROUP, }
+	},
+	execute = function(domoticz, item)
+
+        -- Control WZ_GROUP	    
+	    if (item.isTimer) then
+            if item.trigger == TIMER_RULE_WZ_GROUP_MORNING then
+        		domoticz.log(string.format('Somfy Timer: %s', item.trigger), domoticz.LOG_INFO)
+                domoticz.devices(IDX_SOMFY_WZ_MIDDLE).switchOff()
+                domoticz.devices(IDX_SOMFY_WZ_RIGHT).switchOff()
+            end
+            if item.trigger == TIMER_RULE_WZ_GROUP_EVENING then
+        		domoticz.log(string.format('Somfy Timer: %s', item.trigger), domoticz.LOG_INFO)
+            end
+        end
+
+	    if (item.isDevice) then
+	        local device = domoticz.devices(item.idx)
+    		domoticz.log(string.format('Device changed: %s, nValue=%d, sValue=%s, state=%s, level=%d', device.name, device.nValue, device.sValue, device.state, device.level), domoticz.LOG_INFO)
+	       -- Groups
+	       if item.id == IDX_SOMFY_WZ_GROUP then
+	           -- Device changed: Rolladen WZ Group, nValue=2, sValue=Open, state=Open, level=10
+	           -- Device changed: Rolladen WZ Group, nValue=2, sValue=Stop, state=Stop, level=20
+	           -- Device changed: Rolladen WZ Group, nValue=2, sValue=Close, state=Close, level=30
+         		domoticz.log(string.format('Handling WZ Group: %s %d, %s %d', 
+        		    domoticz.devices(IDX_SOMFY_WZ_MIDDLE).name, 
+        		    domoticz.devices(IDX_SOMFY_WZ_MIDDLE).idx, 
+        		    domoticz.devices(IDX_SOMFY_WZ_RIGHT).name, 
+        		    domoticz.devices(IDX_SOMFY_WZ_RIGHT).idx), 
+        		domoticz.LOG_INFO)
+               if device.state == "Open" then
+                    domoticz.log("OPEN")
+                    domoticz.devices(IDX_SOMFY_WZ_MIDDLE).switchOff()
+                    domoticz.devices(IDX_SOMFY_WZ_RIGHT).switchOff()
+                end
+                if device.state == "Stop" then
+                    domoticz.log("STOP")
+                    domoticz.devices(IDX_SOMFY_WZ_MIDDLE).stop()
+                    domoticz.devices(IDX_SOMFY_WZ_RIGHT).stop()
+                end
+                if device.state == "Close" then
+                    domoticz.log("CLOSE")
+                    domoticz.devices(IDX_SOMFY_WZ_MIDDLE).switchOn()
+                    domoticz.devices(IDX_SOMFY_WZ_RIGHT).switchOn()
+                end
+	       end
+	    end
+	end
+}

@@ -1,0 +1,39 @@
+--[[
+raspmatic_thermostat_onoff.dzvents
+Project: domoticz-homeautomation-workbook
+Switch a thermostat on or off triggered by the web ui quick access mobile (qam) buttons on or off for a selected thermostat.
+The data key (provided by qam) is in json format: {["idx"]=NNN, ["state"]=0|1}. state 0=off,1=on.
+The setpoint values for on or off are defined by two uservariables.
+Changing the domoticz device setpoint triggers updating the raspberrymatic thermostat via the event raspmatic_thermostat_setsetpoint.
+20200908 rwbl
+]]--
+
+local CUSTOMEVENT_NAME = "raspmatic_thermostat_onoff"
+
+local IDX_DEF_THERMOSTAT_ON = 21;   -- 23°C
+local IDX_DEF_THERMOSTAT_OFF = 22;  -- 5°C
+
+return {
+	on = {
+		customEvents = {
+			CUSTOMEVENT_NAME
+		}
+	},
+	data = {},
+	logging = {},
+	execute = function(domoticz, item)
+		if (item.isCustomEvent) then
+		    -- {["idx"]=336, ["state"]=0}
+            domoticz.log(item.data);
+            -- Init the setpoint state on with setpoint value defined by user variable
+            local setpoint = domoticz.variables(IDX_DEF_THERMOSTAT_ON).value;
+            -- Set setpoint to off value 
+            if item.data.state == 0 then
+                setpoint = domoticz.variables(IDX_DEF_THERMOSTAT_OFF).value;
+            end
+            -- Update the domoticz device setpoint which triggers updating raspberrymatic via the event raspmatic_thermostat_setsetpoint
+            domoticz.devices(item.data.idx).updateSetPoint(setpoint)
+            domoticz.log(string.format("Thermostat %s setpoint changed to %.2f.", domoticz.devices(item.data.idx).name, setpoint))
+		end
+	end
+}

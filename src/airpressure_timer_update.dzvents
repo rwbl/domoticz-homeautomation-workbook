@@ -1,0 +1,56 @@
+--[[
+    airpressure_timer_update.dzvents
+    Timer trigger to update the Virtual Sensor Barometer named Air Pressure (idx=116) from the BME280 device (idx=115) property barometer.
+    The BME280 is connected to the Domoticz Production system GPIO and is placed in the server room.
+    Device trigger NOT USED because running rather often (n times/minute).
+    Hint: Use print(device.dump()) ONLY ONCE to get the device properties.
+    Domoticz log entry when the BMR280 hardware starts:
+    2020-09-08 11:47:08.979 Status: I2C Start HW witf ID: 13 Name: I2C_BME280 Address: 0 Port: /dev/i2c-1 Invert:0
+    2020-09-08 11:47:08.979 Status: I2C_BME280: Worker started...   
+    20200908 rwbl
+]]--
+
+-- Idx of the devices
+-- Idx,Hardware,Name,Type,SubType,Data
+-- 115, BME280, Server Room, Temp + Humidity + Baro, Weather Station, 20.9 C, 58 %, 1021.0 hPa
+local IDX_BME280 = 115;
+-- 116,VirtualSensors, Luftdruck, General, Barometer, 1021 hPa
+local IDX_AIRPRESSURE = 116;
+local DEF_BME280_COMPENSATION = 0
+
+-- Event handling changes of the BME280 device
+return {
+	on = {
+	    timer = {
+	        'every 15 minutes'
+	        -- 'every minute'  -- for tests
+        }, 
+	},
+	execute = function(domoticz, item)
+        -- print(domoticz.devices(IDX_BME280).dump())
+        -- Get the airpressure
+        local airpressure = domoticz.devices(IDX_BME280).barometer;
+        -- Round the pressure
+		airpressure = math.floor(airpressure) + DEF_BME280_COMPENSATION
+        -- Get the forcast
+        local forecastString = string.upper(domoticz.devices(IDX_BME280).forecastString);
+		domoticz.log(string.format('1=Device %s updated:%.0f %s', domoticz.devices(IDX_BME280).name, airpressure, forecastString), domoticz.LOG_INFO)
+
+		-- Forecast from the BMP device to the Barometer device
+		-- See source code RFXNames.cpp, BMP_Forecast_Desc
+        -- Map the BMP_Forecase_Desc string to dzEvents Forecast value:
+        -- domoticz.BARO_STABLE, BARO_SUNNY, BARO_CLOUDY, BARO_UNSTABLE, BARO_THUNDERSTORM
+        local forecast = "UNKNOWN"
+	    if (forecastString == 'CLOUDY') then forecast = domoticz.BARO_CLOUDY end
+	    if (forecastString == 'CLOUDY/RAIN') then forecast = domoticz.BARO_CLOUDY end
+		if (forecastString == 'STABLE') then forecast = domoticz.BARO_STABLE end
+        if (forecastString == 'SUNNY') then forecast = domoticz.BARO_SUNNY end
+	    if (forecastString == 'THUNDERSTORM') then forecast = domoticz.BARO_THUNDERSTORM end
+	    if (forecastString == 'UNKNOWN') then forecast = domoticz.BARO_STABLE end
+	    if (forecastString == 'UNSTABLE') then forecast = domoticz.BARO_UNSTABLE end
+
+        -- Update the virtual sensor Luftdruck
+		domoticz.devices(IDX_AIRPRESSURE).updateBarometer(airpressure, forecast)
+		domoticz.log(string.format('2=Device %s updated:%.0f %s', domoticz.devices(IDX_BME280).name, airpressure, forecast), domoticz.LOG_INFO)
+	end
+}

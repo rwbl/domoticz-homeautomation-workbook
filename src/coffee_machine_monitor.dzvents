@@ -1,0 +1,59 @@
+--[[
+    coffee_machine_monitor.dzvents
+    Monitors the electric usage actualWatt between timeframe (see local MONITOR_START_END).
+    If > Threshold (defined as user variable type Integer) then the cofee machine is turned on.
+    The coffee machine stays on for 2 hours, then switches off.
+    Update the alert message with switch off time.
+    Note: alertlevel orange is used (3). if the uservar th_alerttoemail is set to 3 then an email is sent if electricusage threshold is reached.
+    20200910 rwbl
+]]--
+
+-- Idx of the device kWh
+local IDX_ELECTRICUSAGEHOUSE = 171
+-- Idx of the user variable for the threshold (as integer)
+local IDX_TH_COFFEEMACHINEMONITOR = 15
+-- Monitor the actualWatt between 7 and 9 if above threshold
+local MONITOR_START_END = 'at 07:00-09:00'
+
+return {
+	on = {
+	    timer = { 
+	        MONITOR_START_END 
+	    },
+    },
+	data = {
+	    -- set a flag if already notified within timeframe
+	    notified = { initial = 0 }
+    },
+	execute = function(domoticz, item)
+        domoticz.log(string.format('Coffee Machine = Notified: %d, Actual: %02.0f, Threshold: %d', 
+            domoticz.data.notified,
+            domoticz.devices(IDX_ELECTRICUSAGEHOUSE).actualWatt,
+            domoticz.variables(IDX_TH_COFFEEMACHINEMONITOR).value))
+        
+        -- Check if below threshold and notified flag set
+        -- Action: reset notified flag
+        if (domoticz.devices(IDX_ELECTRICUSAGEHOUSE).actualWatt < domoticz.variables(IDX_TH_COFFEEMACHINEMONITOR).value) and (domoticz.data.notified == 1) then
+            domoticz.data.notified = 0
+        end
+
+        -- Check if above threshold and notified flag not set
+        -- Action: set notified flag anf alert message
+        if (domoticz.devices(IDX_ELECTRICUSAGEHOUSE).WhActual > domoticz.variables(IDX_TH_COFFEEMACHINEMONITOR).value) and (domoticz.data.notified == 0) then
+            -- set notified flag
+            domoticz.data.notified = 1
+            -- get the time on and log
+    	    local timeon = os.date("*t")
+    	    local message = ('Kaffeemaschine AN um %02d:%02d'):format(timeon.hour, timeon.min)
+            domoticz.log(message, domoticz.LOG_INFO)
+            -- calculate the time off = timeon + 2 hours
+            local timeoff = os.date("*t", os.time() + 2*60*60)
+            -- define message to notify the time coffee machine switches off
+            message = ('Kaffeemaschine AUS um %02d:%02d'):format(timeoff.hour, timeoff.min)
+            -- update alert message
+            domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_ORANGE, message)
+            domoticz.log(message, domoticz.LOG_INFO)
+        end
+
+    end
+}

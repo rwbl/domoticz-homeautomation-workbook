@@ -1,0 +1,142 @@
+--[[
+    keydates_update.dzvents
+    Update the key date devices sorted by days-to-go (srting lowest).
+    The keydates are defined in external file keydates.json.
+    Location example RPi: '/home/pi/domoticz/scripts/dzVents/scripts/keydates.json'
+    The JSON holds an array with N keydates.
+    The key:value pairs are:
+    name = name of the key date which is set as name for the device with idx
+    idx= idx of the keydate device type general, alert (virtual sensor) [OPTIONAL]
+    date = array of dates in format DD-MM-YYYY
+    Example for 3 dates:
+    [
+    {"name": "KeyDate1","idx": NNN,"dates": ["09-01-2020","23-12-2020"]},
+    {"name": "KeyDate2","idx": NNN,"dates": ["09-01-2021","23-12-2021"]},
+    {"name": "KeyDate3","idx": NNN,"dates": ["09-10-2021","20-12-2022"]}
+    ]
+    The key dates are updated once per day at 0015.
+    Th idx is optional if the devices are sorted depending days-to-go value.
+    DEVICE SORT & UPDATE
+    The key dates device idx must defined in order, i.e. 325 to 331 for 7 devices.
+    After parsing the JSON file with the key dates, the devices are sorted descending starting with the lowest days-to-go value.
+    The sorted devices are then assigned to the key dates devices idx, i.e. the devices is renamed.
+    Example: After JSON parse, idx assigned based on days to go. Device 331 is renamed to Biomüll Pi etc.
+    331:0=Biomüll Pi#03-09-2020 (Heute)
+    330:7=Restabfall Pi#10-09-2020 (in 7 Tage)
+    329:8=Gelbe-Tonne Pi#11-09-2020 (in 8 Tage)
+    328:9=Schadstoff Pi#12-09-2020 (in 9 Tage)
+    327:15=Papier Pi#18-09-2020 (in 15 Tage)
+    ...
+    Dependencies: global_data
+    20200903 rwbl
+]]--
+
+-- Logging marker
+local LM_KEYDATES_UPDATE = 'Keydates Update'
+-- Path keydates file json format
+local KEYDATES_FILE = '/home/pi/domoticz/scripts/dzVents/scripts/keydates.json'
+-- threshold in days difference to notify
+local TH_KEYDATE = 1
+-- Msg no keydates
+local MSG_NOKEYDATE = 'Kein neuer Termin'
+-- Idx used squentially
+local IDX_KEYDATES_START = 331 -- down to 325 for 7 devices as defined by DEF_KEY_DATES_COUNT
+local DEF_KEYDATES_COUNT = 7
+-- Table for the device entries which will be sorted by key daystogo
+local deviceTable = {}
+
+-- Helper Functions
+local function readFile(f)
+    local file = io.open (f, 'r') -- open file in read mode
+    local data =  file:read('*a')  -- read all
+    file:close()
+    return data
+end    
+
+-- Set a new name for the alert device
+local function renameDevice(domoticz, idx, name)
+   local newname = domoticz.utils.urlEncode(name)
+   local urlRequest =      
+       string.format("http://127.0.0.1:8080/json.htm?type=setused&idx=%d&used=true&name=%s", idx, newname)
+   domoticz.openURL({url = urlRequest}).afterSec(0.1)
+end
+
+-- Set a key date from the dates array containing dates in format DD-MM-YYYY
+local function setKeyDate(domoticz, keydata)
+    -- define the device record to be added to the table
+    -- flag to check if a keydate has been found
+    local datefound = 0
+    -- Loop over the dates and build the deviceRecord to be added to the table
+    local deviceRecord = {}
+    deviceRecord.name=keydata.name
+    for index, keydate in ipairs(keydata.dates) do 
+        -- split the keydate into an array with 3 entries day, month, year (D,M,Y)
+        local keydatesplit = domoticz.helpers.split(keydate, "-")
+        -- calculate the daysdiff between now and the keydate and assign to daystogo
+        local datediff = domoticz.helpers.datediffnow(keydatesplit[1], keydatesplit[2], keydatesplit[3])
+        -- check if daysdiff => 0 and the date is not found
+        if datediff >= 0 and datefound == 0 then
+            datefound = 1
+            deviceRecord.daystogo = datediff
+            -- define the alert level & message
+            if datediff == 0 then
+                deviceRecord.message = string.format('%s (%s)', keydate, 'Heute')
+                deviceRecord.alertlevel = domoticz.ALERTLEVEL_RED
+            end
+            if datediff == 1 then 
+                deviceRecord.message = string.format('%s (%s)', keydate, 'Morgen') 
+                deviceRecord.alertlevel = domoticz.ALERTLEVEL_YELLOW
+            end
+            if datediff > 1 then 
+                deviceRecord.message = string.format('%s (in %d Tage)', keydate, datediff) 
+                deviceRecord.alertlevel = domoticz.ALERTLEVEL_GREEN
+            end
+        end
+    end -- for
+    -- check if a keydate has been found, if not then set no date found message
+    if datefound == 0 then 
+        deviceRecord.daystogo = 99999
+        deviceRecord.message = MSG_NOKEYDATE
+        deviceRecord.alertlevel = domoticz.ALERTLEVEL_GRAY
+    end
+    table.insert(deviceTable, deviceRecord)
+end
+
+return {
+	on = {
+	    timer = { 
+	        'at 00:15'
+	        -- 'every minute'  -- for tests
+        },
+	},
+    logging = {  
+        level = domoticz.LOG_INFO,
+        marker = LM_KEYDATES_UPDATE,
+    },
+
+	execute = function(domoticz, item)
+        -- Read and convert the JSON file to a table
+        local keydatesJSON = domoticz.utils.fromJSON(readFile(KEYDATES_FILE))
+        -- domoticz.log(string.format('Key Date Entries: %d', #keydatesJSON), domoticz.LOG_INFO)
+
+        -- Loop over the keydates and build the table array deviceTable
+        for key, keydata in ipairs(keydatesJSON) do
+            setKeyDate(domoticz, keydata)
+        end
+
+        -- Sort the deviceTable ascending by daystogo
+        table.sort(deviceTable, function(a,b) return a.daystogo < b.daystogo end)
+        
+        -- Loop over te deviceTable and update the devices starting with IDX_KEYDATES_START
+        local idx = 0
+        for i, device in ipairs(deviceTable) do
+            idx = IDX_KEYDATES_START - i + 1
+            domoticz.log(idx .. ':' .. device.daystogo .. '=' .. device.name .. '#' .. device.message)
+            -- update the device alertlevel & text with the new date message
+            domoticz.devices(idx).updateAlertSensor(device.alertlevel, device.message)
+            -- update the device name
+            renameDevice(domoticz, idx, device.name)
+        end
+        
+	end
+}

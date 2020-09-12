@@ -1,0 +1,49 @@
+! Function: Quick Access Mobile
+! If the setpoint of a thermostat gets updated, update the corresponding domoticz thermostat silent (no active setpoint change).
+! Via cuxd an http api request for a customevent is submitted to domoticz.
+! Custom event data parameter must be in json format.
+! Note: Use http://ccu-ip/config/xmlapi/statelist.cgi to get device iseid and datapoints.
+! The thermostat trigger is value > 4.5 when updated
+! 20200907 rwbl
+
+string cAmp = "&";
+! Domoticz system url base for the http api request
+string urlBase = "'http://192.168.1.60:8080/json.htm"; ! Production
+! string urlBase = "'http://192.168.1.179:8080/json.htm"; ! Development
+string customEvent = "raspmatic_thermostat_sync";
+
+string deviceID = "UNKNOWN";    ! 1541
+string setPoint = "";           ! 20.5
+string actTemperature = "";     ! 20.3
+string deviceIdx = "UNKNOWN";   ! 336
+string syncState = "1";         ! must be 1 for silent update in domoticz
+
+! Get the object datapoint of the thermostat which setpoint is updated
+object objDatapoint = dom.GetObject ("$src$");
+if (objDatapoint) {
+  if (objDatapoint.Value()) {
+    object objChannel = dom.GetObject (objDatapoint.Channel());
+    deviceID = objChannel.Device(); 
+    setPoint = objChannel.DPByHssDP("SET_POINT_TEMPERATURE").Value();
+    actTemperature = objChannel.DPByHssDP("ACTUAL_TEMPERATURE").Value();
+  }
+}
+
+! Map the raspmatic thermostat datapoint to the domoticz idx
+if (deviceID == "3489") { deviceIdx = 342; }  ! Dusche
+if (deviceID == "3435") { deviceIdx = 341; }  ! Bad
+if (deviceID == "3691") { deviceIdx = 340; }  ! Flur
+if (deviceID == "3375") { deviceIdx = 339; }  ! Wohnzimmer-2
+if (deviceID == "3543") { deviceIdx = 338; }  ! Wohnzimmer-1
+if (deviceID == "3637") { deviceIdx = 337; }  ! Esszimmer
+if (deviceID == "1541") { deviceIdx = 336; }  ! MakeLab
+
+! Custom event data parameter must be in json format
+string data = '{"id":'#deviceID#',"idx":'#deviceIdx#',"setpoint":'#setPoint#',"temperature":'#actTemperature#',"sync":'#syncState#'}';
+
+! Build the Domoticz http rest request url to update the device usig customevent
+string urlRequest = urlBase#"?type=command"#cAmp#"param=customevent"#cAmp#"event="#customEvent#cAmp#"data="#data#"'";
+WriteLine(urlRequest);
+
+! Run the command without a return result
+cmdRes = dom.GetObject("CUxD.CUX2801001:1.CMD_EXEC").State("wget -q -O - "#urlRequest);

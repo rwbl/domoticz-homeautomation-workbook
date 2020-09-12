@@ -1,0 +1,27 @@
+--[[
+garage_door_check.dzvents
+Check daily at 2000, if the garagedoor is closed. Send email notification if open.
+20200820 rwbl
+--]]
+
+local IDX_GARAGEDOOR_ALERT = 324
+local DOOROPEN_STATE = 4    -- alert level 4 red
+
+return {
+	on = {
+		timer = {
+			'at 20:00',	
+		}
+	},
+	execute = function(domoticz, timer)
+		domoticz.log('Timer event was triggered by ' .. timer.trigger, domoticz.LOG_INFO)
+		
+		-- Get state garagedoor alert device
+		local state = domoticz.devices(IDX_GARAGEDOOR_ALERT).nValue
+		if (state == DOOROPEN_STATE) then
+		    domoticz.log("Garagedoor is open. Please Close...")
+		    -- subject,message,mailto
+		    domoticz.email('Garagentor', 'Das Garagentor is noch offen. Bitte umgehend schließen.', 'rwblinn@outlook.de;utelinn@aol.com')
+        end
+	end
+}

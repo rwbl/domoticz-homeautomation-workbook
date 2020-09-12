@@ -1,0 +1,35 @@
+--[[
+    daylight_info.dzvents
+    Display the day-month sunrise and sunset time plus daylength (hours) in a virtual text sensor:
+    10-09 06:32 - 20:08 (13:36)
+    Updated once a day.
+    20200909 rwbl
+]]--
+
+-- Domoticz devices
+-- Idx, Hardware, Name, Type, SubType, Data
+-- 121, VirtualSensors, Tageslicht (Std), General, Text, 10-09 06:31 - 20:13 (13:42)
+local IDX_DAYLIGHTINFO = 121
+
+return {
+    -- active = true,
+    on = {
+        timer = { 
+            'at 01:00' 
+            -- 'every minute'   -- TESTS
+            }
+    },
+    execute = function(domoticz, timer)
+        -- Calculate the daylength
+        local daylength = domoticz.time.sunsetInMinutes - domoticz.time.sunriseInMinutes
+        -- Define the text msg: HH:MM -- HH:MM (HH:MM)
+        local msg = string.format("%s %s - %s (%s)", 
+            domoticz.helpers.isnowdateddmm(domoticz),
+            domoticz.helpers.minutestoclock(domoticz.time.sunriseInMinutes),
+            domoticz.helpers.minutestoclock(domoticz.time.sunsetInMinutes),
+            domoticz.helpers.minutestoclock(daylength))
+        -- Update the device
+        domoticz.devices(IDX_DAYLIGHTINFO).updateText(msg)
+        domoticz.log(msg)
+    end
+}

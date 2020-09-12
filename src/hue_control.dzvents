@@ -1,0 +1,29 @@
+--[[
+    hue_control.dzvents
+    Timer: Switch the hue lights of wz group on and off at specific times
+    20200908 rwbl
+]]--
+
+local IDX_HUE_WZ_GROUP = 332
+
+local TIMER_RULE_WZ_GROUP_ON = '5 minutes after sunset'    -- 'at 07:00';
+local TIMER_RULE_WZ_GROUP_OFF = 'at 23:00'                  -- 'at 23:00';
+
+return {
+	on = {
+	    timer = { TIMER_RULE_WZ_GROUP_ON, TIMER_RULE_WZ_GROUP_OFF },
+	},
+	execute = function(domoticz, item)
+	    
+	    if (item.isTimer) then
+            if item.trigger == TIMER_RULE_WZ_GROUP_ON then
+        		domoticz.log(string.format('Hue Timer: %s', item.trigger), domoticz.LOG_INFO)
+                domoticz.devices(IDX_HUE_WZ_GROUP).switchOn()
+            end
+            if item.trigger == TIMER_RULE_WZ_GROUP_OFF then
+        		domoticz.log(string.format('Hue Timer: %s', item.trigger), domoticz.LOG_INFO)
+                domoticz.devices(IDX_HUE_WZ_GROUP).switchOff()
+            end
+        end
+	end
+}
