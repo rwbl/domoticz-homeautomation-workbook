@@ -1,6 +1,6 @@
 # Changelog domoticz-home-automation-workbook
 
-### 202009DD
+### 20200912
 * NEW: Function BME280 Temp+Hum+Baro - Monitor server room Temp+Hum. Baro for air pressure weather. Timer triggered.
 * NEW: Function Garage Door Monitor - Open|Close state provided by Raspberrymatic with Homematic IP SWDM device.
 * NEW: Function Key Dates Calendar JSON - New Concept using JSON showing sorted key dates as Alert devices in a room plan. The previous CSV solution kept for reference.
