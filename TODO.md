@@ -18,7 +18,7 @@ Not started
 ### NEW: Check Device Battery State Regulary
 Check the state of all devices with batteries and send notification in case low.
 Automation event dzVents trigger by timer daily.
-Thoughts to loop over all devices: dzVents (domoticz.devices() table, http job or just use the default Domoticz function (low battery value with notification, see settings)
+Thoughts to loop over all devices: dzVents (tabel entries from domoticz.devices().forEach()), http job or just use the default Domoticz function (low battery value with notification, see settings)
 #### Status
 Not started
 
