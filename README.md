@@ -15,13 +15,12 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 * Source code for scripts, flows & apps not fully shared or have changed - check the GitHub _src_ folder for latest sources.
 * Automation events developed as dzVents Lua script events.
 * Domoticz Hardware Plugin development in Python.
-* Custom pages with JavaScript.
+* Custom User Interface & Pages with HTML & JavaScript (using jQuery & Bootstrap).
 * Some of the functions make initially use of Node-RED flows - but target is to replace by dzVents Lua scripts if possible.
 * Functions that have been replaced by another solution are kept in this document as reference – could be of use.
 * Screenshots might not be updated as functionality is evolving.
 * To-do’s are tagged with <TODO> - The To-do list, with prefix, i.e. NEW, UPD …, are captured in the file TODO.md.
-* Device names and other are in cases in German as the Domoticz system is used in Germany.
-Abbreviations: GUI = Domoticz UI in browser, HmIP = homematicIP,
+* Device names and other information are in cases in German language as the Domoticz system is used in Germany.
 
 ### Functions
 (full list see the workbook)
@@ -29,8 +28,8 @@ Abbreviations: GUI = Domoticz UI in browser, HmIP = homematicIP,
 * Ambient light (from ESP8266 running ESP Easy) with threshold.
 * Charts for selective weather items, room temperature & humidity.
 * Climate Environment - UV Index & Category, Pollen Index.
-* Coffee machine monitor – start and end time, info message.
-* Control Somfy roller shutters with RTS motors in rooms.
+* Coffee machine monitor – start and end time, alert message.
+* Control Somfy roller shutters & blinds with RTS motors in several rooms.
 * Control Volumio music player whilst listening to web radio.
 * Custom icons.
 * Custom Pages - simple to more complex examples.
@@ -59,25 +58,25 @@ Abbreviations: GUI = Domoticz UI in browser, HmIP = homematicIP,
 * Time Control to track & control the time spent in hours, per activity block (with start- & end-time) and total/day, on a generic task.
 * Timers for single devices or complex tasks (Automation events dzVents).
 * Web UI Quick Access Mobile - customized web frontend to control dedicated functions mainly accessed from mobile smartphones devices.
-* Web App Site Control [Info](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Not developed further as eplaced by Web UI Quick Access Mobile).
+* Web App Site Control [Info](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Note: Not developed further as replaced by Web UI Quick Access Mobile).
 
-### Explore How To Use
+### Explore
 * Domoticz running on a Raspberry Pi (setup, configure).
 * Scripting Python, Lua, dzVents, JavaScript.
 * Python Plugin Development.
-* HTTP JSON/API interaction.
+* Handling HTTP JSON/API requests.
 * MQTT messaging.
-* Node-RED as an alternative Script Engine and User Interface.
-* SQLite3.
-* ESP8266.
-* ESP Easy for sensors.
+* SQLite3 to understand the Domoticz database structure and to query.
+* Connecting & communicating with microcontroller Arduino, ESP8266 and other.
+* Integrate ESP Easy with various sensors.
 * Raspberry Pi GPIO libraries RPi.GPIO and GPIOZero - CLI, Device Actions, Automation Events, Plugins.
-* RFXCOM RFXtrx433E USB RF Transceiver for Temperature & Humidity devices, External Wind device (only for RFXCOM tests), Other 433Mhz devices, i.e. door & window contacts.
+* RFXCOM RFXtrx433E USB RF Transceiver with various devices, i.e. Temperature & Humidity, Wind, Door & Window contacts, Switches.
 * Philips Hue Light Control.
-* Homematic IP using RaspberryMatic CCU3 and integrate into Domoticz.
-* External services.
+* Homematic IP using RaspberryMatic CCU3 and integrate into Domoticz with devices like thermostats, energy measurement, switches, contacts.
+* Tinkerforge Building Blocks.
 * Domoticz Android App (native client, to be determined).
-* Advanced User Interfaces, i.e. Custom Webpages, Node-RED, Bootstrap …
+* Advanced User Interfaces, i.e. Customized User Interface, Custom Webpages, Node-RED, Bootstrap, jQuery.
+* External services.
 
 ### Credits
 To the developers of Domoticz and to all sharing information about Domoticz. Without these, it would not be possible to build this project and write this workbook.
@@ -87,5 +86,5 @@ THIS DOCUMENT IS PROVIDED BY THE AUTHOR “AS IS” AND ANY EXPRESS OR IMPLIED W
 OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, 
 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
 OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
-TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS DOCUMENT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
 DAMAGE.
