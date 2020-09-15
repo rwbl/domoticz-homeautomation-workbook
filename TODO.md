@@ -4,21 +4,21 @@ Status: 20200817
 ### NEW: Domoticz Workbook Wiki
 The workbook is rather growing. The PDF document has reached in the meantime about 530 pages. 
 Considering to create a wiki and publish changes adhoc, instead publishing the PDF document with sources.
-Exploring how to do best without the use of a dedicated homepage.
+Exploring how to do best without the use of a dedicated homepage, i.e. export the PDF document & automatic creation of GitHub pages.
 #### Status
 Not started
 
 ### NEW: Explore Domoticz Standalone
 Setup a Domoticz system on a Raspberry Pi without Internet connection.
 Use the system to control sensors & actuators.
-Idea: RPi to control an Arduino.
+Idea: RPi to control an Arduino or modell railroad.
 #### Status
 Not started
 
 ### NEW: Check Device Battery State Regulary
 Check the state of all devices with batteries and send notification in case low.
 Automation event dzVents trigger by timer daily.
-Thoughts to loop over all devices: http job or ???
+Thoughts to loop over all devices: dzVents (domoticz.devices() table, http job or just use the default Domoticz function (low battery value with notification, see settings)
 #### Status
 Not started
 
