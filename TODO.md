@@ -6,11 +6,11 @@ A Domoticz Custom User Interface, accessible from any browser, as a responsive, 
 An initial solution has been described in the function "Web UI Quick Access Mobile", but in the mean time developed further.
 Create a dedicated GitHub repository "domoticz_quick_access_mobile".
 #### Status
-[Completed](https://github.com/rwbl/domoticz_quick_access_mobile).
+[Completed](https://github.com/rwbl/domoticz_quick_access_mobile)
 
 ### NEW: Remote Control Functions Frequently Used
 Remote control frequently used functions, i.e. blinds, lights.
-Basically the use is like the app "Domoticz Quick Access Mobile" as previously mentioned.
+Basically the use is like the app [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz_quick_access_mobile).
 
 **Solution**
 
@@ -24,7 +24,7 @@ Level = 30 - Somfy Group switch command level 10 (Open), 20 (Stop), 30 (Close)
 http://domoticz-ip:8080/json.htm?type=command&param=switchlight&idx=335&switchcmd=Set%20Level&level=30
 ```
 _Notes_
-Button 2 could open the blinds. Button 3 switch lights living on. Etc.
+Button 2 could open the blinds, button 3 switch lights living on and more ...
 #### Status
 Remote control ordered.
 
