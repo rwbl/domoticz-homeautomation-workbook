@@ -4,35 +4,31 @@ Status: 20201008
 ### NEW: Domoticz Quick Access Mobile GitHub Repository
 A Domoticz Custom User Interface, accessible from any browser, as a responsive, mobile-first front-end.
 An initial solution has been described in the function "Web UI Quick Access Mobile", but in the mean time developed further.
-Make a dedicated GitHub repository "domoticz-quick-access-mobile".
+**Action**: Create a dedicated GitHub repository "domoticz-quick-access-mobile".
 #### Status
-Started to write up the readme and pdf for the solution.
-GitHub Repository not created yet.
+Started to write up the readme and pdf for the solution. The GitHub Repository is not created yet.
 "Domoticz Quick Access Mobile" has become the main app to control the Domoticz Homeautomation & Information system via Android, iOS, Ubuntu, Windows 10 devices.
 
 ### NEW: Remote Control Functions Frequently Used
 Remote control frequently used functions, i.e. blinds, lights.
 Basically the use is like the app "Domoticz Quick Access Mobile" as previously mentioned.
-#Solution#
+**Solution**
 Homematic IP Remote Control (HMIP RC8) with 8 keys controlled via RaspberryMatic script, which communicates with Domoticz devices via HTTP API requests.
 Using Domoticz HTTP API requests ensures to stick to functions defined with the Domoticz devices and related automation events (dzVents Lua).
 __Example__
 Button 1 closes the Living Room Somfy Blinds (Grouped) by submitting HTTP API request.
+```
 Domoticz IDX = 335 - 
 Level = 30 - Somfy Group switch command level 10 (Open), 20 (Stop), 30 (Close)
-```
 http://domoticz-ip:8080/json.htm?type=command&param=switchlight&idx=335&switchcmd=Set%20Level&level=30
 ```
 _Notes_
-Button 2 could open the blinds.
-Button 3 switch lights living on.
-Etc.
+Button 2 could open the blinds. Button 3 switch lights living on. Etc.
 #### Status
 Remote control ordered.
 
 ### NEW: Check Device Battery State Regulary
-Check the state of all devices with batteries and send notification in case battey low at 50%.
-Ideas:
+Check the state of all devices with batteries and send notification in case battey low at 50%. Ideas:
 * Use the default Domoticz function low battery value with notification, see Setup > Settings > Other > Battery Low Level > Set to 50% for tests.
 * Automation event dzVents trigger by timer daily: Loop over all devices: dzVents table entries from domoticz.devices().forEach()
 * Http job requesting status all devices, check property battery
