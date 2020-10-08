@@ -1,5 +1,65 @@
 # ToDo domoticz-home-automation-workbook
-Status: 20200817
+Status: 20201008
+
+### NEW: Domoticz Quick Access Mobile GitHub Repository
+A Domoticz Custom User Interface, accessible from any browser, as a responsive, mobile-first front-end.
+An initial solution has been described in the function "Web UI Quick Access Mobile", but in the mean time developed further.
+Make a dedicated GitHub repository "domoticz-quick-access-mobile".
+#### Status
+Started to write up the readme and pdf for the solution.
+GitHub Repository not created yet.
+"Domoticz Quick Access Mobile" has become the main app to control the Domoticz Homeautomation & Information system via Android, iOS, Ubuntu, Windows 10 devices.
+
+### NEW: Remote Control Functions Frequently Used
+Remote control frequently used functions, i.e. blinds, lights.
+Basically the use is like the app "Domoticz Quick Access Mobile" as previously mentioned.
+#Solution#
+Homematic IP Remote Control (HMIP RC8) with 8 keys controlled via RaspberryMatic script, which communicates with Domoticz devices via HTTP API requests.
+Using Domoticz HTTP API requests ensures to stick to functions defined with the Domoticz devices and related automation events (dzVents Lua).
+__Example__
+Button 1 closes the Living Room Somfy Blinds (Grouped) by submitting HTTP API request.
+Domoticz IDX = 335 - 
+Level = 30 - Somfy Group switch command level 10 (Open), 20 (Stop), 30 (Close)
+```
+http://domoticz-ip:8080/json.htm?type=command&param=switchlight&idx=335&switchcmd=Set%20Level&level=30
+```
+_Notes_
+Button 2 could open the blinds.
+Button 3 switch lights living on.
+Etc.
+#### Status
+Remote control ordered.
+
+### NEW: Check Device Battery State Regulary
+Check the state of all devices with batteries and send notification in case battey low at 50%.
+Ideas:
+* Use the default Domoticz function low battery value with notification, see Setup > Settings > Other > Battery Low Level > Set to 50% for tests.
+* Automation event dzVents trigger by timer daily: Loop over all devices: dzVents table entries from domoticz.devices().forEach()
+* Http job requesting status all devices, check property battery
+#### Status
+Not started
+
+### NEW: Ring Doorbell Monitor
+Monitor the doorbell using a Ring Doorbell 2 device.
+#### Status
+Not started
+
+### NEW: Plugin acting as GPIO Middleware
+A GPIO Plugin as an enabler for several function, i.e. acting as kind of "GPIOMiddleware".
+The GPIO has various devices connected, i.e. LED, LCD display, switch, push-button, sensors...
+The GPIOMiddleware is used by various dzVents automation scripts depending function.
+#### Status
+Not started
+
+### UPD: GPIOZero Handle Exceptions
+Improve GPIOZero exception handling as described here: https://gpiozero.readthedocs.io/en/stable/api_exc.html
+#### Status
+Not started
+
+### NEW: Explore Arduino Raspberry Pi communication
+Idea is to use the Arduino for sensors whilst the Domoticz production system focus on running Domoticz & Node-RED.
+#### Status
+Not started
 
 ### NEW: Domoticz Workbook Wiki
 The workbook is rather growing. The PDF document has reached in the meantime about 530 pages. 
@@ -15,42 +75,13 @@ Idea: RPi to control an Arduino or modell railroad.
 #### Status
 Not started
 
-### NEW: Check Device Battery State Regulary
-Check the state of all devices with batteries and send notification in case low.
-Automation event dzVents trigger by timer daily.
-Thoughts to loop over all devices: dzVents (tabel entries from domoticz.devices().forEach()), http job or just use the default Domoticz function (low battery value with notification, see settings)
-#### Status
-Not started
-
-### NEW: Plugin acting as GPIO Middleware
-A GPIO Plugin as an enabler for several function, i.e. acting as kind of "GPIOMiddleware".
-The GPIO has various devices connected, i.e. LED, LCD display, switch, push-button, sensors...
-The GPIOMiddleware is used by various dzVents automation scripts depending function.
-#### Status
-Not started
-
-### NEW: Ring Doorbell Monitor
-Monitor the doorbell using a Ring Doorbell 2 device.
-#### Status
-Not started
-
-### UPD: GPIOZero Handle Exceptions
-Ref:
-https://gpiozero.readthedocs.io/en/stable/api_exc.html
-#### Status
-Not started
-
-### NEW: Explore Arduino Raspberry Pi communication
-#### Status
-Not started
-
 ### NEW: Automation Event Helper domoticz.py for any device
 In folder /home/pi/domoticz/scripts/python, there is a helper Python script domoticz.py.
 There logging functions are giving an arguments error and are therefore modified.
-In addition exploring how to update Domoticz devices other the switches - not found a way yet.
 The modified helper script is called domoticz2.py.
+In addition exploring how to update Domoticz devices other than switches - not found a way yet.
 #### Status
-Logging modified
+Logging modified. Script called domoticz2.py.
 
 ### NEW: Function Notes Delete Selected Log Entry
 Delete the selected note from the device log history. The note is stored in a text device.
