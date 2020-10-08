@@ -5,10 +5,9 @@ Status: 20201008
 A Domoticz Custom User Interface, accessible from any browser, as a responsive, mobile-first front-end.
 An initial solution has been described in the function "Web UI Quick Access Mobile", but in the mean time developed further.
 
-**Action**: Create a dedicated GitHub repository "domoticz-quick-access-mobile".
+**Action**: Create a dedicated GitHub repository "domoticz_quick_access_mobile".
 #### Status
-Started to write up the readme and pdf for the solution. The GitHub Repository is not created yet.
-"Domoticz Quick Access Mobile" has become the main app to control the Domoticz Homeautomation & Information system via Android, iOS, Ubuntu, Windows 10 devices.
+Completed [Info](https://github.com/rwbl/domoticz_quick_access_mobile).
 
 ### NEW: Remote Control Functions Frequently Used
 Remote control frequently used functions, i.e. blinds, lights.
@@ -31,9 +30,12 @@ Remote control ordered.
 
 ### NEW: Check Device Battery State Regulary
 Check the state of all devices with batteries and send notification in case battey low at 50%. Ideas:
-* Use the default Domoticz function low battery value with notification, see Setup > Settings > Other > Battery Low Level > Set to 50% for tests.
-* Automation event dzVents trigger by timer daily: Loop over all devices: dzVents table entries from domoticz.devices().forEach()
-* Http job requesting status all devices, check property battery
+Use the default Domoticz function low battery value with notification, see Setup > Settings > Other > Battery Low Level > Set to 50% for tests.
+If low, an notification i.e. email is send with subject like "Battery Low: Windmesser (Level: Low)".
+
+Automation event dzVents trigger by timer daily: Loop over all devices: dzVents table entries from domoticz.devices().forEach()
+
+Http job requesting status all devices, check property battery
 #### Status
 Not started
 
