@@ -6,11 +6,11 @@ A Domoticz Custom User Interface, accessible from any browser, as a responsive, 
 An initial solution has been described in the function "Web UI Quick Access Mobile", but in the mean time developed further.
 Create a dedicated GitHub repository "domoticz_quick_access_mobile".
 #### Status
-[Completed](https://github.com/rwbl/domoticz_quick_access_mobile)
+[Completed](https://github.com/rwbl/domoticz-quick-access-mobile)
 
 ### NEW: Remote Control Functions Frequently Used
 Remote control frequently used functions, i.e. blinds, lights.
-Basically the use is like the app [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz_quick_access_mobile).
+Basically the use is like the app [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz-quick-access-mobile).
 
 **Solution**
 
