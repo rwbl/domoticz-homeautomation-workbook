@@ -4,8 +4,7 @@ Status: 20201008
 ### NEW: Domoticz Quick Access Mobile GitHub Repository
 A Domoticz Custom User Interface, accessible from any browser, as a responsive, mobile-first front-end.
 An initial solution has been described in the function "Web UI Quick Access Mobile", but in the mean time developed further.
-
-**Action**: Create a dedicated GitHub repository "domoticz_quick_access_mobile".
+Create a dedicated GitHub repository "domoticz_quick_access_mobile".
 #### Status
 Completed [Info](https://github.com/rwbl/domoticz_quick_access_mobile).
 
@@ -14,6 +13,7 @@ Remote control frequently used functions, i.e. blinds, lights.
 Basically the use is like the app "Domoticz Quick Access Mobile" as previously mentioned.
 
 **Solution**
+
 Homematic IP Remote Control (HMIP RC8) with 8 keys controlled via RaspberryMatic script, which communicates with Domoticz devices via HTTP API requests.
 Using Domoticz HTTP API requests ensures to stick to functions defined with the Domoticz devices and related automation events (dzVents Lua).
 __Example__
