@@ -41,6 +41,7 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 * Hardware Monitor for the Raspberry Pi's used (see HardwareMonitor.zip).
 * HomeMatic (RaspberryMatic) CCU3 integration with variety of devices and plugins [HmIP-eTRV](https://github.com/rwbl/domoticz-plugin-hmip-etrv), [HmIP-PSM](https://github.com/rwbl/domoticz-plugin-hmip-psm).
 * Hue Light controlled via ESP8266 with slide potentiometer & 4-digit-7-segment-display.
+* Indoor Air Quality - Measure in regular intervals, the IAQ Index VOC, assign to a custom sensor (VOC) and set the color of a Hue White & Color Ambiance bulb accordingly.
 * MQTT subscribe & publish messages to trigger actions or information.
 * MQTT Logger (Node-RED)
 * Monitor stock quotes.
@@ -52,13 +53,14 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 * RaspberryMatic DutyCycle monitor.
 * RaspberryMatic Statelist with devices and datapoints (Node-RED).
 * Raspberry Pi system information with charts and threshold email notification.
+* Remote Control via Homematic IP device (HmIP-RC8) for 8 specific functions.
 * Remote Control Domoticz devices using Email client - includes a simple Android test app 
 * Security door & window wireless contact detectors.
 * Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
 * Time Control to track & control the time spent in hours, per activity block (with start- & end-time) and total/day, on a generic task.
 * Timers for single devices or complex tasks (Automation events dzVents).
-* Web UI [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz-quick-access-mobile) - customized web frontend to control dedicated functions mainly accessed from mobile  devices.
-* Web App [Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Note: Not developed further as replaced by Web UI Domoticz Quick Access Mobile).
+* Web UI [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz_quick_access_mobile) - customized web frontend to control dedicated functions mainly accessed from mobile  devices.
+* Web App Site Control [Info](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Note: Not developed further as replaced by Web UI Quick Access Mobile).
 
 ### Explore
 * Domoticz running on a Raspberry Pi (setup, configure).

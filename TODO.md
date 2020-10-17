@@ -1,32 +1,5 @@
 # ToDo domoticz-home-automation-workbook
-Status: 20201008
-
-### NEW: Domoticz Quick Access Mobile GitHub Repository
-A Domoticz Custom User Interface, accessible from any browser, as a responsive, mobile-first front-end.
-An initial solution has been described in the function "Web UI Quick Access Mobile", but in the mean time developed further.
-Create a dedicated GitHub repository "domoticz_quick_access_mobile".
-#### Status
-[Completed](https://github.com/rwbl/domoticz-quick-access-mobile)
-
-### NEW: Remote Control Functions Frequently Used
-Remote control frequently used functions, i.e. blinds, lights.
-Basically the use is like the app [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz-quick-access-mobile).
-
-**Solution**
-
-Homematic IP Remote Control (HMIP RC8) with 8 keys controlled via RaspberryMatic script, which communicates with Domoticz devices via HTTP API requests.
-Using Domoticz HTTP API requests ensures to stick to functions defined with the Domoticz devices and related automation events (dzVents Lua).
-__Example__
-Button 1 closes the Living Room Somfy Blinds (Grouped) by submitting HTTP API request.
-```
-Domoticz IDX = 335 - 
-Level = 30 - Somfy Group switch command level 10 (Open), 20 (Stop), 30 (Close)
-http://domoticz-ip:8080/json.htm?type=command&param=switchlight&idx=335&switchcmd=Set%20Level&level=30
-```
-_Notes_
-Button 2 could open the blinds, button 3 switch lights living on and more ...
-#### Status
-Remote control ordered.
+Status: 20201017
 
 ### NEW: Check Device Battery State Regulary
 Check the state of all devices with batteries and send notification in case battey low at 50%. Ideas:

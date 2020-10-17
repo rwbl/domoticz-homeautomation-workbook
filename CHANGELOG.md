@@ -1,5 +1,15 @@
 # Changelog domoticz-home-automation-workbook
 
+### 20201017
+* NEW: Function Indoor Air Quality - Measure in regular intervals, the IAQ Index VOC, assign to a custom sensor (VOC) and set the color of a Hue White & Color Ambiance bulb accordingly.
+* NEW: Function Philips Hue - Various on how to set the color using color wheel, RGB, change every min for 2 secs.
+* NEW: Function Radiator Thermostat - Solution using Domoticz Thermostat Setpoint device with scripts & automation events (Homematic IP, dzVents Lua, no Python plugins required).
+* NEW: Function Remote Control - Integrated Homematic IP 8 buttons device (HmIP-RC8) connected to RaspberryMatic CCU triggering Automation Event (dzVents) for specific functions.
+* NEW: Explore Events dzVents - Fast Event Less One Minute using HTTP API triggered by Python script with Custom Event dzVents.
+* UPD: Explore RaspberryMatic - Release 3.53.30.20200919.
+* UPD: Various smaller enhancements & corrections.
+* INF: Function Web UI Quick Access Mobile - Not updated further as replaced by dedicated solution [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz_quick_access_mobile). 
+
 ### 20200912
 * NEW: Function BME280 Temp+Hum+Baro - Monitor server room Temp+Hum. Baro for air pressure weather. Timer triggered.
 * NEW: Function Garage Door Monitor - Open|Close state provided by Raspberrymatic with Homematic IP SWDM device.
@@ -14,7 +24,7 @@
 * UPD: Function River Elbe Tide - Converted solution from Node-RED to Automation Event dzVents Lua.
 * UPD: Explore Custom Pages - Reworked chapter & examples; Added hints.
 * UPD: Various smaller enhancements & corrections.
-* INF: Function Air Pressure (BME280) replaced by function BME280 Temp+Hum+Baro.
+* INF: Function Air Pressure (BME280) - Replaced by function BME280 Temp+Hum+Baro.
 
 ### 20200817
 * NEW: Function Climate Environment - UV Index & Category, Pollen Index.
@@ -37,7 +47,7 @@
 ### 20200526
 * NEW: Function Music Player - Control Kodi music player(s) by a single automation event (dzVents Lua) and several virtual sensors.
 * NEW: Function Notes: Export the notes file (JSON format) to local file (text format).
-* NEW: Function Radiator Thermostat - Simple solution using the Domoticz devices Select Switch & Thermostat with a sinle automation event (dzVents Lua, no Python plugins required).
+* NEW: Function Radiator Thermostat - Simple solution using the Domoticz devices Select Switch & Thermostat with a single automation event (dzVents Lua, no Python plugins required).
 * NEW: Explore Kodi Music Player - Explore setting up Kod Music Player and communicate/control by Domoticz
 * NEW: Explore RaspberryMatic - Monitor the CCU Duty Cycle Monitor two separate solutions Node-RED Dashboard and Domoticz Dashboard.
 * UPD: Explore Node-RED - Reworked chapter and the example flows; added new flow Domoticz as Node-RED data logger.
