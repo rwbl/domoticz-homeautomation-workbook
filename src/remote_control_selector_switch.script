@@ -1,0 +1,40 @@
+! Function: Remote Control Selector Switch
+! If a button of the remote control is pressed short, send switch light command with level according utton nr.
+! Via cuxd an http api request is submitted to domoticz.
+! /json.htm?type=command & parameter=switchlight&idx=IDX&switchcmd=Set%20Level&level=LEVEL
+! Note: Use http://ccu-ip/config/xmlapi/statelist.cgi to get device iseid and datapoints.
+! 20201017 rwbl
+
+string cAmp = "&";
+! Domoticz system url base for the http api request
+string urlBase = "'http://domoticz-ip:port/json.htm";
+string datapointID = "0";
+string switchLevel = 0;
+string deviceIdx = 41;
+
+! Get the object datapoint of the remote control
+object objDatapoint = dom.GetObject ("$src$");
+if (objDatapoint) {
+    datapointID = objDatapoint.ID(); 
+}
+! objDatapoint;            ! HmIP-RF.000B1BE98D94DE:1.PRESS_LONG
+! objDatapoint.Channel();  ! 8421 taken from <channel name="HmIP-RC8 000B1BE98D94DE:1" ise_id="8421">
+! objDatapoint.ID();       ! 8422 taken from <datapoint name="HmIP-RF.000B1BE98D94DE:1.PRESS_LONG" ise_id="8422" ...
+
+! Map the raspmatic remote control datapoint to the selector switch level 10-80
+! BUTTON SHORT or BUTTON LONG
+if (datapointID == "8423") { switchLevel = 10; }  ! 8422
+if (datapointID == "8426") { switchLevel = 20; }  ! 8425
+if (datapointID == "8429") { switchLevel = 30; }  ! 8428
+if (datapointID == "8432") { switchLevel = 40; }  ! 8431
+if (datapointID == "8435") { switchLevel = 50; }  ! 8434
+if (datapointID == "8438") { switchLevel = 60; }  ! 8437
+if (datapointID == "8441") { switchLevel = 70; }  ! 8440
+if (datapointID == "8444") { switchLevel = 80; }  ! 8443
+
+! Build the Domoticz http rest request
+string urlRequest = urlBase#"?type=command"#cAmp#"param=switchlight"#cAmp#"idx="#deviceIdx#cAmp#"switchcmd=Set%20Level&level="#switchLevel#"'";
+WriteLine(urlRequest);
+
+! Run the command without a return result
+cmdRes = dom.GetObject("CUxD.CUX2801001:1.CMD_EXEC").State("wget -q -O - "#urlRequest);

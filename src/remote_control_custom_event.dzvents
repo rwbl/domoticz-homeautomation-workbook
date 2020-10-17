@@ -1,0 +1,97 @@
+--[[
+	remote_control.dzvents
+	Trigger: customEvent
+
+	To handle remote control buttons from the HomematicIP HmIP-RC8 device connected to a RaspberryMatic system.
+	A RaspMatic script creates a custom event with data 
+	{["id"]=8444, ["buttonnr"]=8}
+	An action is assigned to every button - see below.
+	20201017 rwbl
+]]--
+
+local CUSTOMEVENTNAME = 'raspmatic_remote_control'
+
+local IDX_SOMFY_WZ_GROUP = 335          -- middle + right
+local IDX_HUE_WZ_GROUP = 332
+local IDX_HUE_IAQ = 355
+local IDX_HUE_ROB = 113
+local IDX_HUE_UTE = 231
+local IDX_THERMOSTAT_WZ_1 = 338
+local IDX_THERMOSTAT_WZ_2 = 339
+
+local IDX_DEF_THERMOSTAT_ON = 23;
+local IDX_DEF_THERMOSTAT_OFF = 5;
+
+-- Switch a light on | off
+function switchLight(domoticz, idx)
+    if domoticz.devices(idx).state ~= "Off" then
+        domoticz.devices(idx).switchOff()
+    else
+        domoticz.devices(idx).switchOn()
+    end
+end
+
+return {
+	on = {
+	    customEvents = {
+		    CUSTOMEVENTNAME,
+	    }
+	},
+	logging = {  
+        level = domoticz.LOG_INFO,
+        marker = 'REMOTECONTROL',
+    },
+
+	execute = function(domoticz, item)
+		if (item.isCustomEvent) then
+		    -- 2020-10-16 11:43:30.372 Status: dzVents: {"id":8423,"buttonnr":1}
+			local data = item.data
+            -- Domoticz > 2020.2 use:
+			-- local data = domoticz.utils.fromJSON(item.data)
+			-- domoticz.log(data)
+			
+			local buttonNr = data.buttonnr
+            -- Blinds Living
+			if buttonNr == 1 then
+			    domoticz.devices(IDX_SOMFY_WZ_GROUP).switchOn()
+            end
+			if buttonNr == 2 then
+			    domoticz.devices(IDX_SOMFY_WZ_GROUP).switchOff()
+            end
+
+            -- Hue Group Living
+			if buttonNr == 3 then
+                switchLight(domoticz, IDX_HUE_WZ_GROUP)
+			end
+
+			-- Hue IAQ Indicator
+			if buttonNr == 4 then
+                switchLight(domoticz, IDX_HUE_IAQ)
+            end
+
+			-- Thermostats Living
+			if buttonNr == 5 then
+                domoticz.devices(IDX_THERMOSTAT_WZ_1).updateSetPoint(IDX_DEF_THERMOSTAT_ON)
+                domoticz.devices(IDX_THERMOSTAT_WZ_2).updateSetPoint(IDX_DEF_THERMOSTAT_ON)
+			end
+			if buttonNr == 6 then
+                domoticz.devices(IDX_THERMOSTAT_WZ_1).updateSetPoint(IDX_DEF_THERMOSTAT_OFF)
+                domoticz.devices(IDX_THERMOSTAT_WZ_2).updateSetPoint(IDX_DEF_THERMOSTAT_OFF)
+			end
+
+            -- Hue Rob
+			if buttonNr == 7 then
+                switchLight(domoticz, IDX_HUE_ROB)
+			end
+
+            -- Hue Ute
+			if buttonNr == 8 then
+                switchLight(domoticz, IDX_HUE_UTE)
+			end
+
+	else
+			-- second parameter can be anything, number, string, boolean or table
+			domoticz.emitEvent('MyEvent', 'Some data')
+		end
+	end
+}

@@ -5,7 +5,7 @@
     The coffee machine stays on for 2 hours, then switches off.
     Update the alert message with switch off time.
     Note: alertlevel orange is used (3). if the uservar th_alerttoemail is set to 3 then an email is sent if electricusage threshold is reached.
-    20200910 rwbl
+    20200926 rwbl
 ]]--
 
 -- Idx of the device kWh
@@ -14,6 +14,10 @@ local IDX_ELECTRICUSAGEHOUSE = 171
 local IDX_TH_COFFEEMACHINEMONITOR = 15
 -- Monitor the actualWatt between 7 and 9 if above threshold
 local MONITOR_START_END = 'at 07:00-09:00'
+-- Alert Message 
+local MONITOR_MESSAGE = 'Kaffee %s %02d:%02d'
+local MONITOR_STATE_ON = 'AN'
+local MONITOR_STATE_OFF = 'AUS'
 
 return {
 	on = {
@@ -44,12 +48,12 @@ return {
             domoticz.data.notified = 1
             -- get the time on and log
     	    local timeon = os.date("*t")
-    	    local message = ('Kaffeemaschine AN um %02d:%02d'):format(timeon.hour, timeon.min)
+    	    local message = (MONITOR_MESSAGE):format(MONITOR_STATE_ON, timeon.hour, timeon.min)
             domoticz.log(message, domoticz.LOG_INFO)
             -- calculate the time off = timeon + 2 hours
             local timeoff = os.date("*t", os.time() + 2*60*60)
             -- define message to notify the time coffee machine switches off
-            message = ('Kaffeemaschine AUS um %02d:%02d'):format(timeoff.hour, timeoff.min)
+            message = (MONITOR_MESSAGE):format(MONITOR_STATE_OFF, timeoff.hour, timeoff.min)
             -- update alert message
             domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_ORANGE, message)
             domoticz.log(message, domoticz.LOG_INFO)

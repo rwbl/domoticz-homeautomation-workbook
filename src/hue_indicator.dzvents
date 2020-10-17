@@ -1,0 +1,67 @@
+--[[
+hue_indicator
+Test to switch a hue color bulb every minute to red for 2 seconds else light green.
+This solution could be used, to indicate every hour the indoor air quality index for one minute.
+
+Timer Event
+1.	Set Hue color to red via HTTP request
+2.	Handle HTTP request to set color to green after 2 seconds via HTTP request
+3.	Do NOT handle the HTTP request
+4.	After 1 minute start at step 1
+]]--
+
+-- Idx devices - the hue device must a color switch RGBWW dimmer
+local IDX_HUE = 355
+
+local HTTPRESPONSE_SETHUEINDICATOR = "SETHUEINDICATOR"
+local HTTPRESPONSE_SETHUENORMAL = "SETHUENORMAL"
+local TIMERRULE = 'every minute'
+local INDICATORDELAY = 2    -- seconds
+
+-- Set the color of a hue bulb
+-- /json.htm?type=command&param=setcolbrightnessvalue&idx=99&hue=274&brightness=40&iswhite=false
+-- hue degrees: 0..360, brightness: 0..100, delay: seconds, httpresponse: as defined in the constants
+local function setLight(domoticz, hue, brightness, delay, httpresponse) 
+    urlRequest = ("http://domoticz-ip:port/json.htm?type=command&param=setcolbrightnessvalue&idx=%d&hue=%d&brightness=%d&iswhite=false"):format(
+        IDX_HUE, hue, brightness)
+    domoticz.openURL({url = urlRequest, method   = "GET", callback = httpresponse }).afterSec(delay)
+end
+
+return {
+	
+	on = {
+		timer = { TIMERRULE },
+		httpResponses  = {HTTPRESPONSE_SETHUENORMAL, HTTPRESPONSE_SETHUEINDICATOR},
+	},
+	data = 
+	{
+        -- Data with Lua tables. Access: domoticz.data.hueNormal.hue
+        -- hue: 105 warm green, 0 mid red
+	    hueNormal = { initial = {['state'] = "Off", ['hue'] = 105, ['brightness'] = 20} },  
+	    hueIndicator = { initial = {['state'] = "On", ['hue'] = 0, ['brightness'] = 60} }
+    },
+    logging =
+    {  
+        level = domoticz.LOG_INFO,
+        marker = 'HUEINDICATOR',
+    },
+
+	execute = function(domoticz, item)
+	    -- Timer Trigger
+	    if item.isTimer then
+            -- Set the indicator color via URL with 0 delay = immediate
+            setLight(domoticz, 
+                domoticz.data.hueIndicator.hue, domoticz.data.hueIndicator.brightness, 
+                0, HTTPRESPONSE_SETHUEINDICATOR) 
+        end
+
+        -- HTTP Response Trigger: Handle only the response from the indicator response
+        if item.isHTTPResponse and item.trigger == HTTPRESPONSE_SETHUEINDICATOR then
+            -- Set the hue to normal color via URL after NN seconds
+            setLight(domoticz, 
+                domoticz.data.hueNormal.hue, domoticz.data.hueNormal.brightness, 
+                INDICATORDELAY, HTTPRESPONSE_SETHUENORMAL) 
+        end
+
+    end
+}

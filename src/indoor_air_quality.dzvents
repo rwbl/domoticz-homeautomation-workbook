@@ -1,0 +1,146 @@
+--[[
+	indoor_air_quality.dzvents
+	Trigger: customEvent
+
+	To update in regular intervals the custom sensor Indoor Air Quality Index (IAQINDEX).
+	Depending IAQ Index value the color of a Hue color lamp is sett according Hue color wheel 0-360 degrees. (See function setHueDegrees)
+	The custom event receives data from a Python script running on the Rapberry Pi CLI.
+	The data is a JSON string. Example Item Data: 
+	{"iaqindex": 249, "iaqquality": "Worse", "iaqaccuracy": "Low", "temperature": 21.31, "humidity": 58.87, "airpressure": 1015.27, "status": "OK", "title": "get_bricklet_data"}
+	The data is converted to a Lua table and used to update domoticz device(s).
+	For now, only one device is used: Virtual sensor showing the IAQ Index 0 - 500 taken from the JSON key iaqindex.
+	
+	Dependencies: indoor_air_quality.py
+	Location Python script: /home/pi/domoticz/scripts/python/indoor_air_quality.py
+	
+	Domoticz Log Example:
+    ...Status: dzVents: Info: TFINDOORAIRQUALITY: ------ Start internal script: indoor_air_quality:, trigger: "every 2 minutes"
+    ...(Philips Hue Bridge 1) Color Switch (Wohnen Luftqualität)
+    ...Status: dzVents: Info: TFINDOORAIRQUALITY: ------ Finished indoor_air_quality
+    ...Status: EventSystem: Script event triggered: /home/pi/domoticz/dzVents/runtime/dzVents.lua
+    ...Status: dzVents: Info: Handling Domoticz custom event for: "indoorairquality"
+    ...Status: dzVents: Info: TFINDOORAIRQUALITY: ------ Start internal script: indoor_air_quality: Custom event: "indoorairquality"
+    ...Status: dzVents: Info: TFINDOORAIRQUALITY: Status:OK
+    ...Status: dzVents: Info: TFINDOORAIRQUALITY: Index:73 (Gut), A:Low, T:20.95, H:51.81, P:1015.99, Color:90 Bri:1
+    ...Status: dzVents: Info: TFINDOORAIRQUALITY: ------ Finished indoor_air_quality
+    ...Status: EventSystem: Script event triggered: /home/pi/domoticz/dzVents/runtime/dzVents.lua
+    ...Status: setcolbrightnessvalue: ID: 163, bri: 1, color: '{m: 3, RGB: 7fff00, CWWW: 0000, CT: 0}'
+
+	Background
+    The IAQ index is a measurement for the quality of air.
+    To calculate the IAQ index the Bricklet detects ethane, isoprene (2-methylbuta-1,3-diene), ethanol, acetone and carbon monoxide (often called VOC, volatile organic components) by adsorption. 
+    These gas measurements are combined with the measurements of air pressure, humidity and temperature to calculate the final IAQ index.
+    The IAQ index has a range of 0-500:	0-50(good),51-100(average),101-150(little bad),151-200(bad),201-300(worse),301-500(very bad).
+	
+	20201013 rwbl
+]]--
+
+-- Idx of the devices
+-- 354, VirtualSensors, Wohnzimmer Luftqualität, General, Custom Sensor, 0, IAQ Index
+local IDX_IAQINDEX = 354
+-- 355, Philips Hue Bridge 1, Wohnen Luft, Color Switch, RGBWW, Set Color
+local IDX_IAQHUE = 355
+-- Set the name of the device with the air quality condition (iaqquality)
+local NAME_IAQINDEX = "Luft Wohnen (%s)"
+
+-- Timers
+local IAQHUE_TIMER = 'every 2 minutes'  -- 'every minute'
+
+-- Full path of the python script to get the bricklet data.
+-- IMPORTANT: runs as an async background process (using the & sign) to not block the domoticz event system
+local CMD_PYTHON_SCRIPT = "python3 /home/pi/domoticz/scripts/python/indoor_air_quality.py&"
+
+-- Run external command: python in this case
+local function osExecute(cmd)
+    local fileHandle     = assert(io.popen(cmd, 'r'))
+    local commandOutput  = assert(fileHandle:read('*a'))
+    local returnTable    = {fileHandle:close()}
+    return commandOutput,returnTable[3]
+end
+
+-- Sets the hue degrees 0-360, using the hue color wheel, depending iaqindex
+-- IAQ index range 0-500 - see if statements below 
+-- Used by the dzVents function huedevice.setHue(hue, brightness, isWhite)
+-- Returns hue degrees 
+-- Hint: Read more about colors: https://learnui.design/blog/the-hsb-color-system-practicioners-primer.html
+local function setHueDegrees(iaqindex)
+	huedegrees = 240                                                    -- 0 unknown: 240 
+	if iaqindex >= 0 and iaqindex < 51 then huedegrees = 120 end        -- 1 good: 120 mid green
+	if iaqindex > 50 and iaqindex < 101 then huedegrees = 90 end        -- 2 average: 90 yellow green
+	if iaqindex > 100 and iaqindex < 150 then huedegrees = 45 end       -- 3 little bad: 45 warm yellow
+	if iaqindex > 150 and iaqindex < 201 then huedegrees = 30 end       -- 4 bad: 30 orange
+	if iaqindex > 200 and iaqindex < 301 then huedegrees = 15 end       -- 5 worse: 15 warm red
+	if iaqindex > 300 and iaqindex < 501 then huedegrees = 345 end      -- 6 very bad: 345 cool red
+	return huedegrees
+end
+
+return 
+{
+    on =
+    {
+        timer = 
+        {
+            IAQHUE_TIMER, IAQHUE_TIMER_ON, IAQHUE_TIMER_OFF,
+        },
+        
+        customEvents =
+        { 
+            'indoorairquality',
+        },
+    },
+
+    logging =
+    {  
+        level = domoticz.LOG_INFO,
+        -- level = domoticz.LOG_DEBUG,
+        marker = 'INDOORAIRQUALITY',
+    },
+
+    execute = function(domoticz, item)
+        -- Timer starting the python script as a process
+        if item.isTimer and item.trigger == IAQHUE_TIMER then
+            -- run the external python script
+    	    local output,rt = osExecute(CMD_PYTHON_SCRIPT)
+            -- domoticz.log(string.format('OS Execute=%d:%s',rt,output), domoticz.LOG_INFO)
+	        -- handle the result of the python command: 0=OK,>0=ERROR
+        end
+        
+        -- Custom event handles the data triggered by the python script http api request
+        if item.isCustomEvent then
+            -- domoticz.log(("Item Data: %s"):format(item.data))
+            -- Read item data
+            local data = item.data
+            -- IMPORTANT: Domoticz 2020.2 no need to convert item data to json
+            -- BUT in the 2020.2 BETA it is needed to convert item data to lua table
+            -- local data = domoticz.utils.fromJSON(item.data)
+            domoticz.log(string.format('Status:%s',data.status), domoticz.LOG_INFO)
+            -- domoticz.utils.dumpTable(data)
+            -- data is ok
+            if data.status == "OK" then
+                domoticz.log(("Index:%d (%s), A:%s, T:%.2f, H:%.2f, P:%.2f, Color:%d Bri:%d"):format(
+                    data.iaqindex, data.iaqquality, 
+                    data.iaqaccuracy,data.temperature,data.humidity,data.airpressure,
+                    setHueDegrees(data.iaqindex), domoticz.devices(IDX_IAQHUE).level))
+                -- Update the devices
+                -- Info: Custom sensor air quality index
+                domoticz.devices(IDX_IAQINDEX).updateCustomSensor(data.iaqindex)
+                -- Notifier: Set hue air quality color if the device is not turned off
+                if domoticz.devices(IDX_IAQHUE).state ~= 'Off' then
+                    domoticz.devices(IDX_IAQHUE).setHue(setHueDegrees(data.iaqindex), domoticz.devices(IDX_IAQHUE).level, false)
+                end
+                -- Add other notifier, i.e. email if iaqindex is high
+            else
+            -- data has error. set the iqauqlity to ERROR
+                data.iaqquality = "ERROR"
+            end
+
+            -- Amend the air quality condition  to the device name, i.e. "Luftqualität (Gut)"
+            local newname = domoticz.utils.urlEncode(string.format(NAME_IAQINDEX, data.iaqquality))
+            -- domoticz.log(string.format('New name:%s',newname), domoticz.LOG_INFO)
+            local urlRequest = string.format("http://127.0.0.1:8080/json.htm?type=setused&idx=%d&used=true&name=%s",
+                IDX_IAQINDEX, newname)
+            -- Set the new name via url without response
+            domoticz.openURL({url = urlRequest}).afterSec(2)
+        end
+    end
+}

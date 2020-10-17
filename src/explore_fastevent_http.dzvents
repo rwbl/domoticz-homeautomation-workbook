@@ -1,0 +1,39 @@
+--[[
+	fastevent_http.dzvents
+	Trigger: customEvent
+	To update in regular intervals less than 1 minute, the level & text of a virtual alert sensor.
+	The custom event receives data from a Python script running on the Rapberry Pi CLI.
+	The custom data is defined as JSON, i.e. {"level": 4, "text": "Alert Level set to 4"}.
+	The data is converted to a Lua table and used to update the alert device level & text.
+	Dependencies: explore_fastevent_http.py	
+	2020929 rwbl
+]]--
+
+-- Idx of the alert sensor
+local IDX_ALERT = 26
+
+return 
+{
+    on =
+    {  
+        customEvents =
+        { 
+            'setalert',
+        },
+    },
+
+    logging =
+    {  
+        level = domoticz.LOG_DEBUG,
+        marker = 'SETALERT',
+    },
+
+    execute = function(domoticz, item)
+        domoticz.log(item)
+        -- Convert item data to lua table
+        local data = domoticz.utils.fromJSON(item.data)
+        domoticz.log(("Level:%d,Text:%s"):format(data.level, data.text))
+        -- Update the alert device
+        domoticz.devices(IDX_ALERT).updateAlertSensor(data.level, data.text)
+    end
+}

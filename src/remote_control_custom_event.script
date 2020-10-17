@@ -1,0 +1,43 @@
+! Function: Remote Control
+! If a button of the remote control is pressed, send custom event with button nr to Domoticz to action accordingly.
+! Via cuxd an http api request for a customevent is submitted to domoticz.
+! Custom event data parameter must be in json format.
+! Note: Use http://ccu-ip/config/xmlapi/statelist.cgi to get device iseid and datapoints.
+! 20201016 rwbl
+
+string cAmp = "&";
+! Domoticz system url base for the http api request
+string urlBase = "'http://domoticz-ip:port/json.htm";
+string customEvent = "raspmatic_remote_control";
+
+string datapointID = "0"; ! 8429
+string buttonNr = 0;      ! 1 - 8
+
+! Get the object datapoint of the remote control
+object objDatapoint = dom.GetObject ("$src$");
+if (objDatapoint) {
+    datapointID = objDatapoint.ID(); 
+}
+! objDatapoint;            ! HmIP-RF.000B1BE98D94DE:1.PRESS_LONG
+! objDatapoint.Channel();  ! 8421 taken from <channel name="HmIP-RC8 000B1BE98D94DE:1" ise_id="8421">
+! objDatapoint.ID();       ! 8422 taken from <datapoint name="HmIP-RF.000B1BE98D94DE:1.PRESS_LONG" ise_id="8422" ...
+
+! Map raspmatic remote control datapoint = button nr : BUTTON SHORT or BUTTON LONG
+if (datapointID == "8423") { buttonNr = 1; }  ! 8422
+if (datapointID == "8426") { buttonNr = 2; }  ! 8425
+if (datapointID == "8429") { buttonNr = 3; }  ! 8428
+if (datapointID == "8432") { buttonNr = 4; }  ! 8431
+if (datapointID == "8435") { buttonNr = 5; }  ! 8434
+if (datapointID == "8438") { buttonNr = 6; }  ! 8437
+if (datapointID == "8441") { buttonNr = 7; }  ! 8440
+if (datapointID == "8444") { buttonNr = 8; }  ! 8443
+
+! Custom event data parameter must be in json format
+string data = '{"id":'#datapointID#',"buttonnr":'#buttonNr#'}';
+
+! Build the Domoticz http rest request url to update the device usig customevent
+string urlRequest = urlBase#"?type=command"#cAmp#"param=customevent"#cAmp#"event="#customEvent#cAmp#"data="#data#"'";
+WriteLine(urlRequest);
+
+! Run the command without a return result
+cmdRes = dom.GetObject("CUxD.CUX2801001:1.CMD_EXEC").State("wget -q -O - "#urlRequest);

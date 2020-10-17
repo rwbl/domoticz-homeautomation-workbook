@@ -1,9 +1,10 @@
 --[[
     somfy_control.dzvents
-    Controlling somfy devices by timer and group.
-    Timer: Open wz group = 2 devices middle + right
+    Controlling somfy devices by 1. timer and group, 2. device or group
+    dzVents commands: OPEN = switchOff(), STOP = stop(), CLOSE = switchOn()
     Device: Handle selector switch for wz group which controls 2 devices middle + right
-    20200908 rwbl
+    Somfy devices properties: Hardware=RFXtrx433e, Type=RFY, SubType=RFY
+    20201001 rwbl
 ]]--
 
 local IDX_SOMFY_WZ_GROUP = 335          -- middle + right
@@ -11,29 +12,42 @@ local IDX_SOMFY_WZ_LEFT = 319
 local IDX_SOMFY_WZ_MIDDLE = 320
 local IDX_SOMFY_WZ_RIGHT = 321
 local IDX_SOMFY_SZ = 13
+local IDX_SOMFY_WZ_GROUP_TIMER = 352
 
 local TIMER_RULE_WZ_GROUP_MORNING = 'at 07:00'
-local TIMER_RULE_WZ_GROUP_EVENING = 'at 22:00'
+local TIMER_RULE_WZ_GROUP_EVENING = 'at sunset'
+local TIMER_RULE_WZ_GROUP_EVENING_RIGHT = 'at sunset'
 
 return {
 	on = {
-	    timer = { TIMER_RULE_WZ_GROUP_MORNING, TIMER_RULE_WZ_GROUP_MORNING },
+	    timer = { TIMER_RULE_WZ_GROUP_MORNING, TIMER_RULE_WZ_GROUP_EVENING },
 		devices = { IDX_SOMFY_WZ_GROUP, }
 	},
 	execute = function(domoticz, item)
 
-        -- Control WZ_GROUP	    
-	    if (item.isTimer) then
+        -- Control WZ_GROUP	- timer when the timerswitch is on
+	    if (item.isTimer) and (domoticz.devices(IDX_SOMFY_WZ_GROUP_TIMER).nValue == 1) then
+            -- Morning = somfy_wz_right up, all others leave down
             if item.trigger == TIMER_RULE_WZ_GROUP_MORNING then
         		domoticz.log(string.format('Somfy Timer: %s', item.trigger), domoticz.LOG_INFO)
-                domoticz.devices(IDX_SOMFY_WZ_MIDDLE).switchOff()
                 domoticz.devices(IDX_SOMFY_WZ_RIGHT).switchOff()
+                domoticz.devices(IDX_SOMFY_WZ_MIDDLE).switchOff()
             end
+            -- Evening = somfy_wz_middle down, all others leave as is
             if item.trigger == TIMER_RULE_WZ_GROUP_EVENING then
         		domoticz.log(string.format('Somfy Timer: %s', item.trigger), domoticz.LOG_INFO)
+                domoticz.devices(IDX_SOMFY_WZ_MIDDLE).switchOn()
+            end
+            -- Evening Right = somfy_wz_right down for 80%
+            -- Challenge: how to stop at 80% when moving down
+            if item.trigger == TIMER_RULE_WZ_GROUP_EVENING_RIGHT then
+        		domoticz.log(string.format('Somfy Timer: %s', item.trigger), domoticz.LOG_INFO)
+                -- domoticz.devices(IDX_SOMFY_WZ_RIGHT).switchOn()
             end
         end
 
+        -- Somfy control by device for the somfy wz group, i.e triggered by widget (selector switch), dashboard or quick access mobile app
+        -- If no group, then handled by the device as such, i.e. no need for dzvents to action
 	    if (item.isDevice) then
 	        local device = domoticz.devices(item.idx)
     		domoticz.log(string.format('Device changed: %s, nValue=%d, sValue=%s, state=%s, level=%d', device.name, device.nValue, device.sValue, device.state, device.level), domoticz.LOG_INFO)
@@ -48,17 +62,17 @@ return {
         		    domoticz.devices(IDX_SOMFY_WZ_RIGHT).name, 
         		    domoticz.devices(IDX_SOMFY_WZ_RIGHT).idx), 
         		domoticz.LOG_INFO)
-               if device.state == "Open" then
+               if device.level == 10 then
                     domoticz.log("OPEN")
                     domoticz.devices(IDX_SOMFY_WZ_MIDDLE).switchOff()
                     domoticz.devices(IDX_SOMFY_WZ_RIGHT).switchOff()
                 end
-                if device.state == "Stop" then
+                if device.level == 20 then
                     domoticz.log("STOP")
                     domoticz.devices(IDX_SOMFY_WZ_MIDDLE).stop()
                     domoticz.devices(IDX_SOMFY_WZ_RIGHT).stop()
                 end
-                if device.state == "Close" then
+                if device.level == 30 then
                     domoticz.log("CLOSE")
                     domoticz.devices(IDX_SOMFY_WZ_MIDDLE).switchOn()
                     domoticz.devices(IDX_SOMFY_WZ_RIGHT).switchOn()

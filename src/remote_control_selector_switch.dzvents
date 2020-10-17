@@ -1,0 +1,41 @@
+--[[
+    remote_control_selector_switch.dzvents
+    To take action based on a selector switch devices trigger.
+    The selector switch level is set by a RaspMatic script triggerd by a remote control device pressing short.
+    The RaspMatic script submits a HTTP API request with level 10-80 for button 1-8
+    http://domoticz-ip:port/json.htm?type=command&param=switchlight&idx=IDX&switchcmd=Set%20Level&level=LEVEL
+    Domoticz Log Entry
+    ...(VirtualSensors) Light/Switch (Remote Control)
+    ...Status: User: Admin initiated a switch command (41/Remote Control/Set Level)
+    ...Status: dzVents: Info: Handling events for: "Remote Control", value: "1"
+    ...Status: dzVents: Info: ------ Start internal script: remote_control_selector_switch: Device: "Remote Control (VirtualSensors)", Index: 41
+    ...Status: dzVents: Info: Device Remote Control state change 1, 2, 1, 10
+    ...Status: dzVents: Info: Remote Control Button 1 action
+    ...Status: dzVents: Info: ------ Finished remote_control_selector_switch
+    20201017 rwbl
+]]--
+
+-- Idx f the device*s(
+local IDX_SELECTOR_SWITCH_RC = 41
+
+return {
+	on = {
+		devices = {
+			IDX_SELECTOR_SWITCH_RC
+		}
+	},
+	execute = function(domoticz, device)
+		domoticz.log(('Device %s state change %s, %d, %s, %d'):format(device.name,device.state,device.nValue,device.sValue,device.level), domoticz.LOG_INFO)
+	    -- state 1-8, nvalue 2, sValue = 1-8, level 10 -80 = best to check on the level property
+
+        -- Button 1
+		if device.level == 10 then
+            domoticz.log(("Remote Control Button %d action"):format(device.level / 10))
+	    end
+        -- Button 2
+		if device.level == 20 then
+            domoticz.log(("Remote Control Button %d action"):format(device.level / 10))
+	    end
+	    
+	end
+}

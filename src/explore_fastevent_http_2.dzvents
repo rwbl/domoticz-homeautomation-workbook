@@ -1,0 +1,58 @@
+--[[
+	fastevent_http_2.dzvents
+	Trigger: customEvent
+	To update in regular intervals less than 1 minute, the level & text of a virtual alert sensor.
+	The custom event receives data from a Python script running on the Rapberry Pi CLI.
+	The custom data contains the filename without full path.
+	The data is stored in a text file with JSON key:value pairs. Example:
+    {"level": 4, "text": "Alert Level set to 4"}	
+    The filename full path is set and the file content is read as data.
+	The data is converted to a Lua table and used to update the alert device level & text.
+	Dependencies: explore_fastevent_http_2.py	
+	20201009 rwbl
+]]--
+
+-- Idx of the alert sensor
+local IDX_ALERT = 26
+
+-- Data File path - must end with /
+local DATA_FILE_PATH = "/home/pi/python/"
+
+-- Read the content of a text file
+local function readFile(f)
+    local file = io.open (f, 'r')   -- open read mode
+    local data =  file:read('*a')   -- read all
+    file:close()                    -- close 
+    return data                     -- return all filecontent
+end    
+
+return 
+{
+    on =
+    {  
+        customEvents =
+        { 
+            'setalert2',
+        },
+    },
+
+    logging =
+    {  
+        level = domoticz.LOG_DEBUG,
+        marker = 'SETALERT2',
+    },
+
+    execute = function(domoticz, item)
+        domoticz.log(("Item Data: %s"):format(item.data))
+        -- Get the filename from the property item.data and amend the full filepath
+        local filename = ("%s%s"):format(DATA_FILE_PATH, item.data)
+
+        -- Read the file content and convert item data to lua table
+        local data = domoticz.utils.fromJSON(readFile(filename))
+        -- domoticz.utils.dumpTable(data)
+        domoticz.log(("Level:%d,Text:%s"):format(data.level, data.text))
+        
+        -- Update the alert device
+        domoticz.devices(IDX_ALERT).updateAlertSensor(data.level, data.text)
+    end
+}
