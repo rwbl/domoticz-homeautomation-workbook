@@ -42,13 +42,13 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 * Event monitor for selected devices.
 * Garage door monitor.
 * Hardware Monitor for the Raspberry Pi's used (see HardwareMonitor.zip).
-* HomeMatic (RaspberryMatic) CCU3 integration with variety of devices and plugins [HmIP-eTRV](https://github.com/rwbl/domoticz-plugin-hmip-etrv), [HmIP-PSM](https://github.com/rwbl/domoticz-plugin-hmip-psm).
+* HomeMatic (RaspberryMatic) CCU3 integration with variety of devices and plugins [HmIP-eTRV](https://github.com/rwbl/domoticz-plugin-hmip-etrv), [HmIP-PSM](https://github.com/rwbl/domoticz-plugin-hmip-psm) or Python scripts triggered by dzVents Lua.
 * Hue Light controlled via ESP8266 with slide potentiometer & 4-digit-7-segment-display.
 * Indoor Air Quality - Measure in regular intervals, the IAQ Index VOC, assign to a custom sensor (VOC) and set the color of a Hue White & Color Ambiance bulb accordingly.
 * MQTT subscribe & publish messages to trigger actions or information.
-* MQTT Logger (Node-RED)
+* MQTT Logger (Node-RED).
 * Monitor stock quotes.
-* Music Player (using LibreELEC with Kodi).
+* Music Player using LibreELEC with Kodi and tests with Volumio.
 * Key Dates management and information organised in a roomplan.
 * Notes with a subject & content and save, copy or notify.
 * Philips Hue Lighting System control via Hue Bridge for ZigBee devices.
@@ -63,7 +63,7 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 * Time Control to track & control the time spent in hours, per activity block (with start- & end-time) and total/day, on a generic task.
 * Timers for single devices or complex tasks (Automation events dzVents).
 * Web UI [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz_quick_access_mobile) - customized web frontend to control dedicated functions mainly accessed from mobile  devices.
-* Web App Site Control [Info](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Note: Not developed further as replaced by Web UI Quick Access Mobile).
+* Wub UI [Web App Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Note: Not developed further as replaced by Web UI Quick Access Mobile).
 
 ### Explore
 * Domoticz running on a Raspberry Pi (setup, configure).
