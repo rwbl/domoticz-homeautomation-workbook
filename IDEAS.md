@@ -8,22 +8,24 @@ Display Google Charts, i.e. graphs, gauges etc. as a custom page for several dat
 Started some first test. 
 
 **Include Google Charts Library**
+
 To be able to use Google Charts, tested two solutions:
 
 **Solution Domoticz index.html Modification**
 ```
-<!-- Custom page Google Charts works if this is added to index.html in the head section -->
+<!-- Custom page Google Charts works if this is added to the Domoticz index.html in the head section -->
 <!-- Read https://developers.google.com/chart/interactive/docs/basic_load_libs -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.8/jquery.csv.min.js"></script>
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 ```
-Tried to include the above code direct in the custom page (the page does not contain html,head,body tags) results in an error: 
+Tried to include the above code direct in the custom page (the page does not contain html,head,body tags) resulting in an error: 
 ```
 "ReferenceError: "google" is not defined".
 ```
 According to the documentation (see ref previous), the src link must be in the HTML page head section.
 
-** Solution use $.getScript()
+**Solution use $.getScript()**
+
 Alternative is to load the API in the script code via 
 ```
 $.getScript('https://www.gstatic.com/charts/loader.js',function (){...
