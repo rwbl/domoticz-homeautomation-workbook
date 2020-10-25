@@ -26,6 +26,7 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 (full list see the workbook)
 * Air Quality monitor - [Plugin](https://github.com/rwbl/domoticz-plugin-indoor-air-quality-monitor).
 * Ambient light (from ESP8266 running ESP Easy) with threshold.
+* Battery Status - Daily check & notify for all devices (Domoticz & External Systems) the battery level against a threshold set via user variable.
 * Charts for selective weather items, room temperature & humidity.
 * Climate Environment - UV Index & Category, Pollen Index.
 * Coffee machine monitor – start and end time, alert message.
@@ -33,6 +34,8 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 * Control Volumio music player whilst listening to web radio.
 * Custom icons.
 * Custom Pages - simple to more complex examples.
+* Custom Settings - Custom page to change the value of selective user variables.
+* Device Status - Custom page to quickly view all device properties of a used device.
 * Display temperature & humidity measured in rooms.
 * Electricity power & energy for selected devices / rooms (washer, room MakeLab etc.).
 * Electricity power & energy for the house from “volkszaehler” with charts.
