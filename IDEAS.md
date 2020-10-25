@@ -41,7 +41,7 @@ Step 2:
 	// Load the visualisation API via getScript()
 	$.getScript('https://www.gstatic.com/charts/loader.js',function (){
 		google.charts.load('current', { packages: ['corechart','gauge'] });
-		google.charts.setOnLoadCallback(drawTemps);	// drawChart);
+		google.charts.setOnLoadCallback(drawChart);
 	});
 ...
 ```
