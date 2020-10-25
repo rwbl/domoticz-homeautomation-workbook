@@ -1,0 +1,56 @@
+! battery_status_raspberrymatic.script
+! Once per day, loop over all devices to check the value of datapoint LOW_BAT against true (means the battery of the device is low)
+! Update system variable BatteryLevelStatus with devices found or OK if all devices are fine.
+! 20201023 rwbl
+
+! System variabe holding the text of the battery level check.
+string BATTERYLEVELSTATUS = "BatteryLevelStatus";
+! Message text to save in the system variable BatteryLevelStatus
+string text = "";
+! Number of devices with LOW_BAT = true
+integer counter = 0;
+
+! Get all devices objects
+var objIDs = dom.GetObject(ID_DEVICES).EnumUsedIDs();
+
+! Loop over all datapoints for the devices found
+string id; 
+foreach(id, objIDs){
+  !Get datapoint
+  var object = dom.GetObject(id);
+  ! Name: Briefkasten Status: ID=2530
+  ! WriteLine("Name: " # object.Name() # ": ID=" #  object.ID());
+  
+  ! Get the device name from the object
+  string DeviceName = object.Name();
+  ! Get the the device object from the device name, i.e. Briefkasten Status
+  var Device = dom.GetObject(DeviceName);
+  string id; 
+  ! Loop over all channels to get the datapoint LOW_BAT
+  foreach(id, Device.Channels()) {
+    ! Get the channel
+    var ch = dom.GetObject(id);
+    ! Get the datapoint for the attribute LOW_BAT from the channel
+    var dp  = ch.DPByHssDP("LOW_BAT");
+    if (dp) {
+      ! dpValue() true|false. If true the battery is low
+      if (dp.Value() == true) {
+        counter = counter + 1;
+        text = text # DeviceName # ";";
+        ! WriteLine(DeviceName # ", Battery LOW = " # dp.Value());      
+      }
+    }    
+  }
+}
+
+! If no devices with low battery found, set text to OK
+if (counter == 0) {
+  text = "OK";
+}
+
+! Update the systemvariable
+var objBatteryLevelStatus = dom.GetObject(BATTERYLEVELSTATUS);
+objBatteryLevelStatus.Variable(text);
+
+! Log for tests the content of the system variable 
+! WriteLine(objBatteryLevelStatus.Variable());

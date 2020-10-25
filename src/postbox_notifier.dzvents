@@ -8,9 +8,7 @@
     Datapoint: Device: Postbox Notifier, Name: HmIP-RF.0000DA498D5859:0.OPERATING_VOLTAGE, ID: 2543, Value: 1.500000
     <datapoint ise_id="2543" name="HmIP-RF.0000DA498D5859:0.OPERATING_VOLTAGE" operations="5" timestamp="1575914670" valueunit="" valuetype="4" value="1.500000" type="OPERATING_VOLTAGE"/>
 
-    Interpreter: dzVents
-    Author: Robert W.B. Linn
-    Version: 20200219
+    Version: 20201019 rwbl
 ]]--
 
 -- Domoticz Idx
@@ -28,7 +26,7 @@ return {
     -- Combined rules defined
 	on = {
 	        -- Check the operating voltage datapoint of the SWDO homematicIP device by submitting http xml-api request
-            timer = { 'every 30 minutes', 'at 00:15' },
+            timer = { 'every 6 hours' },
             -- Check if the state of the postbox notifier switch has changed to on as triggered by raspmatic script
             devices = { IDX_POSTBOXNOTIFIER_STATE },
             -- Handle the response of the http xml-api url request
@@ -48,7 +46,8 @@ return {
             -- Send email notification in case device is switched on
             -- Only the subject is used
             if (domoticz.devices(IDX_POSTBOXNOTIFIER_STATE).state == 'On') and (domoticz.data.pbnnotified == 0) then
-                local subject = 'Briefkasten geöffnet (' .. domoticz.helpers.isnowhhmm(domoticz) .. ')'
+                -- local subject = 'Briefkasten geöffnet (' .. domoticz.helpers.isnowhhmm(domoticz) .. ')'
+                local subject = ('Briefkasten geöffnet (%s)'):format(domoticz.helpers.isnowshort(domoticz))
                 local message = 'Aktion: Status zurücksetzen.\r\n'
                 domoticz.data.pbnnotified = 1
                 -- notify via email
@@ -60,23 +59,19 @@ return {
 
             -- Reset the notify flag is switch is manually switched Off
             if (domoticz.devices(IDX_POSTBOXNOTIFIER_STATE).state == 'Off') and (domoticz.data.pbnnotified == 1) then
-                local message = 'Briefkasten: Status zurückgesetzt.'
+                local message = ('Briefkasten zurückgesetzt (%s)'):format(domoticz.helpers.isnowshort(domoticz))
                 domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, message)
                 domoticz.data.pbnnotified = 0
 		    end
         end
 
-        -- check if the item is a timer at everz 30 minutes, then request datapoint information
-		if (item.isTimer) and (domoticz.time.matchesRule('every 30 minutes')) then
-		    domoticz.openURL({url = URL_RASPMATIC .. DATAPOINT2543.id, method = 'GET', callback = DATAPOINT2543.response,})
-		end
-
-        -- check if the item is a timer at 00:15, then reset switch
-		if (item.isTimer) and (domoticz.time.matchesRule('at 00:15')) then
+        -- check if the item then reset switch
+		if (item.isTimer) then
             if (domoticz.devices(IDX_POSTBOXNOTIFIER_STATE).state == 'On') then
                 domoticz.devices(IDX_POSTBOXNOTIFIER_STATE).switchOff()
                 domoticz.data.pbnnotified = 0
             end
+		    domoticz.openURL({url = URL_RASPMATIC .. DATAPOINT2543.id, method = 'GET', callback = DATAPOINT2543.response,})
 		end
 
         -- check if the item is a httpresponse from the openurl callback
@@ -89,11 +84,12 @@ return {
                     local voltage = tonumber(domoticz_applyXPath(item.data, DATAPOINT2543.xpath))
                     domoticz.log(DATAPOINT2543.name .. ': ' .. voltage) 
                     -- Update the domoticz device
-                    domoticz.devices(IDX_POSTBOXNOTIFIER_VOLTAGE).updateVoltage(voltage)
+                    -- NOT USED
+                    -- domoticz.devices(IDX_POSTBOXNOTIFIER_VOLTAGE).updateVoltage(voltage)
                     -- Check if below threshold
                     if voltage < domoticz.variables(IDX_TH_POSTBOXNOTIFIER_VOLTAGE).value then
                         local message= DATAPOINT2543.name .. ':LOW ' .. voltage .. ' ' .. domoticz.helpers.isnowhhmm(domoticz)
-                        domoticz.log(message) 
+                        domoticz.log(message, domoticz.LOG_ERROR) 
                         domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_RED, message)
                     end
                 end

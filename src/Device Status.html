@@ -1,0 +1,167 @@
+<!--
+	domoticz-homeautomation-workbook function Device Status
+	Domoticz custom page: 
+	Device Status.html (/home/pi/domoticz/www/templates)
+	Purpose: 
+	To quickly check the status, i.e. all properties of a device.
+	20201024 rwbl
+-->
+<style> 
+/* hint style text small */
+.hint {
+	font-size: smaller;
+	color: white;
+}
+/* Textarea listing the device properties */
+.taDevice {
+	width: 100%;
+	padding: 5px 5px;
+	box-sizing: border-box;
+	border: 2px solid #ccc;
+	border-radius: 4px;
+	background-color: #f8f8f8;
+	font-size: 14px;
+	resize: none;
+}
+</style>
+<!--
+	HTML
+-->
+<div class="container">
+    <table class="page-header-small" border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+			<td align="left">
+				<h4 data-i18n="Device Status"></h4>
+			</td>
+			<td align="right">
+				<a class="btnstyle3" onclick="refreshDevicesList();"><span data-i18n="Refresh"></span></a>
+			</td>
+		</tr>
+	</table>
+    <table class="display" border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+			<td align="left">
+				<select id="deviceslist" class="combobox ui-corner-all" style="width: auto;" onchange="setDeviceProperties(statusDevices)">
+				</select>
+			</td>
+		</tr>
+    </table>
+    <table class="display" border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+			<td align="left">
+				<label>
+					<span id="labeldeviceproperties" data-i18n="Status" class="text"></span>
+				</label>
+			</td>
+		</tr>
+		<tr>
+			<td align="left">
+				<textarea id="deviceproperties" class="taDevice" rows="20" spellcheck="false"></textarea>
+			</td>
+		</tr>
+    </table>
+	<div id="pageversion" class="hint"></div></div>
+<!--
+	JavaScript	
+-->
+<script type="text/javascript" charset="utf-8">
+	
+	// Sort an array of objects by key
+	// Example: data.result.sortBy(el => el.Name);
+	Array.prototype.sortBy = function(key_func, reverse=false){
+		return this.sort( (a, b) => {
+			var keyA = key_func(a),
+				keyB = key_func(b);
+			if(keyA < keyB) return reverse? 1: -1;
+			if(keyA > keyB) return reverse? -1: 1;
+			return 0;
+		}); 
+	}
+	
+	// Get all devices data from the domotiz database and create the select dropdown entries
+	// Hint requestUrl parameterSet:
+	// If this custom page is accessing on the same system, than the requesturl starts with json.htm...
+	// "json.htm?type=devices&used=true&displayhidden=0";
+	// No need to add the domoticz ip and port: "http://domoticz-ip:port?json.htm?type=devices&used=true&displayhidden=0";
+	function getData(title, requestUrl) {
+		// console.log(requestUrl);
+		$.ajax({
+			url: requestUrl,
+			async: false,
+			dataType: 'json',
+			success: function (data) {
+				if(typeof data.result == "undefined"){
+					// console.log(data);
+					console.log("Status all devices - no devices found (status: " + data.status + ", title: " + data.title + ")");
+					return false;
+				}
+				console.log("Status all devices - Succesfully retreived (status: " + data.status + ", title: " + data.title + ")");
+				// Array of all device objects used to retrieve the properties via the select dropdown option value idx
+				statusDevices = [];
+				// String holding all devices option tag
+				var optionList = "";
+				optionValue = '<option value="0">Select...</option>';
+				optionList += optionValue;
+				// Sort the device object array by key Name
+				data.result.sortBy(el => el.Name);
+				// Loop over the device entries to build the option and push to the device objects array
+				data.result.forEach(function(entry) {
+					entryType = entry.Type;
+					if (entry.Type === "General") { entryType = entry.SubType; }
+					optionValue = '<option value="'+entry.idx+'">'+ entry.Name+ ' - ' + entryType +'</option>';
+					optionList += optionValue;
+					statusDevices.push(entry);
+					// console.log("Added " + entry.idx + ", " + entry.Name + ", " + entry.Data);
+				});				
+				//
+				console.log("Status all devices - Done");
+				// Update selector
+				document.getElementById("deviceslist").innerHTML = optionList;
+			},
+			error: function () {
+				console.log("[ERROR] Status all devices. Can not communicate to the Domoticz server!");
+				return false;
+			}
+		});	
+	}
+
+	// Set the device property information in the textarea
+	function setDeviceProperties(statusDevices) {
+		var idx = document.getElementById("deviceslist").value;
+		// console.log("Device idx " + idx + " selected.");
+		// Find the specific device object, by its idx, in an array of device objects
+		var deviceObj = statusDevices.find(obj => obj.idx === idx.toString());
+		// if the device is found, get the properties
+		if (typeof deviceObj !== 'undefined') {
+			// Update the textarea label
+			document.getElementById("labeldeviceproperties").innerHTML = "Idx: " +  deviceObj.idx + " | Data: " +  deviceObj.Data;
+			// Get the deviceproperties from the object
+			deviceProperties = "";
+			for (const [key, value] of Object.entries(deviceObj)) {
+				deviceProperties += key + ": " + value + "\n";
+			}
+			// Update the textarea content
+			document.getElementById("deviceproperties").innerHTML = deviceProperties;		
+		}
+	}
+
+	// Refresh the page. Assigned to a button.
+	function refreshDevicesList() {
+		window.location.reload();
+		console.log("Devices list refreshed");
+	}
+
+	function setVersion(pageVersion) {
+		$('#pageversion').html(pageVersion);	
+	};
+
+	// Load the document
+	// Get status of all used devices as array of object
+	$(document).ready(function(){
+		setVersion("20201024 by rwbl");
+		getData(
+			"Domoticz Device Status", 
+			"json.htm?type=devices&used=true&displayhidden=0");
+	});
+	
+</script>

@@ -1,0 +1,257 @@
+<!--
+	domoticz-homeautomation-workbook function Custom Settings
+	Domoticz custom page: 
+	Settings.html (/home/pi/domoticz/www/templates)
+	Purpose: 
+	To change the value of selected user variables, i.e. used as custom settings
+	Any other settings, to be set via Domoticz GUI Setup > Settings (the standard way).
+	20201024 rwbl
+-->
+<style>
+/* hint style text small */
+.hint {
+	font-size: smaller;
+	color: white;
+}
+</style>
+
+<!--
+	HTML
+-->
+<div class="container">
+    <table class="page-header-small" border="0" cellpadding="0" cellspacing="0" width="100%">
+		<tr>
+			<td align="left">
+				<h4 data-i18n="Custom Settings"></h4>
+			</td>
+		</tr>
+	</table>
+	<!--
+		Each user variable consists out of a table with 4 fields vaiablename (readonly), variablevalue (mandatory), variableidx (readonly), variabletype (readonly).
+		The id of the table must set and unique, i.e. table id="raspmaticdutycycle".
+		The field data is initially set when loading/refeshing the page.
+		Any new user variables, copy & paste the first entry <table id=...>..</table> and change the id. 
+		Changes required:
+		* Set the table id, i.e. batterylevelcheck
+		* Set the selector in function updateUserVariable(), i.e. updateUserVariable('#batterylevelcheck');
+		* Set the input type, i.e. type="number"
+		* Set the min/max values, i.e. min="0", max="100"
+		* Amend the document load function getUserVariable('#uservariable', uservariableidx), i.e. getUserVariable('#batterylevelcheck', 24);
+	-->
+
+	<!--
+		Battery Level Check (idx=24)
+	-->
+	<table id="batterylevelcheck" class="display" border="0" cellpadding="0" cellspacing="20">
+		<tr>
+			<td align="right" style="width:110px"></td>
+			<td><h3 data-i18n="Battery Level Check Threshold"></h3></td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"><label for="variablename"><span data-i18n="Name"></span>:</label></td>
+			<td><input type="text" id="variablename" style="width: 250px; padding: .2em;" class="text ui-widget-content ui-corner-all" readonly /></td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"><label for="variablevalue"><span data-i18n="Value"></span>:</label></td>
+			<td>
+				<input id="variablevalue" type="number" min="0" max="100" style="width: 50px; padding: .2em;" class="text ui-widget-content ui-corner-all" required />
+				<a align="right" class="btnstyle3" onclick="updateUserVariable('#batterylevelcheck');" data-i18n="Set"></a>
+			</td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"></td>
+			<td class="hint">(%, Min = 0, Max = 100, 0 = Disabled)</td>
+		</tr>
+		<!-- The next fields are hidden, but the values are used. if want to show, then remove parameter hidden -->
+		<tr hidden>
+			<td align="right" style="width:110px"><label for="variableidx"><span data-i18n="Idx"></span>:</label></td>
+			<td><input id="variableidx" type="number" value="0" style="width: 50px; padding: .2em;" class="text ui-widget-content ui-corner-all" readonly /></td>
+		</tr>
+		<tr hidden>
+			<td align="right" style="width:110px"><label for="variabletype"><span data-i18n="Type"></span>:</label></td>
+			<td><input id="variabletype" type="number" style="width: 50px; padding: .2em; " class="text ui-widget-content ui-corner-all" readonly /></td>
+			<!-- 0=Integer,1:Float,2=String3=Date4=Time5=DateTime -->
+		</tr>
+	</table>
+	<br>
+	
+	<!--
+		RaspberryMatic DutyCycle (idx=23)
+	-->
+	<table id="raspmaticdutycycle" class="display" border="0" cellpadding="0" cellspacing="20">
+		<tr>
+			<td align="right" style="width:110px"></td>
+			<td><h3 data-i18n="RaspberryMatic DutyCycle Threshold"></h3></td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"><label for="variablename"><span data-i18n="Name"></span>:</label></td>
+			<td><input type="text" id="variablename" style="width: 250px; padding: .2em;" class="text ui-widget-content ui-corner-all" readonly /></td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"><label for="variablevalue"><span data-i18n="Value"></span>:</label></td>
+			<td>
+				<input id="variablevalue" type="number" min="0" max="20" style="width: 50px; padding: .2em;" class="text ui-widget-content ui-corner-all" required />
+				<a class="btnstyle3" onclick="updateUserVariable('#raspmaticdutycycle');" data-i18n="Set"></a>
+			</td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"></td>
+			<td class="hint">(%, Min = 0, Max = 20, 0 = Disabled)</td>
+		</tr>
+		<!-- The next fields are hidden, but the values are used. if want to show, then remove parameter hidden -->
+		<tr hidden>
+			<td align="right" style="width:110px"><label for="variableidx"><span data-i18n="Idx"></span>:</label></td>
+			<td><input id="variableidx" type="number" value="0" style="width: 50px; padding: .2em;" class="text ui-widget-content ui-corner-all" readonly /></td>
+		</tr>
+		<tr hidden>
+			<td align="right" style="width:110px"><label for="variabletype"><span data-i18n="Type"></span>:</label></td>
+			<td><input id="variabletype" type="number" style="width: 50px; padding: .2em; " class="text ui-widget-content ui-corner-all" readonly /></td>
+			<!-- 0=Integer,1:Float,2=String3=Date4=Time5=DateTime -->
+		</tr>
+	</table>
+	<br>
+	
+	<!--
+		Thermostat Temperature On (idx=21)
+	-->
+	<table id="thermostaton" class="display" border="0" cellpadding="0" cellspacing="20">
+		<tr>
+			<td align="right" style="width:110px"></td>
+			<td><h3 data-i18n="Thermostat Default Temperature On"></h3></td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"><label for="variablename"><span data-i18n="Name"></span>:</label></td>
+			<td><input type="text" id="variablename" style="width: 250px; padding: .2em;" class="text ui-widget-content ui-corner-all" readonly /></td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"><label for="variablevalue"><span data-i18n="Value"></span>:</label></td>
+			<td>
+				<input id="variablevalue" type="number" min="6" max="23" style="width: 50px; padding: .2em;" class="text ui-widget-content ui-corner-all" required />
+				<a class="btnstyle3" onclick="updateUserVariable('#thermostaton');" data-i18n="Set"></a>
+			</td>
+		</tr>
+		<tr>
+			<td align="right" style="width:110px"></td>
+			<td class="hint">(°C, Min = 6, Max = 23)</td>
+		</tr>
+		<!-- The next fields are hidden, but the values are used. if want to show, then remove parameter hidden -->
+		<tr hidden>
+			<td align="right" style="width:110px"><label for="variableidx"><span data-i18n="Idx"></span>:</label></td>
+			<td><input id="variableidx" type="number" value="0" style="width: 50px; padding: .2em;" class="text ui-widget-content ui-corner-all" readonly /></td>
+		</tr>
+		<tr hidden>
+			<td align="right" style="width:110px"><label for="variabletype"><span data-i18n="Type"></span>:</label></td>
+			<td><input id="variabletype" type="number" style="width: 50px; padding: .2em; " class="text ui-widget-content ui-corner-all" readonly /></td>
+			<!-- 0=Integer,1:Float,2=String3=Date4=Time5=DateTime -->
+		</tr>
+	</table>
+	<br>
+	
+	<!--
+		Add More
+	-->
+
+	<!-- Version info -->
+	<div id="pageversion" class="hint"></div>
+</div>
+
+<!--
+	JavaScript	
+-->
+<script type="text/javascript" charset="utf-8">
+
+	// Update the value of a user variable
+	// Get UV Data: json.htm?type=command&param=getuservariable&idx=IDX
+	// Update UV Value: json.htm?type=command&param=updateuservariable&vname=USERVARIABLENAME&vtype=USERVARIABLETYPE&vvalue=USERVARIABLEVALUE
+	function updateUserVariable(variableSelector) {
+		var uvIdx = $(variableSelector +  ' ' + '#variableidx').val();
+		var uvName = $(variableSelector + ' ' +  '#variablename').val();
+		var uvType = $(variableSelector + ' ' +  '#variabletype').val();
+		var uvValue = $(variableSelector + ' ' +  '#variablevalue').val();
+		var requestUrl = "json.htm?type=command&param=updateuservariable&idx=" + uvIdx + "&vname=" + uvName + "&vtype=" + uvType + "&vvalue=" + uvValue;
+		console.log("updateUserVariable - URL: " + requestUrl);
+		$.ajax({
+			url: requestUrl,
+			async: false,
+			dataType: 'json',
+			success: function (data) {
+				if (typeof data != 'undefined') {
+					if (data.status == "OK") {
+						bootbox.alert($.t('User variable ' + uvName + ' updated.'));
+					}
+					else {
+						ShowNotify($.t(data.message), 2500, true);
+					}
+				}
+			},
+			error: function () {
+				ShowNotify($.t('Problem saving user variable!'), 2500, true);
+			}
+		});
+	};
+
+	// Get the user variable properties
+	// Get UV Data: json.htm?type=command&param=getuservariable&idx=IDX
+	// Parameter:
+	// 	variableSelector (String): #raspmaticdutycycle
+	//	uvIdx (Integer): 23
+	function getUserVariable(variableSelector, uvIdx) {
+		// var uvIdx = $(variableSelector + ' ' + '#variableidx').val();
+		// Define the http api url to get uservariable properties name and type used to set the new value
+		var requestUrl = "json.htm?type=command&param=getuservariable&idx=" + uvIdx;
+		console.log("setUserVariable - Get data: " + requestUrl);
+		$.ajax({
+			url: requestUrl,
+			async: false,
+			dataType: 'json',
+			success: function (data) {
+				if(typeof data.result == "undefined"){
+					console.log("setUserVariable - no data found (status: " + data.status + ", title: " + data.title + ")");
+					return false;
+				}
+				// console.log("setUserVariable - Succesfully retrieved (status: " + data.status + ", title: " + data.title + ")");
+				// Get the uservariable name and type
+				var uvName = data.result[0].Name;
+				var uvType = data.result[0].Type;
+				var uvValue = data.result[0].Value;
+				console.log("getUserVariable Idx,Name,Type,Value: " + uvIdx + "," + uvName + "," + uvType + "," + uvValue);
+				// Update the user value properties
+				$(variableSelector + ' ' +  '#variablename').val(uvName);
+				$(variableSelector + ' ' +  '#variablevalue').val(uvValue);
+				$(variableSelector + ' ' +  '#variableidx').val(uvIdx);
+				$(variableSelector + ' ' +  '#variabletype').val(uvType);
+			},
+			error: function () {
+				console.log("[ERROR] Status all devices. Can not communicate to the Domoticz server!");
+				return false;
+			}
+		});	
+	};
+
+	// Sleep for ms
+	function sleep(milliseconds) {
+	  const date = Date.now();
+	  let currentDate = null;
+	  do {
+		currentDate = Date.now();
+	  } while (currentDate - date < milliseconds);
+	}
+
+	function setVersion(pageVersion) {
+		$('#pageversion').html(pageVersion);	
+	};
+
+	// Load the document
+	$(document).ready(function(){
+		setVersion("20201024 by rwbl");
+		// Get the user variable data with selector, idx.
+		// Short sleep after each uservariable to ensure HTTP api request gets completed
+		getUserVariable('#batterylevelcheck', 24);
+		sleep(50);
+		getUserVariable('#raspmaticdutycycle', 23);
+		sleep(50);
+		getUserVariable('#thermostaton', 21);
+		sleep(50);
+	});
+	
+</script>

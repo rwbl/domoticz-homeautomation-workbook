@@ -1,22 +1,30 @@
 --[[
     raspmatic_dutycycle_monitor.dzvents
     Perform checks on the RaspberryMatic systemvariable "DutyCycle".
-    The threshold (in pct) to send alert message and logerror is set by uservariable.
-    20200910 rwbl
+    The threshold (in pct) to send alert message and logerror is set by uservariable TH_RASPBERRYMATIC_DUTYCYCLE.
+    20201019 rwbl
 ]]--
 
--- url http xml-api request system variable 
+-- url http xml-api request system variable. The ise_id is set in the function openURL
 local URL_RASPMATIC = 'http://192.168.1.225/addons/xmlapi/sysvar.cgi?ise_id=';
+
 -- define the unique (across all dzVents) callback
 local RES_RASPMATIC = "RES_RASPMATIC_DUTYCYCLE_MONITOR";
+
 -- set the datapoint ise_id of the "DutyCycle" with ise_id 1390
 local DATAPOINT_ISE_ID = 1390;
+
 -- domoticz dutycycle device
 local IDX_RASPMATIC_DUTYCYCLE = 301;
+
 -- set the alert message if dutycycle value is above threshold as set by uservariable TH_RASPBERRYMATIC_DUTYCYCLE
 -- (idx,name,type,value): 23, TH_RASPBERRYMATIC_DUTYCYCLE, Integer, 10
 local IDX_UV_TH_RASPBERRYMATIC_DUTYCYCLE = 23
 
+-- Timer interval 'every 10 minutes' - for tests use: 'every minute'
+local TIMER_RULE = 'every 10 minutes' 
+
+-- Helpers
 function round(number, decimals)
     local power = 10^decimals
     return math.floor(number * power) / power
@@ -25,10 +33,11 @@ end
 return {
 	on = {
 	    timer = { 
-	        'every 10 minutes' 
-	        -- 'every minute'  -- for TESTS
+	        TIMER_RULE
         },
-		httpResponses = { RES_RASPMATIC, }
+		httpResponses = { 
+		    RES_RASPMATIC, 
+	    }
 	},
 	execute = function(domoticz, item)
         -- check if the item is a device, then request information
@@ -55,13 +64,15 @@ return {
 
                     -- Check the actual value against the threshold
                     if value > threshold then
-                        message = string.format("RaspberryMatic DutyCycle %.0f%% ABOVE threshold %d%% (at %s).", 
-                            value, threshold, domoticz.helpers.isnowhhmm(domoticz));
-                        domoticz.log(message, domoticz.LOG_ERROR) 
+                        message = string.format("RaspMatic Duty-Cycle %.0f%%, Limit %d%% (%s)", 
+                            value, threshold, 
+                            domoticz.helpers.isnowshort(domoticz));
                         domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_RED, message)
+                        domoticz.log(message, domoticz.LOG_ERROR) 
                     else
-                        message = string.format("RaspberryMatic DutyCycle %.0f%% below threshold %d%% (at %s).", 
-                            value, threshold, domoticz.helpers.isnowhhmm(domoticz));
+                        message = string.format("RaspMatic Duty-Cycle %.0f%%, Limit %d%% (%s)", 
+                            value, threshold, 
+                            domoticz.helpers.isnowshort(domoticz));
                         domoticz.log(message, domoticz.LOG_INFO) 
                     end
                 end

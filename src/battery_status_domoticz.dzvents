@@ -1,0 +1,61 @@
+--[[
+    battery_status_domoticz
+    Once per day at 01:00, check the battery level of all used Domoticz devices 
+    against a threshold set by a user variable.
+    Threshold = 0 battery check is disabled.
+    Battery level below threshold, add the device name and battery level to a message.
+    If devices found, sent an email and update an alert sensor.
+    20201023 rwbl
+]]--
+
+-- Subject of the message for email and alert
+local MSGSUBJECT = 'Domoticz Batterie Stand Niedrig'
+-- Idx of the user variable holding the battery level threshold (n %)
+local IDX_TH_BATTERYLEVEL = 24
+-- Set a default threshold in case the user var is not found
+local DEF_THRESHOLD = 20
+-- Timer Rule
+local TIMER_RULE = 'at 01:00'
+-- local TIMER_RULE = 'every minute'   -- TESTS
+
+return {
+	on = {
+		timer = {
+			TIMER_RULE,
+		},
+        logging =
+        {  
+            level = domoticz.LOG_INFO,
+            marker = 'DOMOTICZBATTERYSTATUS',
+        },
+	},
+	execute = function(domoticz, timer)
+        -- Get the battery level threshold from the user variable
+		local threshold = domoticz.variables(IDX_TH_BATTERYLEVEL).value
+        -- If no user variable found set default threshold 
+        if threshold == nil then threshold = DEF_THRESHOLD	end	
+		if threshold > 0 then
+    		-- Loop over all devices and check the property batteryLevel
+    		-- !Ensure the right case for the device attribute -- see dzVents documentation
+    		local message = 'OK'
+            domoticz.devices().forEach(function(device)
+                if device.batteryLevel ~= nil then
+                    if message == 'OK' then message = '' end
+                    if device.batteryLevel < threshold then
+                        message = message .. ('%s:%d%%; '):format(device.name, device.batteryLevel)
+                        -- message = message .. ('%s;'):format(device.name)
+                        -- domoticz.log(('Device %s Battery Level %d%%'):format(device.name, device.batteryLevel),domoticz.LOG_ERROR)
+                    end
+                end
+            end)
+            domoticz.log(message, domoticz.LOG_INFO)
+            if message ~= 'OK' then
+                -- Send notification via mail
+                domoticz.notify(MSGSUBJECT, message, domoticz.PRIORITY_HIGH)
+                -- update the alert message with level orange (level = 3)
+                -- If user var TH_ALERTTOEMAIL = 4 then no email is sent because level < 4
+                domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, ('%s:%s'):format(MSGSUBJECT, message))
+            end
+        end
+	end
+}

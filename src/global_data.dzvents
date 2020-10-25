@@ -1,23 +1,22 @@
--- global_data.lua
--- utility functions used by all dzVents scripts
--- this script holds all the globally persistent variables and helper functions
--- see the documentation in the wiki
--- NOTE:
--- THERE IS ONLY ONE global_data SCRIPT for each Domoticz install.
--- usage:
--- return {
---    ...
---    execute = function(domoticz, device)
---       local results = domoticz.helpers.myHandyFunction('bla', 'boo')
---       print(domoticz.helpers.MY_CONSTANT)
---
---       local message = domoticz.variables('DEF_ALERTMSG').value
---       domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_GREY, message)
---
---    end
--- }
--- Project: domoticz-homeautomation-workbook
--- 20200501 - rwbl
+--[[
+    global_data.lua
+    utility functions used by all dzVents scripts
+    this script holds all the globally persistent variables and helper functions
+    see the documentation in the wiki
+    NOTE: THERE IS ONLY ONE global_data SCRIPT for each Domoticz install.
+    usage:
+    return {
+        ...
+        execute = function(domoticz, device)
+            local results = domoticz.helpers.myHandyFunction('bla', 'boo')
+            print(domoticz.helpers.MY_CONSTANT)
+
+            local message = domoticz.variables('DEF_ALERTMSG').value
+            domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_GREY, message)
+        end
+    }
+    20190910 rwbl
+]]--
 
 return {
 	-- global persistent data
@@ -81,6 +80,13 @@ return {
             return datearray[3] .. '-' .. datearray[2]
         end,
 
+        -- get the current date YYYY-MM-DD from the domoticz instance with time object
+        -- return date now in format DD-MM, i.e. 10-09
+        isnowddmm = function(domoticz)
+            local datearray = domoticz.helpers.split(domoticz.time.rawDate, '-')
+            return datearray[3] .. '-' .. datearray[2]
+        end,
+
         -- get the current time from the domoticz instance with time object
         -- return time now, i.e. 09:09:00
         isnowtime = function(domoticz)
@@ -92,6 +98,14 @@ return {
         isnowhhmm = function(domoticz)
             local timearray = domoticz.helpers.split(domoticz.time.rawTime, ':')
             return timearray[1] .. ':' .. timearray[2]
+        end,
+
+        -- get the current date YYYY-MM-DD from the domoticz instance with time object
+        -- return datetime now in format DD-MM HH:MM, i.e. 10-09 11:11
+        isnowshort = function(domoticz)
+            return ('%s %s'):format(
+                domoticz.helpers.isnowddmm(domoticz),
+                domoticz.helpers.isnowhhmm(domoticz))
         end,
 
         -- remove seconds from time string hh:mm:ss
