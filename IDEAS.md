@@ -1,6 +1,5 @@
 # domoticz-home-automation-workbook - Ideas
-Any Ideas captured which might get implemented.
-Status: 20201022
+Any ideas captured which might get implemented in the workbook.
 
 ### NEW: Custom Page Google Charts
 Display Google Charts, i.e. graphs, gauges etc. as a custom page for several data.
