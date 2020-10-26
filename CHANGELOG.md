@@ -1,12 +1,12 @@
 # Changelog domoticz-home-automation-workbook
 
 ### 20201025
-* NEW: Function Battery Status: Daily check & notify for all devices (Domoticz & External Systems) the battery level against a threshold set via user variable.
-* NEW: Function Custom Settings: Custom page to change the value of selective user variables.
-* NEW: Function Device Status: Custom page to quickly view the status, i.e. all device attributes, of a used device.
-* NEW: Document IDEAS.md to capture any idea which might get implemented in the workbook.
+* NEW: Function Battery Status - Daily check & notify for all devices (Domoticz & External Systems) the battery level against a threshold set via user variable.
+* NEW: Function Custom Settings - Custom page to change the value of selective user variables.
+* NEW: Function Device Status - Custom page to quickly view the status, i.e. all device attributes, of a used device.
+* NEW: Document IDEAS.md to capture any ideas which might gets implemented in the workbook.
 * UPD: [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz_quick_access_mobile). See CHANGELOG.md.
-* UPD: Document TODO.md to only keep the action for the next workbook version. Any other to capture in IDEAS.md.
+* UPD: Document TODO.md to only keep actions for next workbook version. Any other to capture in IDEAS.md.
 * UPD: Various corrections.
 
 ### 20201017
