@@ -2,15 +2,15 @@
 Any ideas captured which might get implemented in the workbook.
 
 ### NEW: Custom Page Google Charts
-Display Google Charts, i.e. graphs, gauges etc. as a custom page for several data.
+Display Google Charts, i.e. graphs, gauges etc. as a **Custom Page** for several data.
 #### Status
-Started some first test. 
+Started some first tests. 
 
 **Include Google Charts Library**
 
-To be able to use Google Charts, tested two solutions:
+To be able to use Google Charts, tested two solutions including the library:
 
-**Solution Domoticz index.html Modification**
+**Solution Modify Domoticz index.html**
 ```
 <!-- Custom page Google Charts works if this is added to the Domoticz index.html in the head section -->
 <!-- Read https://developers.google.com/chart/interactive/docs/basic_load_libs -->
@@ -23,7 +23,7 @@ Tried to include the above code direct in the custom page (the page does not con
 ```
 According to the documentation (see ref previous), the src link must be in the HTML page head section.
 
-**Solution use $.getScript()**
+**Solution jQuery $.getScript()**
 
 Alternative is to load the API in the script code via 
 ```
@@ -47,7 +47,7 @@ Step 2:
 ```
 
 **External Data from File**
-If reading data from an external file, the reference must include the subpath to the data file, like:
+If reading data from an external file, the reference must include the subpath (from ~domoticz/www) to the data file, like:
 ```
 function drawChart() {
    $.get("templates/Google_Chart_Test.csv", function(csvString) {
