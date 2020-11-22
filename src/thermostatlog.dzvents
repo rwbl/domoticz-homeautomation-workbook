@@ -1,0 +1,55 @@
+--[[
+    thermostatlog.dzvents
+    Read device values triggered by a timer rule and store the values in a virtual text sensor as CSV string.
+    The string contains two values separated by ;. A comma is not used because numeric values could use a , instead of a dot for decimal places.
+    The CSV string can hold max 200 characters.
+    The chart line values used are from the two devices Thermostat SetPoint and Temperature.
+    
+    The data can then be used in the custom page by retrieving the history values (TextLog):
+    http://192.168.1.179:8080/json.htm?type=textlog&idx=42
+    {"result" : [{"Data" : "18.5;21.5","Date" : "2020-11-05 09:13:00","User" : "","idx" : "4"}, ... ], "status" : "OK", "title" : "TextLog"}
+    
+    See custom page thermostatlog.html
+
+    Note
+    This solution is rather simple as it is based on Domoticz devices with HTTP API requests retrievig data from the Domoticz databse.
+    No need to use persistent data or local file(s) to store the data.
+    The Domoticz Log History Settings is set to 1 day.
+    
+    20201106 rwbl
+]]--
+
+-- Idx of the devices
+local IDX_SP = 30   -- Thermostat Temperature SetPoint (SP); Device: Thermostat, SetPoint
+local IDX_PV = 31   -- Thermostat Temperature Process Value (PV); Device: Temp, LaCrosse TX3
+local IDX_TS = 42   -- Text device holding the data as CSV string; Device: General, Text
+
+return
+{
+    on = 
+    { 
+        timer = 
+        {
+            'at *:00', 'at *:05', 'at *:10', 'at *:15', 'at *:20', 'at *:25', 'at *:30', 'at *:35', 'at *:40', 'at *:45', 'at *:50', 'at *:55',  
+            -- 'every minute', 
+        }, 
+    }, 
+    logging =   
+    {
+        -- domoticz.LOG_DEBUG, set to LOG_ERROR when tested and OK
+        level = domoticz.LOG_INFO, 
+        marker = 'THERMOSTATLOG', 
+    }, 
+       
+    execute = function(domoticz)
+        -- Store the new data in the virtual text sensor as CSV string (max length 200)
+        -- Content is: sp,pv
+        domoticz.devices(IDX_TS).updateText(("%.1f;%.1f"):format(
+            domoticz.utils.round(domoticz.devices(IDX_SP).setPoint, 1),
+            domoticz.utils.round(domoticz.devices(IDX_PV).temperature, 1)
+            ));
+        -- Check the value
+        domoticz.log(domoticz.devices(IDX_TS).text)
+    end
+}
+

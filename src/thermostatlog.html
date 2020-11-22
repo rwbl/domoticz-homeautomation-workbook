@@ -1,0 +1,210 @@
+<!--
+	domoticz-homeautomation-workbook function Explore Custom Page Google Charts
+
+	Purpose
+	To explore how to display device data from several devices in a google line chart.
+	
+	Concept
+	The data is retrieved from a text device holding the devices data as string seperated by semicolon.
+    http://domoticz-ip:port/json.htm?type=textlog&idx=42
+    {"result" : [{"Data" : "18.5;21.5","Date" : "2020-11-05 09:13:00","User" : "","idx" : "4"}, ... ], "status" : "OK", "title" : "TextLog"}
+	The entry is added to the chart if the date hour is with MAXHOURS range (set to 24 , see JS Code).
+	The Domoticz settings enables to set the max log entries (see GUI > Setup > Settings > Log History > Light/Switches > Days
+	Consideration could also to use MAXITEMS by checking the IDX for number to ensure only single day data, i.e. 288 entries if timer every 5 minutes.
+
+	References:
+	https://developers.google.com/chart/interactive/docs/gallery/linechart
+
+	20201106 rwbl		
+-->
+
+<!-- 
+Meta tag refreshes the whole page every 300 seconds. 
+Not used as replaced by setInterval(drawChart, 300000); to only draw the chart new instead whole page
+<head>
+	<META HTTP-EQUIV="refresh" CONTENT="300">
+</head>
+-->
+
+<style>
+	.legend {
+		font-size: 12px;
+		font-family: consolas;
+		text-color: gray;
+		padding: 5px;
+	}
+</style>
+
+<!--
+	HTML
+-->
+<div class="chart noselect">
+	<div align="right"><button class="btnstyle3" onclick="refreshChart();">Refresh</button></div>
+	<div class="chartarea">
+		<div class="chartcontainer" id="linechart"></div>
+	</div>
+	<div class="legend">
+		<div id="chartinfo" class="page-footer"></div>
+		<div id="pageversion" class="page-footer" align="right"></div>
+	</div>
+</div>
+
+<!--
+	JavaScript	
+-->
+<script type="text/javascript" charset="utf-8">
+	
+	// use this to load the api if not added to the ~domoticz/www/index.html page head section:
+	$.getScript('https://www.gstatic.com/charts/loader.js',function (){
+		// Load the Visualization API with the corechart package.
+		google.charts.load('current', { packages: ['corechart'] });
+		// Set callback to run when the Google Visualization API is loaded.
+		google.charts.setOnLoadCallback(drawChart);
+	});
+
+	// Draw the linechart
+	function drawChart() {
+		// Settings
+		let MAXHOURS = 24;	// Log max hours
+		let IDX = 42;		// Domoticz IDX of the Text Device with the devices data
+
+		// AJAX call with draws the chart if successfull return
+		$.ajax({
+			url: "json.htm?idx=" + IDX + "&range=day&type=textlog",
+			async: false,
+			dataType: 'json',
+			success: function (deviceData) {
+				// console.log(deviceData);
+				// No data found then leave
+				if(typeof deviceData.result == "undefined"){
+					console.log("[ERROR] No device data found (status: " + deviceData.status + ", title: " + deviceData.title + ")");
+					$('#chartinfo').html("[ERROR] No device data found.");
+					return false;
+				}
+				console.log("[INFO drawChart] Data retrieved, #Entries: " + deviceData.result.length + " (status: " + deviceData.status + ", title: " + deviceData.title + ")");
+
+				// Create the chart data table out of JSON data loaded from server.
+				var chartData = new google.visualization.DataTable(deviceData);
+				chartData.addColumn('string', 'Time');
+				chartData.addColumn('number', 'SP');
+				chartData.addColumn('number', 'PV');
+
+				// Add the data rows, in reverse order, for time in HH:MM format, sp, pv from the JSON object:
+				// {"result" : [{"Data" : "18.5,21.5","Date" : "2020-11-05 09:13:00","User" : "","idx" : "4"}, ... ], "status" : "OK", "title" : "TextLog"}
+				var dataArray;
+				deviceData.result.reverse().forEach(function(entry) {
+					// Split the data csv string into the sp, pv items (array size 2)
+					dataArray = entry.Data.split(";");
+					// console.log(dataArray);
+					// Get the hours difference between now and the date of the entry
+					var dateNow = new Date();
+					var dateEntry = new Date(entry.Date);
+					var hoursDiff = Math.abs(dateNow.getTime() - dateEntry.getTime()) / 3600000;
+					// console.log("Hours Diff:" + hoursDiff);
+					// Get the time HH:MM from the Date key
+					timeArray = dateEntry.toTimeString().split(":");
+					// If the entry hour is within MAXHOURS then row add entry: HH:MM, sp, pv
+					if (hoursDiff <= MAXHOURS) {
+						chartData.addRow([timeArray[0]+":"+timeArray[1], Number(dataArray[0]), Number(dataArray[1])]);
+					}
+				});				
+
+				// From the chartData get min/max for PV which is column 2 (i.e. col0=time, col1=sp,col2=pv)
+				minPV = chartData.getColumnRange(2).min;
+				maxPV = chartData.getColumnRange(2).max;
+				// console.log("PV Min/Max:" + minPV + "/" + maxPV);
+				
+				// Set the linechart options
+				var options = {
+					title: 'Thermostat Last ' + MAXHOURS + ' Hours',
+					titlePosition: 'out',
+					titleTextStyle: {
+						fontSize : 16,
+						fontName: 'consolas', 
+						bold: true,
+						color: 'black'
+					},
+					curveType: 'function',
+					legend: {
+						position: 'in',
+						textStyle: {
+							fontSize : 10,
+							bold: false,
+							color: 'gray'
+						}					
+					}, 
+					// width: 400,
+					height: 300,
+					series: {
+								0: { lineWidth: 3 },
+								1: { lineWidth: 1 },
+					},
+					colors:['blue','tomato'],
+					hAxis: { 
+						// title: 'PV Min:' + minPV + ',Max:' + maxPV,
+						titleTextStyle: {
+							color: 'gray',  
+							fontName: 'consolas', 
+							fontSize: 12, 
+							bold: false, 
+							italic: false
+						},
+						showTextEvery: 9,
+						slantedText: true,
+						slantedTextAngle: 90,
+						textStyle: {
+							fontSize : 12,
+							bold: false,
+							color: 'black'
+						},
+					},
+					vAxis: { 
+						title: 'Degrees \u00B0C',
+						viewWindowMode:'explicit',
+						viewWindow: { max:30, min:15 }
+					}
+				};
+
+				// Instantiate and draw the linechart, passing options
+				var chart = new google.visualization.LineChart(document.getElementById('linechart'));
+				chart.draw(chartData, options);
+
+				// Update the custom legend
+				var updated = new Date().toLocaleTimeString();
+				$('#chartinfo').html(
+					'Updated:' + updated + ' | ' + 'PV Min:' + minPV + ',Max:' + maxPV);
+			},
+			error: function () {
+				console.log("[ERROR] Device Data. Can not communicate to the Domoticz server!");
+				return false;
+			}
+		});	
+	}
+
+	// Redraw the chart if the window is resized
+	// TODO: Need to find a smooth solution ithout reloading the full page and its data!
+	$(window).resize(function(){
+		drawChart();
+		// console.log("[INFO resize]");
+	});
+
+	// Refresh the page. Assigned to a button.
+	function refreshChart() {
+		drawChart();
+		// NOT USED: reload the page fetching a clear copy
+		// window.location.reload(true)
+		// console.log("[INFO refreshChart]");
+	}
+
+	// Set the page version at the bottom of the page
+	function setVersion(pageVersion) {
+		$('#pageversion').html(pageVersion);	
+	};
+
+	// Load the document and refresh every 300 seconds
+	$(document).ready(function(){
+		setVersion("20201106 by rwbl");
+		setInterval(drawChart, 300000);
+	});
+	
+</script>

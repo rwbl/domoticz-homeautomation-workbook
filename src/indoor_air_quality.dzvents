@@ -32,7 +32,10 @@
     These gas measurements are combined with the measurements of air pressure, humidity and temperature to calculate the final IAQ index.
     The IAQ index has a range of 0-500:	0-50(good),51-100(average),101-150(little bad),151-200(bad),201-300(worse),301-500(very bad).
 	
-	20201013 rwbl
+	Changes
+	20101026 - In case data error send data to domoticz log error
+	
+	20201026 rwbl
 ]]--
 
 -- Idx of the devices
@@ -44,7 +47,7 @@ local IDX_IAQHUE = 355
 local NAME_IAQINDEX = "Luft Wohnen (%s)"
 
 -- Timers
-local IAQHUE_TIMER = 'every 2 minutes'  -- 'every minute'
+local IAQHUE_TIMER = 'every 5 minutes'  -- 'every minute'
 
 -- Full path of the python script to get the bricklet data.
 -- IMPORTANT: runs as an async background process (using the & sign) to not block the domoticz event system
@@ -60,14 +63,15 @@ end
 
 -- Sets the hue degrees 0-360, using the hue color wheel, depending iaqindex
 -- IAQ index range 0-500 - see if statements below 
+-- If the iaqindex is out of range 0-500, the color is set to blue.
 -- Used by the dzVents function huedevice.setHue(hue, brightness, isWhite)
 -- Returns hue degrees 
 -- Hint: Read more about colors: https://learnui.design/blog/the-hsb-color-system-practicioners-primer.html
 local function setHueDegrees(iaqindex)
 	huedegrees = 240                                                    -- 0 unknown: 240 
 	if iaqindex >= 0 and iaqindex < 51 then huedegrees = 120 end        -- 1 good: 120 mid green
-	if iaqindex > 50 and iaqindex < 101 then huedegrees = 90 end        -- 2 average: 90 yellow green
-	if iaqindex > 100 and iaqindex < 150 then huedegrees = 45 end       -- 3 little bad: 45 warm yellow
+	if iaqindex > 50 and iaqindex < 101 then huedegrees = 105 end       -- 2 average: 105 warm green
+	if iaqindex > 100 and iaqindex < 150 then huedegrees = 75 end       -- 3 little bad: 75 cool yellow
 	if iaqindex > 150 and iaqindex < 201 then huedegrees = 30 end       -- 4 bad: 30 orange
 	if iaqindex > 200 and iaqindex < 301 then huedegrees = 15 end       -- 5 worse: 15 warm red
 	if iaqindex > 300 and iaqindex < 501 then huedegrees = 345 end      -- 6 very bad: 345 cool red
@@ -132,6 +136,7 @@ return
             else
             -- data has error. set the iqauqlity to ERROR
                 data.iaqquality = "ERROR"
+                domoticz.log(('Item Data:%s'):format(data), domoticz.LOG_ERROR)
             end
 
             -- Amend the air quality condition  to the device name, i.e. "Luftqualität (Gut)"

@@ -1,0 +1,81 @@
+--[[
+    battery_status_raspbmatic
+    Once per day, check the battery level of all raspberrymatic (homematic ip) devices.
+    A raspberrymatic script runs every night and sets a system variable BatteryLevelStatus type string.
+    The raspberrymatic device datapoint LOW_BAT is checked true (battery is low) or false (battery ok).
+    Via HTTP XMLAPI request sysvar.cgi for system variable datapoint, the system variable value (string) is retrieved.
+    If the value (i.e. OK 26.10) does not start with "OK", there are devices with low battery state.
+    Threshold = 0 battery check is disabled.
+    If devices found, sent an email and update an alert sensor.
+    20201117 rwbl
+]]--
+
+-- Subject of the message for email and alert
+local MSGSUBJECT = 'RaspberryMatic Batterie Prüfung'
+-- Idx of the user variable holding the battery level threshold (n %)
+local IDX_TH_BATTERYLEVEL = 24
+-- Set a default threshold in case the user var is not found
+local DEF_THRESHOLD = 20
+-- RaspberryMatic url http xml-api request system variable. The ise_id is set in the function openURL
+local URL_RASPMATIC = 'http://192.168.1.225/addons/xmlapi/sysvar.cgi?ise_id=';
+-- define the unique (across all dzVents) callback
+local RES_RASPMATIC = "RES_RASPMATIC_BATTERYSTATUS";
+-- set the datapoint ise_id of the system variable "BatteryLevelStatus" with ise_id 1390
+-- get the id from http://192.168.1.225/addons/xmlapi/sysvarlist.cgi
+-- <systemVariable name="BatteryLevelStatus" variable="OK 26.10" value="OK 26.10" value_list="" ise_id="9175" min="" max="" unit="" type="20" subtype="11" logged="true" visible="true" timestamp="1603710520" value_name_0="" value_name_1=""/>
+local DATAPOINT_ISE_ID = 9175;
+-- Timer Rule two times a week at 01:00
+local TIMER_RULE = 'at 01:00 on mon,thu'
+-- local TIMER_RULE = 'every minute'   -- TESTS
+
+return {
+	on = {
+		timer = {
+			TIMER_RULE,
+		},
+		httpResponses = { 
+		    RES_RASPMATIC, 
+	    },
+        logging =
+        {  
+            level = domoticz.LOG_INFO,
+            marker = 'BATTERYSTATUSRASPMATIC',
+        },
+	},
+	execute = function(domoticz, item)
+
+	     -- Check if the item is timer, then request RASPBERRYMATIC HTTP XMLAPI datapoint 
+		if (item.isTimer) then
+            -- Get the battery level threshold from the user variable
+    		local threshold = domoticz.variables(IDX_TH_BATTERYLEVEL).value
+            -- If no user variable found set default threshold 
+            if threshold == nil then threshold = DEF_THRESHOLD	end	
+    		if threshold > 0 then
+    		    domoticz.openURL({url = URL_RASPMATIC .. DATAPOINT_ISE_ID, method = 'GET', callback = RES_RASPMATIC,})
+    	    end
+        end
+
+        -- check if the item is a httpresponse from the openurl callback
+		if (item.isHTTPResponse) then
+		    local message = ''
+			if (item.statusCode == 200) then
+                -- Select the callback - in this case there is only one (but for any next developments here might be more)
+                if (item.callback == RES_RASPMATIC) then
+                    -- get the attribute value from the http response and assing as message
+                    -- <systemVariable name="BatteryLevelStatus" variable="OK 26.10" value="OK 26.10" value_list="" ise_id="9175" min="" max="" unit="" type="20" subtype="11" logged="true" visible="true" timestamp="1603710520" value_name_0="" value_name_1=""/>
+                    message = domoticz_applyXPath(item.data,'//systemVariable[@ise_id="'..DATAPOINT_ISE_ID..'"]/@value')
+                end
+			else
+				domoticz.log('[ERROR] Request:' .. item.statusText, domoticz.LOG_ERROR)
+			end
+            domoticz.log(message, domoticz.LOG_INFO)
+            if string.sub(message,1,2) ~= 'OK' then
+                -- Send notification via mail
+                domoticz.notify(MSGSUBJECT, message, domoticz.PRIORITY_HIGH)
+                -- update the alert message with level orange (level = 3)
+                -- If user var TH_ALERTTOEMAIL = 4 then no email is sent because level < 4
+                domoticz.helpers.alertmsg(domoticz, domoticz.ALERTLEVEL_YELLOW, ('%s:%s'):format(MSGSUBJECT, message))
+            end
+        end
+	end
+}
