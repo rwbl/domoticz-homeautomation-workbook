@@ -1,7 +1,7 @@
 # domoticz-home-automation-workbook - ToDo
 Actions to complete till next version of the workbook.
 Any ideas to be captured in IDEAS.md.
-Status: 20201023
+Status: 20201122
 
 ### NEW: Function Custom Settings
 Enhance with HTML elements like checkboxes and buttons instead using virtual devices.

@@ -1,5 +1,10 @@
 # Changelog domoticz-home-automation-workbook
 
+### 20201122
+* NEW: Explore Custom Charts - First examples Custom Pages with Highcharts & Google Charts embedded for single & multiple devices.
+* UPD: Function Temperature & Humidity (TFA TS34C) - Hint on how to replace the batteries and keep the log history.
+* UPD: Various smaller enhancements & corrections.
+
 ### 20201025
 * NEW: Function Battery Status - Daily check & notify for all devices (Domoticz & External Systems) the battery level against a threshold set via user variable.
 * NEW: Function Custom Settings - Custom page to change the value of selective user variables.

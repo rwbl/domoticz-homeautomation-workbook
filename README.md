@@ -71,6 +71,7 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 * Python Plugin Development.
 * Handling HTTP JSON/API requests.
 * MQTT messaging.
+* Custom Pages with Highcharts & Google Charts for single & multiple devices. 
 * SQLite3 to understand the Domoticz database structure and to query.
 * Connecting & communicating with microcontroller Arduino, ESP8266 and other.
 * Integrate ESP Easy with various sensors.
