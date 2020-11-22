@@ -9,7 +9,7 @@ The HTML elements are linked to user variables type integer with values 0 (=OFF)
 #### Status
 Not started.
 
-### NEW: Explore Notifications Custom HTTP/Action
-Not understood so far how this notification type works. Need to find out how of possible use.
+### NEW: Explore Notifications - Custom HTTP/Action
+Check out how to use this notification type.
 #### Status
 Not started.
