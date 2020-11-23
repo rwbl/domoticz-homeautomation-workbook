@@ -71,7 +71,7 @@ local function setHueDegrees(iaqindex)
 	huedegrees = 240                                                    -- 0 unknown: 240 
 	if iaqindex >= 0 and iaqindex < 51 then huedegrees = 120 end        -- 1 good: 120 mid green
 	if iaqindex > 50 and iaqindex < 101 then huedegrees = 105 end       -- 2 average: 105 warm green
-	if iaqindex > 100 and iaqindex < 150 then huedegrees = 75 end       -- 3 little bad: 75 cool yellow
+	if iaqindex > 100 and iaqindex < 151 then huedegrees = 75 end       -- 3 little bad: 75 cool yellow
 	if iaqindex > 150 and iaqindex < 201 then huedegrees = 30 end       -- 4 bad: 30 orange
 	if iaqindex > 200 and iaqindex < 301 then huedegrees = 15 end       -- 5 worse: 15 warm red
 	if iaqindex > 300 and iaqindex < 501 then huedegrees = 345 end      -- 6 very bad: 345 cool red
