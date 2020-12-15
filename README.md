@@ -62,8 +62,10 @@ Lookup [Changelog](https://github.com/rwbl/domoticz-homeautomation-workbook/blob
 * Soil Moisture monitor for plants - [Plugin](https://github.com/rwbl/domoticz-plugin-soil-moisture-monitor).
 * Time Control to track & control the time spent in hours, per activity block (with start- & end-time) and total/day, on a generic task.
 * Timers for single devices or complex tasks (Automation events dzVents).
+* Utility Dashboard Heating, Power, Water dashboard using Grafana & FlowCharting plugin. This is a process engineering prototype (SCADA).
+* Weather 9-DAYS forecast from Norwegian Meteorological Institute (Meteorologisk) as a Custom Page with Highcharts Custom Chart.
 * Web UI [Domoticz Quick Access Mobile](https://github.com/rwbl/domoticz_quick_access_mobile) - customized web frontend to control dedicated functions mainly accessed from mobile  devices.
-* Wub UI [Web App Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Note: Not developed further as replaced by Web UI Quick Access Mobile).
+* Web UI [Web App Site Control](https://github.com/rwbl/domoticz-webapp-sitecontrol) - Node-RED alternative to the standard Domoticz Web UI (Note: Not developed further as replaced by Web UI Quick Access Mobile).
 
 ### Explore
 * Domoticz running on a Raspberry Pi (setup, configure).

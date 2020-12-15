@@ -1,5 +1,14 @@
 # Changelog domoticz-home-automation-workbook
 
+### 20201115
+* NEW: Utility Dashboard - Heating, Power, Water dashboard using Grafana & FlowCharting plugin. This is a process engineering prototype (SCADA).
+* NEW: Weather Forecast - Custom Page with Highcharts Custom Chart 9-DAY FORECAST for a selected location with data from the Norwegian Meteorological Institute (Meteorologisk).
+* NEW: Explore Grafana & InfluxDB - Basic dashboard with two panels displaying gauges & line charts for 3 devices. Explored InfluxLink; dzVents InfluxDB HTTP API using curl.
+* UPD: Explore RaspberryMatic - Thermostat HmIP-eTRV-2 Script handling multiple datapoint requests for multiple devices.
+* UPD: Explore RaspberryMatic - Release 3.53.34.20201121.
+* UPD: Various smaller enhancements & corrections.
+* FIX: Function Hardware Monitor - fixed get RAM data for Raspberry Pi OS.
+
 ### 20201122
 * NEW: Explore Custom Charts - First examples Custom Pages with Highcharts & Google Charts embedded for single & multiple devices.
 * UPD: Function Temperature & Humidity (TFA TS34C) - Hint on how to replace the batteries and keep the log history.
