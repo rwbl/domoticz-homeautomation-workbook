@@ -1,0 +1,265 @@
+--[[
+    weather_forecast.dzvents
+    Request, every hour, the Meteorologisk full weather forecast via HTTP and create a chart data file located in the www/templates folder.
+    The data is imported by the custom ui html file ~domoticz/www/templates/weather_forecast.html 
+
+	The weather forecast location is either from Domoticz settings or from a Switch Selector with Location Name,Lat,Lon as Level Name.
+	Example: Four level names defined with level 0,10,20,30: {"Off", "Hamburg,53.6375,9.7987", "Arrecife,28.9630,-13.5477", "Domburg,51.567,3.500"}
+	The IDX of the switch selector is set as constant IDX_FORECAST_LOCATOR.
+
+    List selective timeseries entries.
+	The content of the file is obtained from:
+    https://api.met.no/weatherapi/locationforecast/2.0/.json?lat=53.6375&lon=9.7987
+
+    Chart Data File for 9 days
+	{"result" : [
+	{"air_pressure_at_sea_level":1013.5,"air_temperature":17.8,"precipitation_amount":0.9,"probability_of_precipitation":0,"time":"26-11 12:00","wind_speed":10.4},
+	{"air_pressure_at_sea_level":1011.2,"air_temperature":16.2,"precipitation_amount":0.4,"probability_of_precipitation":0,"time":"26-11 18:00","wind_speed":9.4},
+	...
+	{"air_pressure_at_sea_level":1019.0,"air_temperature":19.1,"precipitation_amount":0,"probability_of_precipitation":0,"time":"05-12 18:00","wind_speed":3.2}],
+	"status":"OK","title":"Weather Forecast","location":"Arrecife","updated":"26-11 08:47"}
+
+	Domoticz Log
+    2020-11-26 10:48:17.586 Status: dzVents: Info: Handling events for: "Weather Forecast Location", value: "Arrecife,28.9630,-13.5477"
+    2020-11-26 10:48:17.586 Status: dzVents: Info: WEATHERFORECAST: ------ Start internal script: weather_forecast: Device: "Weather Forecast Location (VirtualSensors)", Index: 50
+    2020-11-26 10:48:17.586 Status: dzVents: Info: WEATHERFORECAST: Device Trigger: Weather Forecast Location, 50, Arrecife,28.9630,-13.5477
+    2020-11-26 10:48:17.586 Status: dzVents: Info: WEATHERFORECAST: Location: Arrecife,28.9630,-13.5477
+    2020-11-26 10:48:17.586 Status: dzVents: Info: WEATHERFORECAST: URL: https://api.met.no/weatherapi/locationforecast/2.0/.json?lat=28.9630&lon=-13.5477
+    2020-11-26 10:48:17.591 Status: dzVents: Info: WEATHERFORECAST: ------ Finished weather_forecast
+    2020-11-26 10:48:17.591 Status: EventSystem: Script event triggered: /home/pi/domoticz/dzVents/runtime/dzVents.lua
+    2020-11-26 10:48:17.899 Status: dzVents: Info: Handling httpResponse-events for: "WEATHERFORECAST"
+    2020-11-26 10:48:17.899 Status: dzVents: Info: WEATHERFORECAST: ------ Start internal script: weather_forecast: HTTPResponse: "WEATHERFORECAST"
+    2020-11-26 10:48:18.016 Status: dzVents: Info: WEATHERFORECAST: Timeseries Count: 91
+    2020-11-26 10:48:18.054 Status: dzVents: Info: WEATHERFORECAST: File created: /home/pi/domoticz/www/templates/weather_forecast_data.json
+    2020-11-26 10:48:18.054 Status: dzVents: Info: WEATHERFORECAST: ------ Finished weather_forecast
+
+	20201127 rwbl
+]]--
+
+-- Define the path to the data file holding the weather forecast data in json format
+local CHARTSDATAFILE = '/home/pi/domoticz/www/templates/weather_forecast_data.json'
+-- Change ownership of the datafile to user pi to be able to view/copy the data
+local OSCHOWM = 'sudo chown pi:pi '
+
+-- Selector switch enabling to define multiple weather forecast locations.
+-- Set to -1 if not used, Define selector levels as name,lat,lon. Example: Arrecife,28.9630,-13.5477
+local IDX_FORECAST_LOCATOR = 50
+
+-- HTTP Response from weather forecast HTTP request
+local HTTPRESPONSE = "WEATHERFORECAST"
+-- Regular update the weather forecast data json file in the www/templates folder
+local TIMERRULE = 'every hour'
+
+--
+-- Helper Functions
+--
+
+-- Check if a string is empty 
+local function isEmpty(s)
+  return s == nil or s == ''
+end
+
+-- Split a string by delimiter
+-- return array, i.e. array[1], array[2]
+local function split(s, delimiter)
+    local result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match);
+    end
+    return result;
+end
+
+-- Read a file as R/O
+-- Return full file content as string
+local function readFile(domoticz, f)
+    -- open file in read mode
+    local file = assert(io.open (f, 'r'))
+    -- read all
+    local data =  file:read('*a') 
+    file:close()
+    domoticz.log(("File read: %s"):format(f))
+    return data
+end  
+
+-- Write a file
+local function writeFile(domoticz, f,content)
+    local dataFile = assert(io.open(f, "w"))
+    dataFile:write(content)  
+    dataFile:close()
+    -- domoticz.utils.osCommand(OSCHOWM .. f)
+    domoticz.log(("File created: %s"):format(f))
+end  
+
+-- Convert ISO-8601 date and time string to number of seconds from January 1, 1970
+-- Example: 2020-11-25T08:00:00Z to 1606287600
+-- Hint: 
+-- Convert to table with os.date("*t", ts) where ts = getTimestamp("2020-11-25T08:00:00Z")
+-- {["yday"]=330, ["isdst"]=false, ["wday"]=4, ["month"]=11, ["hour"]=8, ["sec"]=0, ["day"]=25, ["year"]=2020, ["min"]=0}
+local function getTimestamp(dateString)
+    local inYear, inMonth, inDay, inHour, inMinute, inSecond, inZone = 
+        string.match(dateString, '^(%d%d%d%d)-(%d%d)-(%d%d)T(%d%d):(%d%d):(%d%d)(.-)$')
+    local zHours, zMinutes = string.match(inZone, '^(.-):(%d%d)$')
+	local returnTime = os.time({year=inYear, month=inMonth, day=inDay, hour=inHour, min=inMinute, sec=inSecond, isdst=false})
+	if zHours then
+		returnTime = returnTime - ((tonumber(zHours)*3600) + (tonumber(zMinutes)*60))
+	end
+	return returnTime
+end
+
+-- Get timestamp DD-MM HH:MM from timestamp table
+-- Hint from 2020-11-25T08:00:00Z to table
+-- getDateTime(os.date("*t", getTimestamp("2020-11-25T08:00:00Z"))
+local function getDateTime(tableTimestamp)
+    return string.format('%s-%s %s:%s',
+        string.format('%02d', tableTimestamp.day), 
+        string.format('%02d', tableTimestamp.month), 
+        string.format('%02d', tableTimestamp.hour), 
+        string.format('%02d', tableTimestamp.min))
+end
+
+-- Reverse the entries of a table
+-- This is used to show time axis from first time to end time 
+function table_reverse(tbl)
+  for i=1, math.floor(#tbl / 2) do
+    tbl[i], tbl[#tbl - i + 1] = tbl[#tbl - i + 1], tbl[i]
+  end
+end
+
+-- 
+-- Functions
+--
+
+-- Request weather full forecast for given location
+-- Location is CSV string: name, lat, lon
+-- Example using Domoticz settings location:
+-- local forecastLocation = string.format('%s,%s,%s',domoticz.settings.location.name,domoticz.settings.location.latitude,domoticz.settings.location.longitude)
+-- requestForecast(domoticz, HTTPRESPONSE, forecastLocation)
+local function requestForecast(domoticz, httpresponse, location)
+    domoticz.log(('Location: %s'):format(location))
+    local locationTable = split(location, ',')
+    -- Check if split by commata is ok: table with 3 entries name, lat, lon
+    if #locationTable == 3 then
+        local urlRequest = ('https://api.met.no/weatherapi/locationforecast/2.0/.json?lat=%s&lon=%s'):format(
+            locationTable[2], locationTable[3])
+        domoticz.log(('URL: %s'):format(urlRequest))
+        domoticz.openURL({url = urlRequest, method   = "GET", callback = httpresponse })
+    else
+        domoticz.log(('[ERROR] Request Forecast Location: %s'):format(location), domoticz.LOG_ERROR)
+    end
+end
+
+return {
+	on = {
+		devices = {IDX_FORECAST_LOCATOR},
+		timer = {TIMERRULE},
+		httpResponses = {HTTPRESPONSE}
+	},
+	data = {
+	    -- Store the forecast location to get the name used by httpresponse
+	    forecastLocation = { initial = '' }
+    },
+    logging = {  
+        level = domoticz.LOG_INFO,
+        marker = 'WEATHERFORECAST',
+    },
+
+	execute = function(domoticz, triggeredItem)
+
+	    -- Switch trigger. check on idx in case more device triggers used (future)
+        if triggeredItem.isDevice and triggeredItem.idx == IDX_FORECAST_LOCATOR then
+            domoticz.log(string.format('Device Trigger: %s, %s, %s', triggeredItem.name, triggeredItem.idx, triggeredItem.sValue))
+            domoticz.data.forecastLocation = domoticz.devices(IDX_FORECAST_LOCATOR).levelName
+            requestForecast(domoticz, HTTPRESPONSE, domoticz.data.forecastLocation)
+        end
+
+	    -- Timer trigger
+        if triggeredItem.isTimer then
+            -- Check if there is a location selector and select actual levelName as location
+            if IDX_FORECAST_LOCATOR > 0 then
+                domoticz.data.forecastLocation = domoticz.devices(IDX_FORECAST_LOCATOR).levelName
+            else
+            -- Set the default location name,lat,lon from the domoticz settings
+                domoticz.data.forecastLocation = string.format('%s,%s,%s',
+                    domoticz.settings.location.name,
+                    domoticz.settings.location.latitude,
+                    domoticz.settings.location.longitude)
+            end
+            requestForecast(domoticz, HTTPRESPONSE, domoticz.data.forecastLocation)
+        end
+
+        -- HTTP response trigger. check on trigger in case more http triggers used (future)
+        if triggeredItem.isHTTPResponse and triggeredItem.trigger == HTTPRESPONSE then
+            -- domoticz.log(string.format('Data: %s', triggeredItem.data))
+
+            -- Convert the http json response data to a Lua table
+            local jsonData = domoticz.utils.fromJSON(triggeredItem.data)
+
+            -- Log the number of timeseries
+            domoticz.log(string.format(
+                'Timeseries Count: %d',
+                #jsonData.properties.timeseries))
+
+            -- Get meta key updated_at and convert to DD:MM HH:MM
+            local updatedAt = getDateTime(os.date("*t", getTimestamp(jsonData.properties.meta.updated_at)));
+
+            -- Create table holding the data object entries
+            local resultData = {}
+            -- Get selected keys from the time series
+            local timeseries = jsonData.properties.timeseries
+            for i, item in pairs(timeseries) do
+                local tableTime = os.date("*t", getTimestamp(item.time))
+                -- Show all timeseries items
+                --[[
+                domoticz.log(string.format(
+                    '%s = T: %.1f',
+                    getDateTime(tableTime),
+                    item.data.instant.details.air_temperature))
+                ]]--
+                -- Select every 6 hr, i.e. hour = 0,6,12,18. 
+                if tableTime.hour == 0 or 
+                    tableTime.hour == 6 or
+                    tableTime.hour == 12 or
+                    tableTime.hour == 18 then
+                    -- Create the result item
+                    local resultItem = {}
+                    -- Add time stamp
+                    resultItem.time = string.format('%s', getDateTime(tableTime));
+                    
+                    -- Select keys
+                    resultItem.air_temperature = item.data.instant.details.air_temperature
+                    resultItem.air_pressure_at_sea_level = item.data.instant.details.air_pressure_at_sea_level
+                    resultItem.wind_speed = item.data.instant.details.wind_speed
+
+                    -- Check if there is a key next_6_hours
+                    resultItem.precipitation_amount = 0
+                    resultItem.probability_of_precipitation = 0
+                    if item.data.next_6_hours ~= nil then
+                        if item.data.next_6_hours.details.precipitation_amount ~= nil then
+                            resultItem.precipitation_amount = item.data.next_6_hours.details.precipitation_amount
+                        end
+                        if item.data.next_6_hours.details.probability_of_precipitation ~= nil then
+                            resultItem.probability_of_precipitation = item.data.next_6_hours.details.probability_of_precipitation
+                        end
+                    end
+
+                    -- Insert the new item in the table resultdata
+                    table.insert(resultData, '\n' .. domoticz.utils.toJSON(resultItem))
+                end
+            end
+        
+            -- Create the result JSON object used to store into the data file
+            local locationTable = split(domoticz.data.forecastLocation, ',')
+
+            -- table_reverse(resultData)
+            local result = ('{"result" : [%s],\n"status":"OK","title":"Weather Forecast","location":"%s","updated":"%s"}'):format(
+                table.concat(resultData, ","),
+                locationTable[1],
+                updatedAt)
+            -- domoticz.log(result)
+
+            -- Save the data to file for import by custom ui html file ~domoticz/www/templates/weather_forecast.html 
+            writeFile(domoticz,CHARTSDATAFILE,result)            
+
+        end
+	end
+}

@@ -1,0 +1,398 @@
+<!--
+	domoticz-homeautomation-workbook function Weather_Forecast
+	File / Data Source
+	weather-forecast.html / datajsonfile
+
+	Purpose
+	To display a 9-DAY WEATHER FORECAST chart with temperature, air pressure, rainfall.
+	
+	Concept
+	The history data is retrieved from a file holding the history data as JSON object.
+	The file is created from data requested from the Norwegian Meteorological Institute (Meteorologisk Institutt) using the MET Norway Weather API v.3.
+
+	The weather forecast location is either from Domoticz settings or from a Switch Selector with Location Name,Lat,Lon as Level Name.
+	Example: Four level names defined with level 0,10,20,30: {"Off", "Hamburg,53.6375,9.7987", "Arrecife,28.9630,-13.5477", "Domburg,51.567,3.500"}
+	The IDX of the switch selector is set as constant in the dzVents code.
+
+	The file contains more weather information then used for  the chart. The chart uses 3 keys for the yaxis and the time for the xaxis.
+	air_pressure_at_sea_level, air_temperature, precipitation_amount
+	
+	File located in ~domoticz/www/templates/weather_forecast_data.json.
+	{"result" : [
+	{"air_pressure_at_sea_level":1013.5,"air_temperature":17.8,"precipitation_amount":0.9,"probability_of_precipitation":0,"time":"26-11 12:00","wind_speed":10.4},
+	{"air_pressure_at_sea_level":1011.2,"air_temperature":16.2,"precipitation_amount":0.4,"probability_of_precipitation":0,"time":"26-11 18:00","wind_speed":9.4},
+	...
+	{"air_pressure_at_sea_level":1019.0,"air_temperature":19.1,"precipitation_amount":0,"probability_of_precipitation":0,"time":"05-12 18:00","wind_speed":3.2}],
+	"status":"OK","title":"Weather Forecast","location":"Arrecife","updated":"26-11 08:47"}
+
+	Dependencies
+	Atomation Event: weather_forecast.dzvents
+	
+	References
+	https://api.highcharts.com/highcharts/
+	https://www.tutorialspoint.com/highcharts/highcharts_line_basic.htm
+
+	Credits
+	This solution is based on this example. Thanks a lot to the developer(s).
+	https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/combo-multi-axes
+	
+	20201127 rwbl
+-->
+<!--
+	HTML
+-->
+<style>
+.highcharts-figure, .highcharts-data-table table {
+    min-width: 310px; 
+    max-width: 800px;
+    margin: 1em auto;
+}
+
+.highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #EBEBEB;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+.highcharts-data-table th {
+	font-weight: 600;
+    padding: 0.5em;
+}
+.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+    padding: 0.5em;
+}
+.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+</style>
+<div class="chart noselect">
+	<div class="chartarea">
+		<!-- Container containing the chart -->
+		<div id="chartcontainer" class="device-log-chart"></div>
+	</div>
+</div>
+
+<!--
+	JavaScript	
+-->
+<script type="text/javascript" charset="utf-8">
+
+	// Draw the chart
+	// Argument
+	//	chartOptions: chart settings and data for the categories (xaxis) and series (yaxis)
+	function drawChart(chartOptions) {
+		var json = {};
+		json.chart= chartOptions.chart;
+		json.title = chartOptions.title;
+		json.subtitle = chartOptions.subtitle;
+		json.xAxis = chartOptions.xAxis;
+		json.yAxis = chartOptions.yAxis;
+		json.tooltip = chartOptions.tooltip;
+		json.legend = chartOptions.legend;
+		json.series = chartOptions.series;
+		json.responsive = chartOptions.responsive;
+		json.credits = chartOptions.credits;
+		json.exporting = chartOptions.exporting;
+		$('#chartcontainer').highcharts(json);
+		// console.log("[INFO drawChart]" + json);
+	}
+
+	// Update the linechart by reading data from file and redraw the chart
+	function updateChart() {
+		let VERSION = 'v20201127';
+		let METNO = 'met.no';
+		
+		// File holding the data located in the ~domoticz/www/templates folder
+		let DATAFILEPATH = "templates/weather_forecast_data.json";
+		
+		// Get the data from the file
+		$.get(DATAFILEPATH, function(deviceData) {
+			// console.log(deviceData);
+			// No data found then leave
+			if(typeof deviceData.result == "undefined"){
+				console.log("[ERROR updateChart] No device data found (status: " + deviceData.status + ", title: " + deviceData.title + ")");
+				$('#chartinfo').html("[ERROR] No device data found.");
+				return false;
+			}
+			console.log("[INFO updateChart] Data retrieved, #Entries: " + deviceData.result.length + 
+				" (status: " + deviceData.status + 
+				", title: " + deviceData.title + 
+				", location: " + deviceData.location + ")");
+
+			// Add the data rows from the JSON object:
+			var locationName = deviceData.location;
+			var updatedAt = deviceData.updated;
+			// Chart data arrays
+			var dataCategories = [];
+			var dataAirPressureAtSeaLevel = [];
+			var dataAirTemperature = [];
+			var dataPrecipitationAmount = [];
+			var dataProbabilityOfPrecipitation = [];
+			var dataWindSpeed = [];
+			//time, air_pressure_at_sea_level, air_temperature, precipitation_amount, wind_speed
+			deviceData.result.forEach(function(dataPoint) {
+				dataCategories.push(dataPoint.time);
+				dataAirPressureAtSeaLevel.push(dataPoint.air_pressure_at_sea_level);
+				dataAirTemperature.push(dataPoint.air_temperature);
+				dataPrecipitationAmount.push(dataPoint.precipitation_amount);
+				dataProbabilityOfPrecipitation.push(dataPoint.probability_of_precipitation);
+				dataWindSpeed.push(dataPoint.wind_speed);
+			});				
+			// Create the series array
+			var dataSeries = [];
+			dataSeries.push({name:'Pressure', data:dataAirPressureAtSeaLevel, color:'#00FF00'});
+			dataSeries.push({name:'Temperature', data:dataAirTemperature, color:'#FFFF00'});
+			dataSeries.push({name:'Wind Speed', data:dataWindSpeed, color:'#00FFFF'});
+			dataSeries.push({name:'Precipitation', data:dataPrecipitationAmount, color:'#0000FF'});
+			dataSeries.push({name:'Precipitation Probability', data:dataProbabilityOfPrecipitation, color:'#0F0F0F'});
+			
+			// Define the chart options
+			var chartOptions = {
+				// Bottom right info last update and page version
+				credits: {
+					enabled: true,
+					position:{
+						align:'right',
+						verticalAlign:'bottom'
+					},
+					style:{
+						color:'#606060'
+					},
+					text: updatedAt + ' | ' + VERSION,
+					href: 'http://' + METNO
+				},
+				// series: dataSeries,
+				chart: {
+					zoomType: 'xy'
+				},
+				title: {
+					text: 'Weather Forecast ' + locationName,
+					align: 'left'
+				},
+				subtitle: {
+					text: 'Source: ' + METNO,
+					align: 'left'
+				},
+				xAxis: [{
+					categories: dataCategories,
+					crosshair: true,
+					tickWidth: 2,
+					labels: {
+						// step:3, 
+						rotation: -90,
+						formatter: function () {
+							var label = this.axis.defaultLabelFormatter.call(this);
+							// Show only the date DD:MM at time 00:00
+							if (label.includes('00:00') || this.isFirst){
+								// Extract DD:MM from label DD:MM HH:MM
+								return this.value.slice(0,5)
+							}
+							/* Option to show time for first & last
+							if (this.isFirst || this.isLast) {
+								return this.value.slice(0,5) + '<br/> ' + this.value.slice(6,11)
+							}
+							*/
+						}
+					}
+				}],
+				yAxis: [{ // Primary yAxis
+					labels: {
+						format: '{value}°C',
+						style: {
+							color: Highcharts.getOptions().colors[2]
+						}
+					},
+					title: {
+						text: 'Temperature',
+						style: {
+							color: Highcharts.getOptions().colors[2]
+						}
+					},
+					opposite: true
+
+				}, { // Secondary yAxis
+					gridLineWidth: 0,
+					title: {
+						text: 'Rainfall',
+						style: {
+							color: Highcharts.getOptions().colors[0]
+						}
+					},
+					labels: {
+						format: '{value} mm',
+						style: {
+							color: Highcharts.getOptions().colors[0]
+						}
+					}
+
+				}, { // Tertiary yAxis
+					gridLineWidth: 0,
+					title: {
+						text: 'Sea-Level Pressure',
+						style: {
+							color: Highcharts.getOptions().colors[1]
+						}
+					},
+					labels: {
+						format: '{value} mb',
+						style: {
+							color: Highcharts.getOptions().colors[1]
+						}
+					},
+					opposite: true
+				}],
+				tooltip: {
+					shared: true
+				},
+				legend: {
+					layout: 'vertical',
+					align: 'left',
+					x: 80,
+					verticalAlign: 'top',
+					y: 55,
+					floating: true,
+					backgroundColor:
+						Highcharts.defaultOptions.legend.backgroundColor || // theme
+						'rgba(255,255,255,0.25)'
+				},
+				series: [{
+					name: 'Rainfall',
+					type: 'column',
+					yAxis: 1,
+					data: dataPrecipitationAmount,
+					tooltip: {
+						valueSuffix: ' mm'
+					}
+
+				}, {
+					name: 'Sea-Level Pressure',
+					type: 'spline',
+					yAxis: 2,
+					data: dataAirPressureAtSeaLevel,
+					marker: {
+						enabled: false
+					},
+					dashStyle: 'shortdot',
+					tooltip: {
+						valueSuffix: ' mb'
+					}
+
+				}, {
+					name: 'Temperature',
+					type: 'spline',
+					data: dataAirTemperature,
+					tooltip: {
+						valueSuffix: ' °C'
+					}
+				}],
+				responsive: {
+					rules: [{
+						condition: {
+							maxWidth: 500
+						},
+						chartOptions: {
+							legend: {
+								floating: false,
+								layout: 'horizontal',
+								align: 'center',
+								verticalAlign: 'bottom',
+								x: 0,
+								y: 0
+							},
+							yAxis: [{
+								labels: {
+									align: 'right',
+									x: 0,
+									y: -6
+								},
+								showLastLabel: false
+							}, {
+								labels: {
+									align: 'left',
+									x: 0,
+									y: -6
+								},
+								showLastLabel: false
+							}, {
+								visible: false
+							}]
+						}
+					}]
+				},
+				exporting: {
+					menuItemDefinitions: {
+						refreshChart: {
+							onclick: function () {
+								refreshChart();
+							},
+							text: 'Refresh'
+						},
+						aboutInformation: {
+							onclick: function () {
+								showAbout();
+							},
+							text: 'About...'
+						}
+					},
+					buttons: {
+						contextButton: {
+							menuItems: ['refreshChart', 'separator', 'viewFullscreen', 'downloadPNG','downloadPDF', 'separator', 'aboutInformation']
+						}
+					}
+				}
+			};
+			// console.log("[INFO drawChart]" + chartOptions);
+			
+			// Draw the chart
+			drawChart(chartOptions);
+		});	
+	}
+
+	// Refresh the page
+	function refreshChart() {
+		// reload the page fetching a clear copy
+		window.location.reload(true);
+		console.log("[INFO refreshChart]");
+		// updateChart();
+	}
+
+	// Show a bootbox message
+	function showMessage(title, msg) {
+		bootbox.alert({
+			title: title,
+			message: msg
+		});
+	}
+
+	// Show about dialog
+	// Note: Style ag is used to ensure the href link is visible. if not used, the link text is not shown.
+	function showAbout() {
+		showMessage(
+			'About...', 
+			'<style>a:link{ color: blue; background-color: transparent;</style>' + 
+			'<p style="font-weight: bold;">Weather Forecast 9-DAYS</p>' + 
+			'<p>Source: Weather forecast delivered by the <a href="http://met.no" target="_blank">Norwegian Meteorological Institute</a>.</p>' +
+			'<p>Credits: Solution based on <a href="https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/combo-multi-axes" target="_blank">this</a> Highcharts example.</p><hr>' + 
+			'<p>Read more in the <a href="https://github.com/rwbl/domoticz-homeautomation-workbook" target="_blank">Domoticz Homeautomation Workbook</a> by rwbl.</p>');
+	}
+	
+	// Load the document and refresh every 30 minutes
+	$(document).ready(function(){
+		// Show the chart first
+		updateChart();
+		// Timer triggered chart update
+		setInterval(updateChart, 1800000);
+	});
+	
+</script>
